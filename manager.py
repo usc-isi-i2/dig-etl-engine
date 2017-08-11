@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 import subprocess
 import json
 from kafka import KafkaProducer, KafkaConsumer
@@ -85,7 +86,9 @@ def ensure_topic_exists(topic, zookeeper_server, partitions):
     )
     ret = subprocess.call(cmd, shell=True)
     if ret != 0:
-        pass
+        logger.error('ensure_topic_exists error: {}'.format(topic))
+        return
+    logger.info('ensure_topic_exists finish: {}'.format(topic))
 
 
 def seek_to_topic_end(topic, consumers, group_id=None):
@@ -94,6 +97,7 @@ def seek_to_topic_end(topic, consumers, group_id=None):
         bootstrap_servers=consumers,
         group_id=group_id)
     consumer.seek_to_end()
+    logger.info('seek_to_topic_end finish: {}'.format(topic))
 
 
 def delete_topic(topic, zookeeper_server):
@@ -107,14 +111,15 @@ def delete_topic(topic, zookeeper_server):
     )
     ret = subprocess.call(cmd, shell=True)
     if ret != 0:
-        pass
+        logger.error('delete_topic: {}'.format(topic))
+        return
+    logger.info('delete_topic finish: {}'.format(topic))
 
 
 def run_etk_processes(project_name, processes):
 
     for i in xrange(processes):
-        cmd = 'source activate etk_env; \
-        python -u {run_core_path} \
+        cmd = 'python -u {run_core_path} \
         --tag-mydig-etk-{project_name}-{idx} \
         --config "{working_dir}/etk_config.json" \
         --kafka-input-server "{input_server}" \
@@ -136,7 +141,8 @@ def run_etk_processes(project_name, processes):
         print cmd
         p = subprocess.Popen(cmd, shell=True) # async
 
-    print 'finish'
+    logger.info('run_etk_processes finish: {}'.format(project_name))
+    print 'run_etk_processes finish'
 
 
 def kill_etk_process(project_name, ignore_error=False):
@@ -144,8 +150,15 @@ def kill_etk_process(project_name, ignore_error=False):
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and ignore_error:
         print 'error'
-    print 'finish'
+    logger.info('kill_etk_process finish: {}'.format(project_name))
+    print 'kill_etk_process finish'
 
 
 if __name__ == '__main__':
-    app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
+    try:
+        app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
+    except Exception as e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        print lines
+        logger.error('\n'.join(line for line in lines))
