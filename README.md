@@ -32,8 +32,8 @@ Ideally you should have as many threads as the number of partitions for a perfec
 
 The identifier of the group this consumer belongs to. Consumer group is a single logical subscriber that happens to be made up of multiple processors. Messages in a topic will be distributed to all Logstash instances with the same group_id
 
-`topics`
-- Value type is array
+`topic_id`
+- Value type is string
 - Default value is ["logstash"]
 
 A list of topics to subscribe to, defaults to ["logstash"].
