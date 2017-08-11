@@ -5,7 +5,6 @@ config = {
         'port': 9999,
     },
 
-    # 'manager_topic': 'dig_etl_manager',
     'input_zookeeper_server': ['localhost:2181'],
     'output_zookeeper_server': ['localhost:2181'],
     'input_server': ['localhost:9092'],
