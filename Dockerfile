@@ -37,9 +37,9 @@ ENV PATH /app/miniconda/envs/etk_env/bin:$PATH
 RUN /bin/bash -c "python -m spacy download en && pip install flask"
 
 # download kafka (for command tools)
-RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka-0.11.0.0-src.tgz" && \
-    tar -xvzf kafka-0.11.0.0-src.tgz && rm kafka-0.11.0.0-src.tgz && \
-    mv kafka-0.11.0.0-src kafka
+RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz" && \
+    tar -xvzf "kafka_2.11-0.11.0.0.tgz" && rm "kafka_2.11-0.11.0.0.tgz" && \
+    mv "kafka_2.11-0.11.0.0" kafka
 
 # persistent data
 VOLUME /projects_data
