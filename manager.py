@@ -44,6 +44,12 @@ def run_etk():
     args['number_of_workers'] = args.get('number_of_workers', 4)
 
     kill_etk_process(args['project_name'], True)
+    # reset input offset in `dig` group
+    if 'input_offset' in args and args['input_offset'] == 'seek_to_end':
+        seek_to_topic_end(args['project_name'] + '_in', config['input_server'], config['input_group_id'])
+    # reset output offset in all groups
+    if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
+        seek_to_topic_end(args['project_name'] + '_out', config['output_server'])
     run_etk_processes(args['project_name'], args['number_of_workers'])
     return jsonify({}), 202
 
@@ -55,6 +61,13 @@ def kill_etk():
         return jsonify({'error_message': 'invalid project_name'}), 400
     kill_etk_process(args['project_name'], True)
     return jsonify({}), 201
+
+
+@app.route('/debug/ps', methods=['GET'])
+def debug_ps():
+    p = subprocess.Popen('ps -ef | grep -v grep | grep "tag-mydig-etk"', stdout=subprocess.PIPE, shell=True)
+    output = p.stdout.read()
+    return output, 200
 
 
 def ensure_topic_exists(topic, zookeeper_server, partitions):
@@ -75,9 +88,18 @@ def ensure_topic_exists(topic, zookeeper_server, partitions):
         pass
 
 
-def delete_topic(topic, zookeeper_server, partitions):
+def seek_to_topic_end(topic, consumers, group_id=None):
+    consumer = KafkaConsumer(
+        topic,
+        bootstrap_servers=consumers,
+        group_id=group_id)
+    consumer.seek_to_end()
+
+
+def delete_topic(topic, zookeeper_server):
     # in broker, set `delete.topic.enable` to `true`
     # kafka-topics.sh --delete --if-exists --zookeeper localhost:2181 --topic test
+    # may have side effects
     cmd = '{} --delete --if-exists --zookeeper {} --topic {}'.format(
         os.path.join(config['kafka_bin_path'], 'kafka-topics.sh'),
         ','.join(zookeeper_server),
@@ -112,7 +134,7 @@ def run_etk_processes(project_name, processes):
             idx=i
         )
         print cmd
-        subprocess.Popen(cmd, shell=True) # async
+        p = subprocess.Popen(cmd, shell=True) # async
 
     print 'finish'
 
@@ -122,7 +144,7 @@ def kill_etk_process(project_name, ignore_error=False):
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and ignore_error:
         print 'error'
-    return 'finish'
+    print 'finish'
 
 
 if __name__ == '__main__':
