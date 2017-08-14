@@ -5,17 +5,18 @@ import subprocess
 import json
 from kafka import KafkaProducer, KafkaConsumer
 import logging
+import logstash
 from config import config
 
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-logger = logging.getLogger('mydig-webservice.log')
-log_file = logging.FileHandler('log.log')
-logger.addHandler(log_file)
-# log_file.setFormatter(logging.Formatter(config['logging']['format']))
-# logger.setLevel(config['logging']['level'])
+logger = logging.getLogger(config['logstash']['name'])
+logger.addHandler(
+    logstash.LogstashHandler(
+        config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
+logger.setLevel(config['logstash']['level'])
 
 
 @app.route('/')
@@ -51,6 +52,10 @@ def run_etk():
     # reset output offset in all groups
     if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
         seek_to_topic_end(args['project_name'] + '_out', config['output_server'])
+    if 'delete_input_topic' in args and args['delete_input_topic'] is True:
+        delete_topic(args['project_name'] + '_in', config['input_zookeeper_server'])
+    if 'delete_output_topic' in args and args['delete_output_topic'] is True:
+        delete_topic(args['project_name'] + '_out', config['output_zookeeper_server'])
     run_etk_processes(args['project_name'], args['number_of_workers'])
     return jsonify({}), 202
 

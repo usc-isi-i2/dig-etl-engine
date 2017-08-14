@@ -1,3 +1,5 @@
+import logging
+
 config = {
     'debug': True,
     'server': {
@@ -5,10 +7,18 @@ config = {
         'port': 9999,
     },
 
-    'input_zookeeper_server': ['localhost:2181'],
-    'output_zookeeper_server': ['localhost:2181'],
-    'input_server': ['localhost:9092'],
-    'output_server': ['localhost:9092'],
+    'logstash': {
+        'host': 'localhost',
+        'port': 5959,
+        'level': logging.INFO,
+        'version': 1,
+        'name': 'dig_etl_engine'
+    },
+
+    'input_zookeeper_server': ['128.9.184.225:2181'],
+    'output_zookeeper_server': ['128.9.184.225:2181'],
+    'input_server': ['128.9.184.225:9092'],
+    'output_server': ['128.9.184.225:9092'],
 
     # per project topic
     'input_partitions': 4,
