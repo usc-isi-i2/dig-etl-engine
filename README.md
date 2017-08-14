@@ -39,6 +39,35 @@ The identifier of the group this consumer belongs to. Consumer group is a single
 A list of topics to subscribe to, defaults to ["logstash"].
 
 
+## Manager's endpoints
+
+- `POST /create_project`
+    ```
+    {
+        "project_name" : "new_project"
+    }
+    ```
+    
+- `POST /run_etk`
+    ```
+    {
+        "project_name" : "new_project",
+        "number_of_workers": 4, // optional
+        "input_offset": "seek_to_end", // optional
+        "output_offset": "seek_to_end", // optional
+        "delete_input_topic": true, // optional
+        "delete_output_topic": true // optional
+    }
+    ```
+    
+- `POST /kill_etk`
+    ```
+    {
+        "project_name" : "new_project"
+    }
+    ```
+
+
 ## Docker Image
 
 Build image
