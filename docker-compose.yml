@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+
+  dig_etl_engine:
+    build: .
+    volumes:
+      - ./config_docker_sample.py:/app/dig-etl-engine/config.py
+      - projects_data_volume:/projects_data
+    ports:
+      - "9999:9999"
+    networks:
+      - dig_net
+
+networks:
+  dig_net:
+    driver: bridge
+
+volumes:
+  projects_data_volume:
