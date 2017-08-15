@@ -8,7 +8,7 @@ config = {
     },
 
     'logstash': {
-        'host': 'localhost',
+        'host': 'logstash',
         'port': 5959,
         'level': logging.INFO,
         'version': 1,

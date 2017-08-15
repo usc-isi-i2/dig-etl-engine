@@ -26,12 +26,27 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "test:1:1"
     volumes:
+#      - ./kafka/config/server.properties:/opt/kafka/config/server.properties
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
     networks:
       - dig_net
+
+#  logstash:
+#    image: docker.elastic.co/logstash/logstash:5.5.1
+#    environment:
+#      PATH_CONFIG: /usr/share/logstash/pipeline
+#    volumes:
+#      - ./logstash/pipeline/logstash_sandbox.conf:/usr/share/logstash/pipeline/logstash.conf
+#      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+#      - ./logstash/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
+#    networks:
+#      - dig_net
+#    depends_on:
+#      - kafka
 
 networks:
   dig_net:
