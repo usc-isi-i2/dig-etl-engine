@@ -67,14 +67,13 @@ A list of topics to subscribe to, defaults to ["logstash"].
     }
     ```
 
-
-## Docker image
+## Docker image of DIG ETL Engine
 
 Build image
 
     docker build -t dig_etl_engine .
     
-Run instance
+Run in container
 
     docker run -d -p 9999:9999 \
     -v $(pwd)/../mydig-projects:/projects_data \
@@ -85,3 +84,11 @@ Run instance
 
 - Create `.env` file from `.env.example` and change the environment variables.
 - Run `docker-compose up`.
+
+## Docker port mapping
+
+- DIG ETL Engine: 9999 (localhost / dig_net)
+- Kafka: 9092 (localhost / dig_net)
+- Zookeeper: 2181 (localhost / dig_net)
+
+> `dig_net` is the LAN in Docker compose.
