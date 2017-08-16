@@ -6,7 +6,7 @@ services:
     build: .
     volumes:
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
-      - ./../mydig-projects:/projects_data
+      - ${DIG_PROJECTS_DIR_PATH}:/projects_data
     ports:
       - "9999:9999"
     networks:
@@ -24,9 +24,9 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_HOST_IP}
+      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_HOST_NAME}
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "test:1:1"
+      KAFKA_CREATE_TOPICS: "dig_etl_engine:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
