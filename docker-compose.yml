@@ -34,18 +34,17 @@ services:
     networks:
       - dig_net
 
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:5.5.1
-#    environment:
-#      PATH_CONFIG: /usr/share/logstash/pipeline
-#    volumes:
-#      - ./logstash/pipeline/logstash_sandbox.conf:/usr/share/logstash/pipeline/logstash.conf
-#      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
-#      - ./logstash/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
-#    networks:
-#      - dig_net
-#    depends_on:
-#      - kafka
+  logstash:
+    image: docker.elastic.co/logstash/logstash:5.5.1
+    environment:
+      PATH_CONFIG: /usr/share/logstash/pipeline
+    volumes:
+      - ./logstash/sandbox/pipeline/:/usr/share/logstash/pipeline/
+      - ./logstash/sandbox/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
+    networks:
+      - dig_net
+    depends_on:
+      - kafka
 
 networks:
   dig_net:
