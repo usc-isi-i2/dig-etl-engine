@@ -68,7 +68,7 @@ A list of topics to subscribe to, defaults to ["logstash"].
     ```
 
 
-## Docker Image
+## Docker image
 
 Build image
 
@@ -80,3 +80,8 @@ Run instance
     -v $(pwd)/../mydig-projects:/projects_data \
     -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
     dig_etl_engine
+
+## Docker compose
+
+- Create `.env` file from `.env.example` and change the environment variables.
+- Run `docker-compose up`.
