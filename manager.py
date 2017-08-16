@@ -12,11 +12,14 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+# logging
 logger = logging.getLogger(config['logstash']['name'])
+logger.setLevel(config['logstash']['level'])
 logger.addHandler(
     logstash.LogstashHandler(
         config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
-logger.setLevel(config['logstash']['level'])
+logger.addHandler(logging.FileHandler('log.log'))
+
 
 
 @app.route('/')
@@ -133,6 +136,7 @@ def run_etk_processes(project_name, processes):
         --kafka-input-session-timeout {session_timeout} \
         --kafka-output-server "{output_server}" \
         --kafka-output-topic "{project_name}_out" \
+        --indexing \
         > "{working_dir}/etk_stdout_{idx}.txt"'.format(
             run_core_path=os.path.join(config['etk_path'], 'etk/run_core.py'),
             project_name=project_name,
