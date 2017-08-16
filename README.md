@@ -90,5 +90,6 @@ Run in container
 - DIG ETL Engine: 9999 (localhost / dig_net)
 - Kafka: 9092 (localhost / dig_net)
 - Zookeeper: 2181 (localhost / dig_net)
+- ElasticSearch: 9200 (localhost / dig_net), 9300 (localhost / dig_net)
 
 > `dig_net` is the LAN in Docker compose.

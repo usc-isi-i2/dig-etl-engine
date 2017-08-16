@@ -15,9 +15,9 @@ app = Flask(__name__)
 # logging
 logger = logging.getLogger(config['logstash']['name'])
 logger.setLevel(config['logstash']['level'])
-logger.addHandler(
-    logstash.LogstashHandler(
-        config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
+# logger.addHandler(
+#     logstash.LogstashHandler(
+#         config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
 logger.addHandler(logging.FileHandler('log.log'))
 
 
