@@ -1,0 +1,36 @@
+input {
+  kafka {
+    bootstrap_servers => "127.0.0.1:9092"
+    topics => ["test"]
+    consumer_threads => "3"
+    codec => json {}
+}
+}
+
+output {
+  elasticsearch {
+    document_id  => "%{doc_id}"
+    document_type => "ads"
+    hosts => ["http://35.160.106.225:9200"]
+    index => "dig3"
+  }
+  s3 {
+     aws_credentials_file => "./aws/aws_credentials_sample.yml"
+     region => "eu-west-1"
+     bucket => "your_bucket"
+     size_file => 1000000000
+     encoding => "gzip"
+     canned_acl => "private"
+     prefix => "folder_structure/path, eg %{+yyyy.MM.dd.HH}"
+     temporary_directory => "path to directory where files are stored before uploading to s3"
+   }
+  webhdfs {
+     host => "10.1.94.54"
+     port => "14000"
+     path => "path/on/hdfs, eg%{+yyyy.MM.dd.HH}"
+     user => "worker"
+     compression => "gzip"
+     idle_flush_time => "time in seconds before file is uploaded to hdfs"
+  }
+}
+
