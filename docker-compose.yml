@@ -51,12 +51,13 @@ services:
   elasticsearch:
     image: elasticsearch:2.4.6
     volumes:
+      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"
       - "9300:9300"
-#    environment:
-#      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - dig_net
 
