@@ -45,7 +45,7 @@ RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz" && \
 RUN pip install python-logstash
 
 # persistent data
-VOLUME /projects_data
+VOLUME /shared_data
 
 EXPOSE 9999
 
@@ -55,7 +55,3 @@ WORKDIR /app/dig-etl-engine
 ADD . /app/dig-etl-engine
 
 CMD /bin/bash -c "python manager.py"
-
-# docker build -t dig_etl_engine .
-# docker run -d -p 9999:9999 -v $(pwd)/projects_data:/projects_data \
-# -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py dig_etl_engine
