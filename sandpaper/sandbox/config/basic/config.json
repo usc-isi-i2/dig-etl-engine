@@ -1,0 +1,85 @@
+{
+  "fine": {},
+  "coarse": {
+    "preprocess": {
+      "components": [
+        {
+          "type": "ConstraintTypeMapper",
+          "name": "PredicateDictConstraintTypeMapper",
+          "predicate_range_mappings": "config/basic/predicate_range_mappings.json"
+        },
+        {
+          "type": "ConstraintConsistency",
+          "name": "ConstraintTypeTransformations",
+          "constraint_type_transformations": "config/basic/constraint_type_transformations.json"
+        },
+        {
+          "type": "ConstraintExpansion",
+          "name": "DictConstraintExpander",
+          "dict_constraint_mappings": "config/basic/dict_constraint_mappings.json"
+        }
+      ]
+    },
+    "parameterize": {
+      "components": [
+        {
+          "zone_count": 1,
+          "type": "ZoneHierarchy",
+          "name": "MultipleZoneHierarchy"
+        },
+        {
+          "type": "ClauseCombination",
+          "name": "NoClauseCombination"
+        },
+        {
+          "type": "FieldCombination",
+          "name": "AtLeastOneFieldCombination"
+        }
+      ]
+    },
+    "execute": {
+      "components": [
+        {
+          "host": "elasticsearch",
+          "type": "ExecuteQueryComponent",
+          "name": "ExecuteElasticsearchQuery",
+          "port": 9200
+        }
+      ]
+    },
+    "generate": {
+      "components": [
+        {
+          "type": "TypeFieldMapping",
+          "name": "TypeFieldMapping",
+          "type_field_mappings": "config/basic/type_field_mappings.json"
+        },
+        {
+          "zone_field_mappings": "config/basic/zone_field_mappings.json",
+          "type": "ZoneFieldMapping",
+          "name": "ZoneFieldMapping"
+        },
+        {
+          "type": "FieldWeightMapping",
+          "name": "FieldWeightMapping",
+          "field_weight_mappings": "config/basic/field_weights.json"
+        },
+        {
+          "type_doc_type_mappings": "config/basic/type_doc_type_mappings.json",
+          "type": "TypeDocTypeMapping",
+          "name": "TypeDocTypeMapping"
+        },
+        {
+          "type_index_mappings": "config/basic/type_index_mappings.json",
+          "type": "TypeIndexMapping",
+          "name": "TypeIndexMapping"
+        },
+        {
+          "elasticsearch_compiler_options": "config/basic/elasticsearch_compiler_options.json",
+          "type": "QueryCompiler",
+          "name": "ElasticsearchQueryCompiler"
+        }
+      ]
+    }
+  }
+}

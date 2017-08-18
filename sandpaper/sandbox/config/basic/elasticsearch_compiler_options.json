@@ -1,0 +1,40 @@
+{
+  "boost_musts": true,
+  "default_source_fields": [
+    "doc_id",
+    "tld",
+    "url",
+    "fields.*"
+  ],
+  "highlight": {
+    "fields": {
+      "fields.*": {
+        "number_of_fragments": 0
+      },
+      "fields.description.strict.name": {
+        "number_of_fragments": 0
+      },
+      "fields.description.relaxed.name": {
+        "number_of_fragments": 0
+      },
+      "fields.description.strict.search": {
+        "number_of_fragments": 0
+      },
+      "fields.description.relaxed.search": {
+        "number_of_fragments": 0
+      },
+      "fields.title.strict.name": {
+        "number_of_fragments": 0
+      },
+      "fields.title.relaxed.name": {
+        "number_of_fragments": 0
+      },
+      "fields.title.strict.search": {
+        "number_of_fragments": 0
+      },
+      "fields.title.relaxed.search": {
+        "number_of_fragments": 0
+      }
+    }
+  }
+}

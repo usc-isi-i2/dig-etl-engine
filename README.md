@@ -83,7 +83,7 @@ Run in container
 ## Docker compose
 
 - Create `.env` file from `.env.example` and change the environment variables.
-- Run `docker-compose up`.
+- Run `docker-compose up` for sandbox version, run `docker-compose -f docker-compose-production.yml up` for production version.
 
 ## Docker port mapping
 
@@ -91,5 +91,6 @@ Run in container
 - Kafka: 9092 (localhost / dig_net)
 - Zookeeper: 2181 (localhost / dig_net)
 - ElasticSearch: 9200 (localhost / dig_net), 9300 (localhost / dig_net)
+- Sandpaper: 9876 (localhost / dig_net)
 
 > `dig_net` is the LAN in Docker compose.

@@ -1,0 +1,142 @@
+{
+  "tld":  { 
+    "*": 100    
+  },
+  "fields": {
+    "description": {
+      "*": 1,
+      "relaxed": {
+        "*": 0.1
+      }
+    },
+    "phone":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 10
+      }
+    },
+    "email":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 10
+      }
+    },
+    "city":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 5
+      }
+    },
+    "state":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 10
+      }
+    },
+    "title":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 2
+      }
+    },
+    "risk":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 5
+      }
+    },
+    "service":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 4
+      }
+    },
+    "price":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 1
+      }
+    },
+    "name":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 5
+      }
+    },
+    "gender":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 5
+      }
+    },
+    "ethnicity":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 5
+      }
+    },
+    "eye":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 2
+      }
+    },
+    "hair":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 2
+      }
+    },
+    "review_id":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 10
+      }
+    },
+    "social_media_id":  { 
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 10
+      }
+    },
+    "*": {
+      "relaxed": {
+        "*": 0.1
+      },
+      "strict": {
+        "*": 3
+      },
+      "*": 1
+    }
+  }
+}

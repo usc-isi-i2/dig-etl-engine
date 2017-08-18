@@ -61,6 +61,27 @@ services:
     networks:
       - dig_net
 
+  sandpaper:
+    image: digsandpaper/digsandpaper
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./sandpaper/sandbox/config:/etc/sandpaper/sandbox/config
+    links:
+      - elasticsearch
+    entrypoint:
+      - bin/start.sh
+      - --host
+      - 0.0.0.0
+      - --endpoint
+      - http://elasticsearch:9200
+      - --config
+      - config/sandpaper.json
+    networks:
+      - dig_net
+    depends_on:
+      - elasticsearch
+
 networks:
   dig_net:
     driver: bridge

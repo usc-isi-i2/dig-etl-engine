@@ -1,0 +1,40 @@
+{
+  "convert_text_filters_to_shoulds": true,
+  "boost_shoulds": true,
+  "filter_for_fields_of_unbound_variables": false,
+  "default_source_fields": [
+    "doc_id",
+    "tld",
+    "url",
+    "knowledge_graph.*",
+    "content_extraction.content_strict.text",
+    "content_extraction.title.text",
+    "objects.*"
+  ],
+  "excluded_source_fields": [
+    "content_extraction.content_relaxed.text",
+    "raw_content",
+    "*.provenance.extracted_value",
+    "*.provenance.confidence.extraction",
+    "*.provenance.source.context.end",
+    "*.provenance.source.context.start",
+    "*.provenance.source.context.tokens_left",
+    "*.provenance.source.context.tokens_right",
+    "*.provenance.source.context.input",
+    "*.confidence",
+    "objects.response_headers.*"
+  ],
+  "highlight": {
+    "fields": {
+      "indexed.*": {
+        "number_of_fragments": 0
+      },
+      "content_extraction.content_strict.text": {
+        "number_of_fragments": 0
+      },
+      "content_extraction.title.text": {
+        "number_of_fragments": 0
+      }
+    }
+  }
+}

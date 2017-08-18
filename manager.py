@@ -138,7 +138,7 @@ def run_etk_processes(project_name, processes):
         --kafka-output-topic "{project_name}_out" \
         --indexing \
         > "{working_dir}/etk_stdout_{idx}.txt"'.format(
-            run_core_path=os.path.join(config['etk_path'], 'etk/run_core.py'),
+            run_core_path=os.path.join(config['etk_path'], 'etk/run_core_kafka.py'),
             project_name=project_name,
             working_dir=os.path.join(config['projects_path'], project_name, 'working_dir'),
             session_timeout=config['input_session_timeout'],

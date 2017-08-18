@@ -1,0 +1,210 @@
+{
+  "owl:Thing": [
+    "fields.title.strict.name",
+    "fields.title.relaxed.name",
+    "fields.title.strict.search",
+    "fields.title.relaxed.search",
+    "fields.description.relaxed.name",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "Address":[
+    "fields.address.strict.name",
+    "fields.address.relaxed.name",
+    "fields.address.strict.search",
+    "fields.address.relaxed.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "Age": [
+    "fields.age.strict.name",
+    "fields.age.relaxed.name",
+    "fields.age.strict.search",
+    "fields.age.relaxed.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search"
+  ],
+  "City": [
+    "fields.city.strict.name",
+    "fields.city.relaxed.name",
+    "fields.city.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Country": [
+    "fields.country.strict.name",
+    "fields.country.relaxed.name",
+    "fields.country.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Description": [
+    "fields.title.strict.name",
+    "fields.title.relaxed.name",
+    "fields.title.strict.search",
+    "fields.title.relaxed.search",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "Email": [
+    "fields.email.strict.name",
+    "fields.email.relaxed.name",
+    "fields.email.strict.search",
+    "fields.email.strict.key",
+    "fields.email.relaxed.key",
+    "fields.title.strict.name",
+    "fields.title.strict.search"
+  ],
+  "Ethnicity": [
+    "fields.ethnicity.strict.name",
+    "fields.ethnicity.relaxed.name",
+    "fields.ethnicity.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "EyeColor": [
+    "fields.eye_color.strict.name",
+    "fields.eye_color.relaxed.name",
+    "fields.eye_color.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Gender":[
+    "fields.gender.strict.name",
+    "fields.gender.relaxed.name",
+    "fields.gender.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "HairColor": [
+    "fields.hair_color.strict.name",
+    "fields.hair_color.relaxed.name",
+    "fields.hair_color.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Height": [
+    "fields.height.strict.name",
+    "fields.height.relaxed.name",
+    "fields.height.strict.search",
+    "fields.height.relaxed.search"
+  ],
+  "Location": [
+    "fields.location.strict.name",
+    "fields.location.relaxed.name",
+    "fields.location.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Name": [
+    "fields.name.strict.name",
+    "fields.name.relaxed.name",
+    "fields.name.strict.search",
+    "fields.name.relaxed.search",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "Phone": [
+    "fields.phone.strict.name",
+    "fields.phone.relaxed.name",
+    "fields.phone.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "PostingDate": [
+    "fields.posting_date.strict.key",
+    "fields.posting_date.relaxed.key"
+  ],
+  "Price": [
+    "fields.price.strict.name",
+    "fields.price.relaxed.name",
+    "fields.price.strict.search",
+    "fields.price.relaxed.search"
+  ],
+  "ReviewId":[
+    "fields.review_id.strict.name",
+    "fields.review_id.relaxed.name",
+    "fields.review_id.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Risk":[
+    "fields.risk.strict.name",
+    "fields.risk.strict.search"
+  ],
+  "Service":[
+    "fields.service.strict.name",
+    "fields.service.relaxed.name",
+    "fields.service.strict.search",
+    "fields.service.relaxed.search",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "SocialMediaId":[
+    "fields.social_media_id.strict.name",
+    "fields.social_media_id.relaxed.name",
+    "fields.social_media_id.strict.search",
+    "fields.description.strict.name",
+    "fields.description.relaxed.name",
+    "fields.description.strict.search",
+    "fields.description.relaxed.search"
+  ],
+  "State": [
+    "fields.state.strict.name",
+    "fields.state.relaxed.name",
+    "fields.state.strict.search",
+    "fields.title.strict.name",
+    "fields.title.strict.search",
+    "fields.description.strict.name",
+    "fields.description.strict.search"
+  ],
+  "Title": [
+    "fields.title.strict.name",
+    "fields.title.relaxed.name",
+    "fields.title.strict.search",
+    "fields.title.relaxed.search"
+  ],
+  "Weight": [
+    "fields.weight.strict.name",
+    "fields.weight.relaxed.name",
+    "fields.weight.strict.search",
+    "fields.weight.relaxed.search"
+  ],
+  "TopLevelDomain": [
+    "tld.raw",
+    "tld"
+  ],
+  "URL": [
+    "url",
+    "url.raw",
+    "tld"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "owl:Thing": [
+    "content_extraction.content_strict.text"
+  ],
+  "Address": [
+    "indexed.address.high_confidence_keys"
+  ],
+  "Age": [
+    "indexed.age.high_confidence_keys"
+  ],
+  "City":[
+    "indexed.city.high_confidence_keys"
+  ],
+  "Country":[
+    "indexed.country.high_confidence_keys"
+  ],
+  "Email": [
+    "indexed.email.high_confidence_keys"
+  ],
+  "Ethnicity":[
+    "indexed.ethnicity.high_confidence_keys"
+  ],
+  "EyeColor":[
+    "indexed.eye_color.high_confidence_keys"
+  ],
+  "Gender": [
+    "indexed.gender.high_confidence_keys"
+  ],
+  "HairColor":[
+    "indexed.hair_color.high_confidence_keys"
+  ],
+  "Height": [
+    "indexed.height.high_confidence_keys"
+  ],
+  "Name": [
+    "indexed.name.high_confidence_keys"
+  ],
+  "Phone": [
+    "indexed.phone.high_confidence_keys"
+  ],
+  "PostingDate": [
+    "indexed.posting_date.high_confidence_keys"
+  ],
+  "Price": [
+    "indexed.price.high_confidence_keys"
+  ],
+  "ReviewId": [
+    "indexed.review_id.high_confidence_keys"
+  ],
+  "Service": [
+    "indexed.service.high_confidence_keys"
+  ],
+  "SocialMediaId":[
+    "indexed.social_media_id.high_confidence_keys"
+  ],
+  "State": [
+    "indexed.state.high_confidence_keys"
+  ],
+  "Weight": [
+    "indexed.weight.high_confidence_keys"
+  ],
+  "TopLevelDomain": [
+    "tld.raw"
+  ],
+  "URL": [
+    "url.raw"
+  ],
+  "Website": [
+    "indexed.website.high_confidence_keys"
+  ]
+}

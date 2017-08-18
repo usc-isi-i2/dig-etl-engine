@@ -1,0 +1,62 @@
+{
+  "owl:Thing": [
+    "fields.title.strict.name",
+    "fields.content.strict.name",
+    "fields.content.strict.name.raw"
+  ],
+  "Content": [
+    "fields.content.strict.name",
+    "fields.content.strict.key",
+    "fields.content.relaxed.name",
+    "fields.content.relaxed.key"
+  ],
+  "Location": [
+    "fields.location.strict.name",
+    "fields.location.relaxed.name",
+    "fields.location.strict.key",
+    "fields.title.strict.name",
+    "fields.content.strict.name"
+  ],
+  "Money":[
+    "fields.money.strict.name",
+    "fields.money.relaxed.name",
+    "fields.money.strict.key",
+    "fields.money.relaxed.key"
+  ],
+  "Org":[
+    "fields.org.strict.name",
+    "fields.org.relaxed.name",
+    "fields.prg.strict.key",
+    "fields.org.relaxed.key"
+  ],
+  "Person": [
+    "fields.person.strict.name",
+    "fields.person.strict.key",
+    "fields.person.restricted.name",
+    "fields.person.restricted.key"
+  ],
+  "PostingDate": [
+    "fields.posting_date.strict.key"
+  ],
+  "Ticker": [
+    "fields.ticker.strict.name",
+    "fields.ticker.strict.key",
+    "fields.ticker.relaxed.name",
+    "fields.ticker.relaxed.key"
+  ],
+  "Title": [
+    "fields.title.strict.name",
+    "fields.title.relaxed.name",
+    "fields.title.strict.key",
+    "fields.title.relaxed.key"
+  ],
+  "TopLevelDomain": [
+    "tld.raw",
+    "tld"
+  ],
+  "URL": [
+    "url",
+    "url.raw",
+    "tld"
+  ]
+}

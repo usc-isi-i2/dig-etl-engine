@@ -1,0 +1,1160 @@
+{
+  "fine": {},
+  "coarse": {
+    "preprocess": {
+      "components": [
+        {
+          "type": "ConstraintTypeMapper",
+          "name": "PredicateDictConstraintTypeMapper",
+          "predicate_range_mappings": {
+            "address": "Address",
+            "age": "Age",
+            "city": "City",
+            "content": "Content",
+            "country": "Country",
+            "email": "Email",
+            "ethnicity": "Ethnicity",
+            "eye_color": "EyeColor",
+            "gender": "Gender",
+            "hair_color": "HairColor",
+            "height": "Height",
+            "location": "Location",
+            "name": "Name",
+            "phone": "Phone",
+            "post_date": "PostingDate",
+            "posting_date": "PostingDate",
+            "price": "Price",
+            "review_id": "ReviewId",
+            "review_site_id": "ReviewId",
+            "service": "Service",
+            "services": "Service",
+            "social_media_id": "SocialMediaId",
+            "state": "State",
+            "street_address": "Address",
+            "title": "Title",
+            "weight": "Weight",
+            "tld": "TopLevelDomain",
+            "url": "URL",
+            "website": "Website"
+          }
+        },
+        {
+          "type": "ConstraintConsistency",
+          "name": "ConstraintTypeTransformations",
+          "constraint_type_transformations": {
+            "Title": "' '.join([v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for']])",
+            "Description": "' '.join(v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for'])",
+            "Content": "' '.join(v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for'])"
+          }
+        },
+        {
+          "type": "ConstraintExpansion",
+          "name": "HeightConstraintExpander"
+        },
+        {
+          "type": "ConstraintExpansion",
+          "name": "PhoneConstraintExpander"
+        }
+      ]
+    },
+    "parameterize": {
+      "components": [
+        {
+          "type": "ClauseCombination",
+          "name": "NoClauseCombination"
+        },
+        {
+          "type": "FieldCombination",
+          "name": "AtLeastOneFieldCombination"
+        }
+      ]
+    },
+    "execute": {
+      "components": [
+        {
+          "host": "localhost",
+          "type": "ExecuteQueryComponent",
+          "name": "ExecuteElasticsearchQuery",
+          "port": 9200,
+          "timeout": 180
+        }
+      ]
+    },
+    "generate": {
+      "components": [
+        {
+          "type": "TypeFieldMapping",
+          "name": "TypeFieldMapping",
+          "type_field_mappings": {
+            "owl:Thing": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Ad": [
+              "doc_id"
+            ],
+            "Address": [
+              "indexed.address.gurobi.inferlink_description.value",
+              "indexed.address.gurobi.content_strict.value",
+              "indexed.address.gurobi.title.value",
+              "indexed.address.gurobi.other_segment.value",
+              "indexed.address.extract_from_landmark.inferlink_description.value",
+              "indexed.address.extract_from_landmark.content_strict.value",
+              "indexed.address.extract_from_landmark.title.value",
+              "indexed.address.extract_from_landmark.other_segment.value",
+              "indexed.address.other_method.inferlink_description.value",
+              "indexed.address.other_method.content_strict.value",
+              "indexed.address.other_method.title.value",
+              "indexed.address.other_method.other_segment.value",
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "City": [
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Country": [
+              "indexed.country.gurobi.inferlink_description.value",
+              "indexed.country.gurobi.content_strict.value",
+              "indexed.country.gurobi.title.value",
+              "indexed.country.gurobi.other_segment.value",
+              "indexed.country.extract_from_landmark.inferlink_description.value",
+              "indexed.country.extract_from_landmark.content_strict.value",
+              "indexed.country.extract_from_landmark.title.value",
+              "indexed.country.extract_from_landmark.other_segment.value",
+              "indexed.country.other_method.inferlink_description.value",
+              "indexed.country.other_method.content_strict.value",
+              "indexed.country.other_method.title.value",
+              "indexed.country.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Age": [
+              "indexed.age.gurobi.inferlink_description.value",
+              "indexed.age.gurobi.content_strict.value",
+              "indexed.age.gurobi.title.value",
+              "indexed.age.gurobi.other_segment.value",
+              "indexed.age.extract_from_landmark.inferlink_description.value",
+              "indexed.age.extract_from_landmark.content_strict.value",
+              "indexed.age.extract_from_landmark.title.value",
+              "indexed.age.extract_from_landmark.other_segment.value",
+              "indexed.age.other_method.inferlink_description.value",
+              "indexed.age.other_method.content_strict.value",
+              "indexed.age.other_method.title.value",
+              "indexed.age.other_method.other_segment.value",
+              "content_extraction.title.text"
+            ],
+            "Content": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Email": [
+              "indexed.email.gurobi.inferlink_description.value",
+              "indexed.email.gurobi.content_strict.value",
+              "indexed.email.gurobi.title.value",
+              "indexed.email.gurobi.other_segment.value",
+              "indexed.email.extract_from_landmark.inferlink_description.value",
+              "indexed.email.extract_from_landmark.inferlink_description.key",
+              "indexed.email.extract_from_landmark.content_strict.value",
+              "indexed.email.extract_from_landmark.content_strict.key",
+              "indexed.email.extract_from_landmark.title.value",
+              "indexed.email.extract_from_landmark.title.key",
+              "indexed.email.extract_from_landmark.other_segment.value",
+              "indexed.email.extract_from_landmark.other_segment.key",
+              "indexed.email.other_method.inferlink_description.value",
+              "indexed.email.other_method.inferlink_description.key",
+              "indexed.email.other_method.content_strict.value",
+              "indexed.email.other_method.content_strict.key",
+              "indexed.email.other_method.title.value",
+              "indexed.email.other_method.title.key",
+              "indexed.email.other_method.other_segment.value",
+              "indexed.email.other_method.other_segment.key",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Ethnicity": [
+              "indexed.ethnicity.gurobi.inferlink_description.value",
+              "indexed.ethnicity.gurobi.content_strict.value",
+              "indexed.ethnicity.gurobi.title.value",
+              "indexed.ethnicity.gurobi.other_segment.value",
+              "indexed.ethnicity.extract_from_landmark.inferlink_description.value",
+              "indexed.ethnicity.extract_from_landmark.content_strict.value",
+              "indexed.ethnicity.extract_from_landmark.title.value",
+              "indexed.ethnicity.extract_from_landmark.other_segment.value",
+              "indexed.ethnicity.other_method.inferlink_description.value",
+              "indexed.ethnicity.other_method.content_strict.value",
+              "indexed.ethnicity.other_method.title.value",
+              "indexed.ethnicity.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "EyeColor": [
+              "indexed.eye_color.gurobi.inferlink_description.value",
+              "indexed.eye_color.gurobi.content_strict.value",
+              "indexed.eye_color.gurobi.title.value",
+              "indexed.eye_color.gurobi.other_segment.value",
+              "indexed.eye_color.extract_from_landmark.inferlink_description.value",
+              "indexed.eye_color.extract_from_landmark.content_strict.value",
+              "indexed.eye_color.extract_from_landmark.title.value",
+              "indexed.eye_color.extract_from_landmark.other_segment.value",
+              "indexed.eye_color.other_method.inferlink_description.value",
+              "indexed.eye_color.other_method.content_strict.value",
+              "indexed.eye_color.other_method.title.value",
+              "indexed.eye_color.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Gender": [
+              "indexed.gender.gurobi.inferlink_description.value",
+              "indexed.gender.gurobi.content_strict.value",
+              "indexed.gender.gurobi.title.value",
+              "indexed.gender.gurobi.other_segment.value",
+              "indexed.gender.extract_from_landmark.inferlink_description.value",
+              "indexed.gender.extract_from_landmark.content_strict.value",
+              "indexed.gender.extract_from_landmark.title.value",
+              "indexed.gender.extract_from_landmark.other_segment.value",
+              "indexed.gender.other_method.inferlink_description.value",
+              "indexed.gender.other_method.content_strict.value",
+              "indexed.gender.other_method.title.value",
+              "indexed.gender.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "HairColor": [
+              "indexed.hair_color.gurobi.inferlink_description.value",
+              "indexed.hair_color.gurobi.content_strict.value",
+              "indexed.hair_color.gurobi.title.value",
+              "indexed.hair_color.gurobi.other_segment.value",
+              "indexed.hair_color.extract_from_landmark.inferlink_description.value",
+              "indexed.hair_color.extract_from_landmark.content_strict.value",
+              "indexed.hair_color.extract_from_landmark.title.value",
+              "indexed.hair_color.extract_from_landmark.other_segment.value",
+              "indexed.hair_color.other_method.inferlink_description.value",
+              "indexed.hair_color.other_method.content_strict.value",
+              "indexed.hair_color.other_method.title.value",
+              "indexed.hair_color.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Height": [
+              "indexed.height.gurobi.inferlink_description.value",
+              "indexed.height.gurobi.content_strict.value",
+              "indexed.height.gurobi.title.value",
+              "indexed.height.gurobi.other_segment.value",
+              "indexed.height.extract_from_landmark.inferlink_description.value",
+              "indexed.height.extract_from_landmark.content_strict.value",
+              "indexed.height.extract_from_landmark.title.value",
+              "indexed.height.extract_from_landmark.other_segment.value",
+              "indexed.height.other_method.inferlink_description.value",
+              "indexed.height.other_method.content_strict.value",
+              "indexed.height.other_method.title.value",
+              "indexed.height.other_method.other_segment.value"
+            ],
+            "Location": [
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "indexed.country.gurobi.inferlink_description.value",
+              "indexed.country.gurobi.content_strict.value",
+              "indexed.country.gurobi.title.value",
+              "indexed.country.gurobi.other_segment.value",
+              "indexed.country.extract_from_landmark.inferlink_description.value",
+              "indexed.country.extract_from_landmark.content_strict.value",
+              "indexed.country.extract_from_landmark.title.value",
+              "indexed.country.extract_from_landmark.other_segment.value",
+              "indexed.country.other_method.inferlink_description.value",
+              "indexed.country.other_method.content_strict.value",
+              "indexed.country.other_method.title.value",
+              "indexed.country.other_method.other_segment.value",
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Name": [
+              "indexed.name.gurobi.inferlink_description.value",
+              "indexed.name.gurobi.content_strict.value",
+              "indexed.name.gurobi.title.value",
+              "indexed.name.gurobi.other_segment.value",
+              "indexed.name.extract_from_landmark.inferlink_description.value",
+              "indexed.name.extract_from_landmark.content_strict.value",
+              "indexed.name.extract_from_landmark.title.value",
+              "indexed.name.extract_from_landmark.other_segment.value",
+              "indexed.name.other_method.inferlink_description.value",
+              "indexed.name.other_method.content_strict.value",
+              "indexed.name.other_method.title.value",
+              "indexed.name.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Phone": [
+              "indexed.phone.gurobi.inferlink_description.value",
+              "indexed.phone.gurobi.content_strict.value",
+              "indexed.phone.gurobi.title.value",
+              "indexed.phone.gurobi.other_segment.value",
+              "indexed.phone.extract_from_landmark.inferlink_description.value",
+              "indexed.phone.extract_from_landmark.content_strict.value",
+              "indexed.phone.extract_from_landmark.title.value",
+              "indexed.phone.extract_from_landmark.other_segment.value",
+              "indexed.phone.other_method.inferlink_description.value",
+              "indexed.phone.other_method.content_strict.value",
+              "indexed.phone.other_method.title.value",
+              "indexed.phone.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "PostingDate": [
+              "indexed.posting_date.gurobi.inferlink_description.key",
+              "indexed.posting_date.gurobi.content_strict.key",
+              "indexed.posting_date.gurobi.title.key",
+              "indexed.posting_date.extract_from_landmark.inferlink_description.key",
+              "indexed.posting_date.extract_from_landmark.content_strict.key",
+              "indexed.posting_date.extract_from_landmark.title.key",
+              "indexed.posting_date.other_method.inferlink_description.key",
+              "indexed.posting_date.other_method.content_strict.key",
+              "indexed.posting_date.other_method.title.key"
+            ],
+            "Price": [
+              "indexed.price.gurobi.inferlink_description.value",
+              "indexed.price.gurobi.content_strict.value",
+              "indexed.price.gurobi.title.value",
+              "indexed.price.gurobi.other_segment.value",
+              "indexed.price.extract_from_landmark.inferlink_description.value",
+              "indexed.price.extract_from_landmark.content_strict.value",
+              "indexed.price.extract_from_landmark.title.value",
+              "indexed.price.extract_from_landmark.other_segment.value",
+              "indexed.price.other_method.inferlink_description.value",
+              "indexed.price.other_method.content_strict.value",
+              "indexed.price.other_method.title.value",
+              "indexed.price.other_method.other_segment.value"
+            ],
+            "ReviewId": [
+              "indexed.review_id.gurobi.inferlink_description.value",
+              "indexed.review_id.gurobi.content_strict.value",
+              "indexed.review_id.gurobi.title.value",
+              "indexed.review_id.gurobi.other_segment.value",
+              "indexed.review_id.extract_from_landmark.inferlink_description.value",
+              "indexed.review_id.extract_from_landmark.content_strict.value",
+              "indexed.review_id.extract_from_landmark.title.value",
+              "indexed.review_id.extract_from_landmark.other_segment.value",
+              "indexed.review_id.other_method.inferlink_description.value",
+              "indexed.review_id.other_method.content_strict.value",
+              "indexed.review_id.other_method.title.value",
+              "indexed.review_id.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Service": [
+              "indexed.service.gurobi.inferlink_description.value",
+              "indexed.service.gurobi.content_strict.value",
+              "indexed.service.gurobi.title.value",
+              "indexed.service.gurobi.other_segment.value",
+              "indexed.service.extract_from_landmark.inferlink_description.value",
+              "indexed.service.extract_from_landmark.content_strict.value",
+              "indexed.service.extract_from_landmark.title.value",
+              "indexed.service.extract_from_landmark.other_segment.value",
+              "indexed.service.other_method.inferlink_description.value",
+              "indexed.service.other_method.content_strict.value",
+              "indexed.service.other_method.title.value",
+              "indexed.service.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "SocialMediaId": [
+              "indexed.social_media_id.gurobi.inferlink_description.value",
+              "indexed.social_media_id.gurobi.content_strict.value",
+              "indexed.social_media_id.gurobi.title.value",
+              "indexed.social_media_id.gurobi.other_segment.value",
+              "indexed.social_media_id.extract_from_landmark.inferlink_description.value",
+              "indexed.social_media_id.extract_from_landmark.content_strict.value",
+              "indexed.social_media_id.extract_from_landmark.title.value",
+              "indexed.social_media_id.extract_from_landmark.other_segment.value",
+              "indexed.social_media_id.other_method.inferlink_description.value",
+              "indexed.social_media_id.other_method.content_strict.value",
+              "indexed.social_media_id.other_method.title.value",
+              "indexed.social_media_id.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "State": [
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Title": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Weight": [
+              "indexed.weight.gurobi.inferlink_description.value",
+              "indexed.weight.gurobi.content_strict.value",
+              "indexed.weight.gurobi.title.value",
+              "indexed.weight.gurobi.other_segment.value",
+              "indexed.weight.extract_from_landmark.inferlink_description.value",
+              "indexed.weight.extract_from_landmark.content_strict.value",
+              "indexed.weight.extract_from_landmark.title.value",
+              "indexed.weight.extract_from_landmark.other_segment.value",
+              "indexed.weight.other_method.inferlink_description.value",
+              "indexed.weight.other_method.content_strict.value",
+              "indexed.weight.other_method.title.value",
+              "indexed.weight.other_method.other_segment.value"
+            ],
+            "TopLevelDomain": [
+              "tld.raw",
+              "tld"
+            ],
+            "URL": [
+              "url",
+              "url.raw",
+              "tld"
+            ],
+            "Website": [
+              "indexed.website.gurobi.inferlink_description.value",
+              "indexed.website.gurobi.content_strict.value",
+              "indexed.website.gurobi.title.value",
+              "indexed.website.gurobi.other_segment.value",
+              "indexed.website.extract_from_landmark.inferlink_description.value",
+              "indexed.website.extract_from_landmark.inferlink_description.key",
+              "indexed.website.extract_from_landmark.content_strict.value",
+              "indexed.website.extract_from_landmark.content_strict.key",
+              "indexed.website.extract_from_landmark.title.value",
+              "indexed.website.extract_from_landmark.title.key",
+              "indexed.website.extract_from_landmark.other_segment.value",
+              "indexed.website.extract_from_landmark.other_segment.key",
+              "indexed.website.other_method.inferlink_description.value",
+              "indexed.website.other_method.inferlink_description.key",
+              "indexed.website.other_method.content_strict.value",
+              "indexed.website.other_method.content_strict.key",
+              "indexed.website.other_method.title.value",
+              "indexed.website.other_method.title.key",
+              "indexed.website.other_method.other_segment.value",
+              "indexed.website.other_method.other_segment.key",
+              "content_extraction.title.text"
+            ]
+          }
+        },
+        {
+          "type": "TypeFieldMapping",
+          "name": "TypeFieldGroupByMapping",
+          "type_field_mappings": {
+            "owl:Thing": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Ad": [
+              "doc_id"
+            ],
+            "Address": [
+              "indexed.address.gurobi.inferlink_description.value",
+              "indexed.address.gurobi.content_strict.value",
+              "indexed.address.gurobi.title.value",
+              "indexed.address.gurobi.other_segment.value",
+              "indexed.address.extract_from_landmark.inferlink_description.value",
+              "indexed.address.extract_from_landmark.content_strict.value",
+              "indexed.address.extract_from_landmark.title.value",
+              "indexed.address.extract_from_landmark.other_segment.value",
+              "indexed.address.other_method.inferlink_description.value",
+              "indexed.address.other_method.content_strict.value",
+              "indexed.address.other_method.title.value",
+              "indexed.address.other_method.other_segment.value",
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "City": [
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Country": [
+              "indexed.country.gurobi.inferlink_description.value",
+              "indexed.country.gurobi.content_strict.value",
+              "indexed.country.gurobi.title.value",
+              "indexed.country.gurobi.other_segment.value",
+              "indexed.country.extract_from_landmark.inferlink_description.value",
+              "indexed.country.extract_from_landmark.content_strict.value",
+              "indexed.country.extract_from_landmark.title.value",
+              "indexed.country.extract_from_landmark.other_segment.value",
+              "indexed.country.other_method.inferlink_description.value",
+              "indexed.country.other_method.content_strict.value",
+              "indexed.country.other_method.title.value",
+              "indexed.country.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Age": [
+              "indexed.age.gurobi.inferlink_description.value",
+              "indexed.age.gurobi.content_strict.value",
+              "indexed.age.gurobi.title.value",
+              "indexed.age.gurobi.other_segment.value",
+              "indexed.age.extract_from_landmark.inferlink_description.value",
+              "indexed.age.extract_from_landmark.content_strict.value",
+              "indexed.age.extract_from_landmark.title.value",
+              "indexed.age.extract_from_landmark.other_segment.value",
+              "indexed.age.other_method.inferlink_description.value",
+              "indexed.age.other_method.content_strict.value",
+              "indexed.age.other_method.title.value",
+              "indexed.age.other_method.other_segment.value",
+              "content_extraction.title.text"
+            ],
+            "Content": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Email": [
+              "indexed.email.gurobi.inferlink_description.value",
+              "indexed.email.gurobi.content_strict.value",
+              "indexed.email.gurobi.title.value",
+              "indexed.email.gurobi.other_segment.value",
+              "indexed.email.extract_from_landmark.inferlink_description.value",
+              "indexed.email.extract_from_landmark.inferlink_description.key",
+              "indexed.email.extract_from_landmark.content_strict.value",
+              "indexed.email.extract_from_landmark.content_strict.key",
+              "indexed.email.extract_from_landmark.title.value",
+              "indexed.email.extract_from_landmark.title.key",
+              "indexed.email.extract_from_landmark.other_segment.value",
+              "indexed.email.extract_from_landmark.other_segment.key",
+              "indexed.email.other_method.inferlink_description.value",
+              "indexed.email.other_method.inferlink_description.key",
+              "indexed.email.other_method.content_strict.value",
+              "indexed.email.other_method.content_strict.key",
+              "indexed.email.other_method.title.value",
+              "indexed.email.other_method.title.key",
+              "indexed.email.other_method.other_segment.value",
+              "indexed.email.other_method.other_segment.key",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "Ethnicity": [
+              "indexed.ethnicity.gurobi.inferlink_description.value",
+              "indexed.ethnicity.gurobi.content_strict.value",
+              "indexed.ethnicity.gurobi.title.value",
+              "indexed.ethnicity.gurobi.other_segment.value",
+              "indexed.ethnicity.extract_from_landmark.inferlink_description.value",
+              "indexed.ethnicity.extract_from_landmark.content_strict.value",
+              "indexed.ethnicity.extract_from_landmark.title.value",
+              "indexed.ethnicity.extract_from_landmark.other_segment.value",
+              "indexed.ethnicity.other_method.inferlink_description.value",
+              "indexed.ethnicity.other_method.content_strict.value",
+              "indexed.ethnicity.other_method.title.value",
+              "indexed.ethnicity.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "EyeColor": [
+              "indexed.eye_color.gurobi.inferlink_description.value",
+              "indexed.eye_color.gurobi.content_strict.value",
+              "indexed.eye_color.gurobi.title.value",
+              "indexed.eye_color.gurobi.other_segment.value",
+              "indexed.eye_color.extract_from_landmark.inferlink_description.value",
+              "indexed.eye_color.extract_from_landmark.content_strict.value",
+              "indexed.eye_color.extract_from_landmark.title.value",
+              "indexed.eye_color.extract_from_landmark.other_segment.value",
+              "indexed.eye_color.other_method.inferlink_description.value",
+              "indexed.eye_color.other_method.content_strict.value",
+              "indexed.eye_color.other_method.title.value",
+              "indexed.eye_color.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Gender": [
+              "indexed.gender.gurobi.inferlink_description.value",
+              "indexed.gender.gurobi.content_strict.value",
+              "indexed.gender.gurobi.title.value",
+              "indexed.gender.gurobi.other_segment.value",
+              "indexed.gender.extract_from_landmark.inferlink_description.value",
+              "indexed.gender.extract_from_landmark.content_strict.value",
+              "indexed.gender.extract_from_landmark.title.value",
+              "indexed.gender.extract_from_landmark.other_segment.value",
+              "indexed.gender.other_method.inferlink_description.value",
+              "indexed.gender.other_method.content_strict.value",
+              "indexed.gender.other_method.title.value",
+              "indexed.gender.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "HairColor": [
+              "indexed.hair_color.gurobi.inferlink_description.value",
+              "indexed.hair_color.gurobi.content_strict.value",
+              "indexed.hair_color.gurobi.title.value",
+              "indexed.hair_color.gurobi.other_segment.value",
+              "indexed.hair_color.extract_from_landmark.inferlink_description.value",
+              "indexed.hair_color.extract_from_landmark.content_strict.value",
+              "indexed.hair_color.extract_from_landmark.title.value",
+              "indexed.hair_color.extract_from_landmark.other_segment.value",
+              "indexed.hair_color.other_method.inferlink_description.value",
+              "indexed.hair_color.other_method.content_strict.value",
+              "indexed.hair_color.other_method.title.value",
+              "indexed.hair_color.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Height": [
+              "indexed.height.gurobi.inferlink_description.value",
+              "indexed.height.gurobi.content_strict.value",
+              "indexed.height.gurobi.title.value",
+              "indexed.height.gurobi.other_segment.value",
+              "indexed.height.extract_from_landmark.inferlink_description.value",
+              "indexed.height.extract_from_landmark.content_strict.value",
+              "indexed.height.extract_from_landmark.title.value",
+              "indexed.height.extract_from_landmark.other_segment.value",
+              "indexed.height.other_method.inferlink_description.value",
+              "indexed.height.other_method.content_strict.value",
+              "indexed.height.other_method.title.value",
+              "indexed.height.other_method.other_segment.value"
+            ],
+            "Location": [
+              "indexed.city.gurobi.inferlink_description.value",
+              "indexed.city.gurobi.content_strict.value",
+              "indexed.city.gurobi.title.value",
+              "indexed.city.gurobi.other_segment.value",
+              "indexed.city.extract_from_landmark.inferlink_description.value",
+              "indexed.city.extract_from_landmark.content_strict.value",
+              "indexed.city.extract_from_landmark.title.value",
+              "indexed.city.extract_from_landmark.other_segment.value",
+              "indexed.city.other_method.inferlink_description.value",
+              "indexed.city.other_method.content_strict.value",
+              "indexed.city.other_method.title.value",
+              "indexed.city.other_method.other_segment.value",
+              "indexed.country.gurobi.inferlink_description.value",
+              "indexed.country.gurobi.content_strict.value",
+              "indexed.country.gurobi.title.value",
+              "indexed.country.gurobi.other_segment.value",
+              "indexed.country.extract_from_landmark.inferlink_description.value",
+              "indexed.country.extract_from_landmark.content_strict.value",
+              "indexed.country.extract_from_landmark.title.value",
+              "indexed.country.extract_from_landmark.other_segment.value",
+              "indexed.country.other_method.inferlink_description.value",
+              "indexed.country.other_method.content_strict.value",
+              "indexed.country.other_method.title.value",
+              "indexed.country.other_method.other_segment.value",
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Name": [
+              "indexed.name.gurobi.inferlink_description.value",
+              "indexed.name.gurobi.content_strict.value",
+              "indexed.name.gurobi.title.value",
+              "indexed.name.gurobi.other_segment.value",
+              "indexed.name.extract_from_landmark.inferlink_description.value",
+              "indexed.name.extract_from_landmark.content_strict.value",
+              "indexed.name.extract_from_landmark.title.value",
+              "indexed.name.extract_from_landmark.other_segment.value",
+              "indexed.name.other_method.inferlink_description.value",
+              "indexed.name.other_method.content_strict.value",
+              "indexed.name.other_method.title.value",
+              "indexed.name.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Phone": [
+              "indexed.phone.gurobi.inferlink_description.value",
+              "indexed.phone.gurobi.content_strict.value",
+              "indexed.phone.gurobi.title.value",
+              "indexed.phone.gurobi.other_segment.value",
+              "indexed.phone.extract_from_landmark.inferlink_description.value",
+              "indexed.phone.extract_from_landmark.content_strict.value",
+              "indexed.phone.extract_from_landmark.title.value",
+              "indexed.phone.extract_from_landmark.other_segment.value",
+              "indexed.phone.other_method.inferlink_description.value",
+              "indexed.phone.other_method.content_strict.value",
+              "indexed.phone.other_method.title.value",
+              "indexed.phone.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "raw_content"
+            ],
+            "PostingDate": [
+              "indexed.posting_date.gurobi.inferlink_description.key",
+              "indexed.posting_date.gurobi.content_strict.key",
+              "indexed.posting_date.gurobi.title.key",
+              "indexed.posting_date.extract_from_landmark.inferlink_description.key",
+              "indexed.posting_date.extract_from_landmark.content_strict.key",
+              "indexed.posting_date.extract_from_landmark.title.key",
+              "indexed.posting_date.other_method.inferlink_description.key",
+              "indexed.posting_date.other_method.content_strict.key",
+              "indexed.posting_date.other_method.title.key"
+            ],
+            "Price": [
+              "indexed.price.gurobi.inferlink_description.value",
+              "indexed.price.gurobi.content_strict.value",
+              "indexed.price.gurobi.title.value",
+              "indexed.price.gurobi.other_segment.value",
+              "indexed.price.extract_from_landmark.inferlink_description.value",
+              "indexed.price.extract_from_landmark.content_strict.value",
+              "indexed.price.extract_from_landmark.title.value",
+              "indexed.price.extract_from_landmark.other_segment.value",
+              "indexed.price.other_method.inferlink_description.value",
+              "indexed.price.other_method.content_strict.value",
+              "indexed.price.other_method.title.value",
+              "indexed.price.other_method.other_segment.value"
+            ],
+            "ReviewId": [
+              "indexed.review_id.gurobi.inferlink_description.value",
+              "indexed.review_id.gurobi.content_strict.value",
+              "indexed.review_id.gurobi.title.value",
+              "indexed.review_id.gurobi.other_segment.value",
+              "indexed.review_id.extract_from_landmark.inferlink_description.value",
+              "indexed.review_id.extract_from_landmark.content_strict.value",
+              "indexed.review_id.extract_from_landmark.title.value",
+              "indexed.review_id.extract_from_landmark.other_segment.value",
+              "indexed.review_id.other_method.inferlink_description.value",
+              "indexed.review_id.other_method.content_strict.value",
+              "indexed.review_id.other_method.title.value",
+              "indexed.review_id.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Service": [
+              "indexed.service.gurobi.inferlink_description.value",
+              "indexed.service.gurobi.content_strict.value",
+              "indexed.service.gurobi.title.value",
+              "indexed.service.gurobi.other_segment.value",
+              "indexed.service.extract_from_landmark.inferlink_description.value",
+              "indexed.service.extract_from_landmark.content_strict.value",
+              "indexed.service.extract_from_landmark.title.value",
+              "indexed.service.extract_from_landmark.other_segment.value",
+              "indexed.service.other_method.inferlink_description.value",
+              "indexed.service.other_method.content_strict.value",
+              "indexed.service.other_method.title.value",
+              "indexed.service.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "SocialMediaId": [
+              "indexed.social_media_id.gurobi.inferlink_description.value",
+              "indexed.social_media_id.gurobi.content_strict.value",
+              "indexed.social_media_id.gurobi.title.value",
+              "indexed.social_media_id.gurobi.other_segment.value",
+              "indexed.social_media_id.extract_from_landmark.inferlink_description.value",
+              "indexed.social_media_id.extract_from_landmark.content_strict.value",
+              "indexed.social_media_id.extract_from_landmark.title.value",
+              "indexed.social_media_id.extract_from_landmark.other_segment.value",
+              "indexed.social_media_id.other_method.inferlink_description.value",
+              "indexed.social_media_id.other_method.content_strict.value",
+              "indexed.social_media_id.other_method.title.value",
+              "indexed.social_media_id.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "State": [
+              "indexed.state.gurobi.inferlink_description.value",
+              "indexed.state.gurobi.content_strict.value",
+              "indexed.state.gurobi.title.value",
+              "indexed.state.gurobi.other_segment.value",
+              "indexed.state.extract_from_landmark.inferlink_description.value",
+              "indexed.state.extract_from_landmark.content_strict.value",
+              "indexed.state.extract_from_landmark.title.value",
+              "indexed.state.extract_from_landmark.other_segment.value",
+              "indexed.state.other_method.inferlink_description.value",
+              "indexed.state.other_method.content_strict.value",
+              "indexed.state.other_method.title.value",
+              "indexed.state.other_method.other_segment.value",
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Title": [
+              "content_extraction.content_relaxed.text",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text"
+            ],
+            "Weight": [
+              "indexed.weight.gurobi.inferlink_description.value",
+              "indexed.weight.gurobi.content_strict.value",
+              "indexed.weight.gurobi.title.value",
+              "indexed.weight.gurobi.other_segment.value",
+              "indexed.weight.extract_from_landmark.inferlink_description.value",
+              "indexed.weight.extract_from_landmark.content_strict.value",
+              "indexed.weight.extract_from_landmark.title.value",
+              "indexed.weight.extract_from_landmark.other_segment.value",
+              "indexed.weight.other_method.inferlink_description.value",
+              "indexed.weight.other_method.content_strict.value",
+              "indexed.weight.other_method.title.value",
+              "indexed.weight.other_method.other_segment.value"
+            ],
+            "TopLevelDomain": [
+              "tld.raw",
+              "tld"
+            ],
+            "URL": [
+              "url",
+              "url.raw",
+              "tld"
+            ],
+            "Website": [
+              "indexed.website.gurobi.inferlink_description.value",
+              "indexed.website.gurobi.content_strict.value",
+              "indexed.website.gurobi.title.value",
+              "indexed.website.gurobi.other_segment.value",
+              "indexed.website.extract_from_landmark.inferlink_description.value",
+              "indexed.website.extract_from_landmark.inferlink_description.key",
+              "indexed.website.extract_from_landmark.content_strict.value",
+              "indexed.website.extract_from_landmark.content_strict.key",
+              "indexed.website.extract_from_landmark.title.value",
+              "indexed.website.extract_from_landmark.title.key",
+              "indexed.website.extract_from_landmark.other_segment.value",
+              "indexed.website.extract_from_landmark.other_segment.key",
+              "indexed.website.other_method.inferlink_description.value",
+              "indexed.website.other_method.inferlink_description.key",
+              "indexed.website.other_method.content_strict.value",
+              "indexed.website.other_method.content_strict.key",
+              "indexed.website.other_method.title.value",
+              "indexed.website.other_method.title.key",
+              "indexed.website.other_method.other_segment.value",
+              "indexed.website.other_method.other_segment.key",
+              "content_extraction.title.text",
+              "raw_content"
+            ]
+          }
+        },
+        {
+          "type": "FieldWeightMapping",
+          "name": "FieldWeightMapping",
+          "field_weight_mappings": {
+            "tld": {
+              "*": 100
+            },
+            "raw_content": 2,
+            "content_extraction": {
+              "content_relaxed": {
+                "*": 1
+              },
+              "content_strict": {
+                "*": 2
+              },
+              "title": {
+                "*": 3
+              }
+            },
+            "indexed": {
+              "phone": {
+                "gurobi": {
+                  "*": 20,
+                  "other_segment": {
+                    "*": 2.1
+                  }
+                },
+                "extract_from_landmark": {
+                  "*": 15,
+                  "other_segment": {
+                    "*": 2.1
+                  }
+                },
+                "other_method": {
+                  "*": 10,
+                  "other_segment": {
+                    "*": 5.1
+                  }
+                }
+              },
+              "email": {
+                "gurobi": {
+                  "*": 20,
+                  "other_segment": {
+                    "*": 2.1
+                  }
+                },
+                "extract_from_landmark": {
+                  "*": 15,
+                  "other_segment": {
+                    "*": 2.1,
+                    "key": 15.1
+                  }
+                },
+                "other_method": {
+                  "*": 10,
+                  "title": {
+                    "*": 10,
+                    "key": 15.1
+                  },
+                  "other_segment": {
+                    "*": 2.1,
+                    "key": 10.1
+                  }
+                }
+              },
+              "price": {
+                "*": {
+                  "*": 1,
+                  "other_segment": 2.1
+                }
+              },
+              "name": {
+                "*": {
+                  "*": 5,
+                  "other_segment": 2.1
+                }
+              },
+              "review_id": {
+                "*": {
+                  "*": 5,
+                  "other_segment": 2.1
+                }
+              },
+              "social_media_id  ": {
+                "*": {
+                  "*": 5,
+                  "other_segment": 2.1
+                }
+              },
+              "city": {
+                "*": {
+                  "*": 6,
+                  "other_segment": 2.1
+                }
+              },
+              "posting_date": {
+                "*": {
+                  "*": 6,
+                  "other_segment": 2.1
+                }
+              },
+              "address": {
+                "*": {
+                  "*": 6,
+                  "other_segment": 2.1
+                }
+              },
+              "*": {
+                "extract_from_landmark": {
+                  "*": 5,
+                  "other_segment": 2.1
+                },
+                "*": {
+                  "*": 3,
+                  "other_segment": 2.1
+                }
+              },
+              "website": {
+                "*": {
+                  "*": {
+                    "value": 5.1,
+                    "key": 20.1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TypeQueryMapping",
+          "name": "TypeQueryMapping",
+          "type_query_mappings": {
+            "Title": "match_phrase"
+          }
+        },
+        {
+          "type_doc_type_mappings": {
+            "Ad": "ads"
+          },
+          "type": "TypeDocTypeMapping",
+          "name": "TypeDocTypeMapping"
+        },
+        {
+          "type_index_mappings": {
+            "Ad": "dig-etk-search"
+          },
+          "type": "TypeIndexMapping",
+          "name": "TypeIndexMapping"
+        },
+        {
+          "elasticsearch_compiler_options": {
+            "convert_text_filters_to_shoulds": true,
+            "boost_shoulds": true,
+            "filter_for_fields_of_unbound_variables": false,
+            "default_source_fields": [
+              "doc_id",
+              "tld",
+              "url",
+              "knowledge_graph.*",
+              "content_extraction.content_strict.text",
+              "content_extraction.title.text",
+              "objects.*"
+            ],
+            "excluded_source_fields": [
+              "content_extraction.content_relaxed.text",
+              "raw_content",
+              "*.provenance.extracted_value",
+              "*.provenance.confidence.extraction",
+              "*.provenance.source.context.end",
+              "*.provenance.source.context.start",
+              "*.provenance.source.context.tokens_left",
+              "*.provenance.source.context.tokens_right",
+              "*.provenance.source.context.input",
+              "*.confidence",
+              "objects.response_headers.*"
+            ],
+            "highlight": {
+              "fields": {
+                "indexed.*": {
+                  "number_of_fragments": 0
+                },
+                "content_extraction.content_strict.text": {
+                  "number_of_fragments": 0
+                },
+                "content_extraction.title.text": {
+                  "number_of_fragments": 0
+                }
+              }
+            }
+          },
+          "type": "QueryCompiler",
+          "name": "ElasticsearchQueryCompiler"
+        }
+      ]
+    }
+  },
+  "indexing": {
+    "log_responses": "/tmp"
+  }
+}

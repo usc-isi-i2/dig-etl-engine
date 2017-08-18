@@ -1,0 +1,16 @@
+{
+  "boost_musts": 10,
+  "default_source_fields": [
+    "doc_id",
+    "tld",
+    "url",
+    "fields.*"
+  ],
+  "highlight": {
+    "fields": {
+      "fields.*": {
+        "number_of_fragments": 0
+      }
+    }
+  }
+}

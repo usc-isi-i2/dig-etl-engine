@@ -1,0 +1,5 @@
+{
+	"Title": "' '.join([v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for']])",
+	"Description": "' '.join(v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for'])",
+	"Content": "' '.join(v for v in value.split(' ') if v not in ['i', 'am', 'the', 'a', 'an', 'in', 'is', 'for'])"
+}

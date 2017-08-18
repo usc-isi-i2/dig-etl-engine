@@ -1,0 +1,13 @@
+{
+  "content":"Content",
+  "location":"Location",
+  "money":"Money",
+  "org":"Org",
+  "person":"Person",
+  "posting_date": "PostingDate",
+  "product":"Product",
+  "ticker":"Ticker",
+  "title":"Title",
+  "tld": "TopLevelDomain",
+  "url": "URL"
+}

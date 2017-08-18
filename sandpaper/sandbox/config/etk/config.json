@@ -1,0 +1,92 @@
+{
+  "fine": {},
+  "coarse": {
+    "preprocess": {
+      "components": [
+        {
+          "type": "ConstraintTypeMapper",
+          "name": "PredicateDictConstraintTypeMapper",
+          "predicate_range_mappings": "config/etk/predicate_range_mappings.json"
+        },
+        {
+          "type": "ConstraintConsistency",
+          "name": "ConstraintTypeTransformations",
+          "constraint_type_transformations": "config/etk/constraint_type_transformations.json"
+        },
+        {
+          "type": "ConstraintExpansion",
+          "name": "HeightConstraintExpander"
+        },
+        {
+          "type": "ConstraintExpansion",
+          "name": "PhoneConstraintExpander"
+        }
+      ]
+    },
+    "parameterize": {
+      "components": [
+        {
+          "type": "ClauseCombination",
+          "name": "NoClauseCombination"
+        },
+        {
+          "type": "FieldCombination",
+          "name": "AtLeastOneFieldCombination"
+        }
+      ]
+    },
+    "execute": {
+      "components": [
+        {
+          "host": "elasticsearch",
+          "type": "ExecuteQueryComponent",
+          "name": "ExecuteElasticsearchQuery",
+          "port": 9200,
+          "timeout": 180
+        }
+      ]
+    },
+    "generate": {
+      "components": [
+        {
+          "type": "TypeFieldMapping",
+          "name": "TypeFieldMapping",
+          "type_field_mappings": "config/etk/type_field_mappings.json"
+        },
+        {
+          "type": "TypeFieldMapping",
+          "name": "TypeFieldGroupByMapping",
+          "type_field_mappings": "config/etk/type_field_group_by_mappings.json"
+        },
+        {
+          "type": "FieldWeightMapping",
+          "name": "FieldWeightMapping",
+          "field_weight_mappings": "config/etk/field_weights.json"
+        },
+        {
+            "type": "TypeQueryMapping",
+            "name": "TypeQueryMapping",
+            "type_query_mappings": "config/etk/type_query_mappings.json"
+        },
+        {
+          "type_doc_type_mappings": "config/etk/type_doc_type_mappings.json",
+          "type": "TypeDocTypeMapping",
+          "name": "TypeDocTypeMapping"
+        },
+        {
+          "type_index_mappings": "config/etk/type_index_mappings.json",
+          "type": "TypeIndexMapping",
+          "name": "TypeIndexMapping"
+        },
+        {
+          "elasticsearch_compiler_options": "config/etk/elasticsearch_compiler_options.json",
+          "type": "QueryCompiler",
+          "name": "ElasticsearchQueryCompiler"
+        }
+      ]
+    }
+  },
+  "indexing": {
+    "log_responses": "/tmp"
+  }
+}
