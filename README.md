@@ -76,7 +76,7 @@ Build image
 Run in container
 
     docker run -d -p 9999:9999 \
-    -v $(pwd)/../mydig-projects:/projects_data \
+    -v $(pwd)/../mydig-projects:/shared_data/projects \
     -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
     dig_etl_engine
 

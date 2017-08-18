@@ -6,7 +6,7 @@ services:
     build: .
     volumes:
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
-      - ${DIG_PROJECTS_DIR_PATH}:/projects_data
+      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
     ports:
       - "9999:9999"
     networks:

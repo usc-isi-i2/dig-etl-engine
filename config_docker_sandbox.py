@@ -27,6 +27,6 @@ config = {
     'input_group_id': 'dig',
 
     'kafka_bin_path': '/app/kafka/bin',
-    'projects_path': '/projects_data',
+    'projects_path': '/shared_data/projects',
     'etk_path': '/app/etk'
 }
