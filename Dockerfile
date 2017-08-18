@@ -29,7 +29,7 @@ RUN conda update -y conda
 # download etk
 RUN git clone https://github.com/usc-isi-i2/etk.git && \
     cd etk && \
-    git checkout kafka
+    git checkout development
 # create and config conda-env (install flask) for etk
 RUN cd etk && conda-env create .
 # set etk_env as default env

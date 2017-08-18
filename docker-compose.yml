@@ -49,9 +49,9 @@ services:
       - elasticsearch
 
   elasticsearch:
-    image: elasticsearch:2.4.6
+    image: elasticsearch:2.4
     volumes:
-      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
+#      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"

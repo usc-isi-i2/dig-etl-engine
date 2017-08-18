@@ -1,3 +1,2 @@
 path.config: /usr/share/logstash/pipeline
-xpack.monitoring.elasticsearch.url: elasticsearch:9200
-xpack.monitoring.enabled: true
+xpack.monitoring.enabled: false
