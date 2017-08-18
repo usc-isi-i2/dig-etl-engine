@@ -1,0 +1,77 @@
+# -*- backup-inhibited: t -*-
+upstream app_dig {
+        server digapp:8080;
+        keepalive 8;
+}
+log_format full
+    '$remote_addr $remote_user [$time_local] '
+    '"$host"->$proxy_host->$upstream_addr '
+    '"$request" $status($upstream_status) '
+    '$bytes_sent/$gzip_ratio($sent_http_content_type) '
+    '$request_time($upstream_response_time)';
+server {
+        # match any requested server running on port 80
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+        access_log /var/log/nginx/dig.log full;
+        error_log /var/log/nginx/error.log info;
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        location / {
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_set_header user $remote_user;
+                proxy_pass http://app_dig;
+                proxy_redirect off;
+        }
+        location /downloadImage/ {
+                proxy_set_header Host "s3.amazonaws.com";
+                proxy_set_header Authorization "";
+                proxy_hide_header x-amz-id-2;
+                proxy_hide_header x-amz-request-id;
+                proxy_hide_header Set-Cookie;
+                proxy_ignore_headers "Set-Cookie";
+                proxy_buffering off;
+                proxy_intercept_errors on;
+                proxy_pass https://s3.amazonaws.com/;
+        }
+        location /elasticsearch/ {
+                add_header 'Access-Control-Allow-Origin' '*';
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header Host 10.1.94.103;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_pass http://10.1.94.103:9201/;
+                proxy_redirect off;
+        }
+        location /elasticimages/ {
+                add_header 'Access-Control-Allow-Origin' '*';
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header Host 10.1.94.103;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_pass http://10.1.94.103:9200/;
+                proxy_redirect off;
+        }
+        location /search/coarse {
+                add_header 'Access-Control-Allow-Origin' '*';
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header Host 10.3.2.82;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_pass http://192.168.11.128:9876/search/coarse;
+                proxy_redirect off;
+        }
+        location /projects {
+                add_header 'Access-Control-Allow-Origin' '*';
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_set_header Host 52.36.12.77;
+                proxy_pass http://52.36.12.77:9879/projects;
+                proxy_set_header Authorization "Basic XXXX";
+                proxy_redirect off;
+        }
+        location /diglogs/ {
+            root /var/log;
+            autoindex on;
+        }
+}
