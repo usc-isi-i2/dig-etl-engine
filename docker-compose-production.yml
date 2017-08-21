@@ -2,50 +2,50 @@ version: '3'
 
 services:
 
-  dig_etl_engine:
-    build: .
-    volumes:
-      - ./config_docker_production.py:/app/dig-etl-engine/config.py
-      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
-    ports:
-      - "9999:9999"
-    networks:
-      - dig_net
+#  dig_etl_engine:
+#    build: .
+#    volumes:
+#      - ./config_docker_production.py:/app/dig-etl-engine/config.py
+#      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+#    ports:
+#      - "9999:9999"
+#    networks:
+#      - dig_net
+#
+#  zookeeper:
+#    image: wurstmeister/zookeeper
+#    ports:
+#      - "2181:2181"
+#    networks:
+#      - dig_net
+#
+#  kafka:
+#    image: wurstmeister/kafka
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_HOST_NAME}
+#      KAFKA_ADVERTISED_PORT: 9092
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_CREATE_TOPICS: "test:1:1"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    depends_on:
+#      - zookeeper
+#    networks:
+#      - dig_net
 
-  zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - dig_net
-
-  kafka:
-    image: wurstmeister/kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_HOST_NAME}
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "test:1:1"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - zookeeper
-    networks:
-      - dig_net
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:5.5.1
-    environment:
-      PATH_CONFIG: /usr/share/logstash/pipeline
-    volumes:
-      - ./logstash/production/pipeline/:/usr/share/logstash/pipeline/
-      - ./logstash/production/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
-    networks:
-      - dig_net
-    depends_on:
-      - kafka
+#  logstash:
+#    image: docker.elastic.co/logstash/logstash:5.5.1
+#    environment:
+#      PATH_CONFIG: /usr/share/logstash/pipeline
+#    volumes:
+#      - ./logstash/production/pipeline/:/usr/share/logstash/pipeline/
+#      - ./logstash/production/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
+#    networks:
+#      - dig_net
+#    depends_on:
+#      - kafka
 
   sandpaper:
     image: digsandpaper/digsandpaper
@@ -67,30 +67,30 @@ services:
   digapp3:
     image: digmemex/digapp:3.0.2-14
     ports:
-      - "8080"
+      - "8080:8080"
     volumes:
       - ./logs/digapp:/var/log
     environment:
       ELASTIC_INDEX: 'dig-etk-search'
-      ELASTIC_CONFIG: '{"host": "http://${DOCKER_HOST_NAME}:8089/elasticsearch/"}'
+      ELASTIC_CONFIG: '{"host": "http://nginxdigapp3:8089/elasticsearch/"}'
       NODE_ENV: 'production'
       IMAGE_TYPE: 'image'
       IMAGE_INDEX: 'dig-4'
-      IMAGE_CONFIG: '{"host": "http://${DOCKER_HOST_NAME}:8089/elasticimages/"}'
+      IMAGE_CONFIG: '{"host": "http://nginxdigapp3:8089/elasticimages/"}'
       IMAGE_SERVICE_AUTH: ${DIGAPP3_IMAGE_SERVICE_AUTH}
       IMAGE_SERVICE_HOST: '{"url":"https://isi.memexproxy.com/ESCORTS/cu_image_search/byURL","base64":"https://isi.memexproxy.com/ESCORTS/cu_image_search/byB64_nocache"}'
-      CACHE_CONFIG: '{"host":"http://${DOCKER_HOST_NAME}:8089"}'
+      CACHE_CONFIG: '{"host":"http://nginxdigapp3:8089"}'
       CACHE_INDEX: 'cdr'
       ANNOTATION_INDEX: 'dig-annotations'
       ANNOTATION_TYPE: 'annotation'
-      QUERY_URL: 'http://${DOCKER_HOST_NAME}:8089/search/coarse'
+      QUERY_URL: 'http://nginxdigapp3:8089/search/coarse'
       DEV: 'true'
       # CLASSIFICATION AUTH IS SET IN NGINX CONFIG
-      CLASSIFICATION_HOST: 'http://${DOCKER_HOST_NAME}:8089'
-      CLASSIFICATION_ENTITY_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/tags/FLAG/annotations/Ad/annotations'
-      CLASSIFICATION_EXTRACTION_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/entities/ENTITY_ID/fields/EXTRACTION_TYPE/annotations'
-      CLASSIFICATION_FLAG_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/tags'
-      RAW_ES_DATA_URL: 'http://${DOCKER_HOST_NAME}:8089/elasticsearch/dig-etk-search/ads/'
+      CLASSIFICATION_HOST: 'http://nginxdigapp3:8089'
+      CLASSIFICATION_ENTITY_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/tags/FLAG/annotations/Ad/annotations'
+      CLASSIFICATION_EXTRACTION_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/entities/ENTITY_ID/fields/EXTRACTION_TYPE/annotations'
+      CLASSIFICATION_FLAG_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/tags'
+      RAW_ES_DATA_URL: 'http://nginxdigapp3:8089/elasticsearch/dig-etk-search/ads/'
     networks:
       - dig_net
     depends_on:
@@ -103,7 +103,8 @@ services:
     ports:
       - "8089:80"
     volumes:
-#      - ./digapp/production/conf/nginx/.htpasswd:/etc/nginx/.htpasswd
+      # default credential is admin:123 (admin:$apr1$yiWDyz14$wR9gx7kQOedRGxPu62cak0)
+      - ./digapp/production/conf/nginx/.htpasswd:/etc/nginx/.htpasswd
       - ./digapp/production/conf/nginx_sites_enabled/dig.conf:/etc/nginx/conf.d/default.conf
       - ./digapp/production/logs/nginx:/var/log/nginx
       - ./digapp/production/logs/digapp:/var/log/diglogs

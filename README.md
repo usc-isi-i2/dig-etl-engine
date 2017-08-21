@@ -92,5 +92,7 @@ Run in container
 - Zookeeper: 2181 (localhost / dig_net)
 - ElasticSearch: 9200 (localhost / dig_net), 9300 (localhost / dig_net)
 - Sandpaper: 9876 (localhost / dig_net)
+- DIG App: 8080 (localhost / dig_net)
+- DIG App Nginx: 8089 (localhost / dig_net)
 
 > `dig_net` is the LAN in Docker compose.
