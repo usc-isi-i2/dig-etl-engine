@@ -72,25 +72,25 @@ services:
       - ./logs/digapp:/var/log
     environment:
       ELASTIC_INDEX: 'dig-etk-search'
-      ELASTIC_CONFIG: '{"host": "http://nginxdigapp3:8089/elasticsearch/"}'
+      ELASTIC_CONFIG: '{"host": "http://${DOCKER_HOST_NAME}:8089/elasticsearch/"}'
       NODE_ENV: 'production'
       IMAGE_TYPE: 'image'
       IMAGE_INDEX: 'dig-4'
-      IMAGE_CONFIG: '{"host": "http://nginxdigapp3:8089/elasticimages/"}'
+      IMAGE_CONFIG: '{"host": "http://${DOCKER_HOST_NAME}:8089/elasticimages/"}'
       IMAGE_SERVICE_AUTH: ${DIGAPP3_IMAGE_SERVICE_AUTH}
       IMAGE_SERVICE_HOST: '{"url":"https://isi.memexproxy.com/ESCORTS/cu_image_search/byURL","base64":"https://isi.memexproxy.com/ESCORTS/cu_image_search/byB64_nocache"}'
-      CACHE_CONFIG: '{"host":"http://nginxdigapp3:8089"}'
+      CACHE_CONFIG: '{"host":"http://${DOCKER_HOST_NAME}:8089"}'
       CACHE_INDEX: 'cdr'
       ANNOTATION_INDEX: 'dig-annotations'
       ANNOTATION_TYPE: 'annotation'
-      QUERY_URL: 'http://nginxdigapp3:8089/search/coarse'
+      QUERY_URL: 'http://${DOCKER_HOST_NAME}:8089/search/coarse'
       DEV: 'true'
       # CLASSIFICATION AUTH IS SET IN NGINX CONFIG
-      CLASSIFICATION_HOST: 'http://nginxdigapp3:8089'
-      CLASSIFICATION_ENTITY_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/tags/FLAG/annotations/Ad/annotations'
-      CLASSIFICATION_EXTRACTION_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/entities/ENTITY_ID/fields/EXTRACTION_TYPE/annotations'
-      CLASSIFICATION_FLAG_URL: 'http://nginxdigapp3:8089/projects/dig3-ht/tags'
-      RAW_ES_DATA_URL: 'http://nginxdigapp3:8089/elasticsearch/dig-etk-search/ads/'
+      CLASSIFICATION_HOST: 'http://${DOCKER_HOST_NAME}:8089'
+      CLASSIFICATION_ENTITY_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/tags/FLAG/annotations/Ad/annotations'
+      CLASSIFICATION_EXTRACTION_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/entities/ENTITY_ID/fields/EXTRACTION_TYPE/annotations'
+      CLASSIFICATION_FLAG_URL: 'http://${DOCKER_HOST_NAME}:8089/projects/dig3-ht/tags'
+      RAW_ES_DATA_URL: 'http://${DOCKER_HOST_NAME}:8089/elasticsearch/dig-etk-search/ads/'
     networks:
       - dig_net
     depends_on:
