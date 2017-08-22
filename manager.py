@@ -104,6 +104,7 @@ def seek_to_topic_end(topic, consumers, group_id=None):
         topic,
         bootstrap_servers=consumers,
         group_id=group_id)
+    # consumer.poll()
     consumer.seek_to_end()
     logger.info('seek_to_topic_end finish: {}'.format(topic))
 
