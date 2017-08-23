@@ -94,5 +94,6 @@ Run in container
 - Sandpaper: 9876 (localhost / dig_net)
 - DIG App: 8080 (localhost / dig_net)
 - DIG App Nginx: 8089 (localhost / dig_net)
+- myDIG: 9879 (localhost / dig_net), 9880 (localhost / dig_get)
 
 > `dig_net` is the LAN in Docker compose.

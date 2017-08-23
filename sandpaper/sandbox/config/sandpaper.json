@@ -72,7 +72,7 @@
     "execute": {
       "components": [
         {
-          "host": "localhost",
+          "host": "elasticsearch",
           "type": "ExecuteQueryComponent",
           "name": "ExecuteElasticsearchQuery",
           "port": 9200,

@@ -61,26 +61,41 @@ services:
     networks:
       - dig_net
 
-#  sandpaper:
-#    image: digsandpaper/digsandpaper
-#    ports:
-#      - "9876:9876"
-#    volumes:
-#      - ./sandpaper/sandbox/config:/etc/sandpaper/sandbox/config
-#    links:
-#      - elasticsearch
-#    entrypoint:
-#      - bin/start.sh
-#      - --host
-#      - 0.0.0.0
-#      - --endpoint
-#      - http://elasticsearch:9200
-#      - --config
-#      - config/sandpaper.json
-#    networks:
-#      - dig_net
-#    depends_on:
-#      - elasticsearch
+  sandpaper:
+    image: digsandpaper/digsandpaper
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./sandpaper/sandbox/config:/etc/sandpaper/sandbox/config
+    links:
+      - elasticsearch
+    entrypoint:
+      - bin/start.sh
+      - --host
+      - 0.0.0.0
+      - --endpoint
+      - http://elasticsearch:9200
+      - --config
+      - config/sandpaper.json
+    networks:
+      - dig_net
+    depends_on:
+      - elasticsearch
+
+  mydig_ws:
+    image: mydig_ws
+    environment:
+      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
+    ports:
+      - "9879:9879"
+      - "9880:9880"
+    volumes:
+      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py
+      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+      - ${DIG_RESOURCES_DIR_PATH}:/shared_data/dig3-resources
+    networks:
+      - dig_net
 
 networks:
   dig_net:
