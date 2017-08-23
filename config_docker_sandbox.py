@@ -12,13 +12,15 @@ config = {
         'port': 5959,
         'level': logging.INFO,
         'version': 1,
-        'name': 'dig_etl_engine'
+        'name': 'dig_etl_engine',
+        'pipeline': '/app/logstash_pipeline'
     },
 
     'input_zookeeper_server': ['zookeeper:2181'],
     'output_zookeeper_server': ['zookeeper:2181'],
     'input_server': ['kafka:9092'],
     'output_server': ['kafka:9092'],
+    'es_server': 'elasticsearch:9200',
 
     # per project topic
     'input_partitions': 4,

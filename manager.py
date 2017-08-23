@@ -6,6 +6,7 @@ import json
 from kafka import KafkaProducer, KafkaConsumer
 import logging
 import logstash
+import codecs
 from config import config
 
 from flask import Flask, request, jsonify
@@ -19,7 +20,6 @@ logger.setLevel(config['logstash']['level'])
 #     logstash.LogstashHandler(
 #         config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
 logger.addHandler(logging.FileHandler('log.log'))
-
 
 
 @app.route('/')
@@ -38,6 +38,10 @@ def create_project():
         args['project_name'] + '_in', config['input_zookeeper_server'], config['input_partitions'])
     ensure_topic_exists(
         args['project_name'] + '_out', config['output_zookeeper_server'], config['output_partitions'])
+
+    # update logstash pipeline
+    update_logstash_pipeline(args['project_name'])
+
     return jsonify({}), 201
 
 
@@ -162,6 +166,30 @@ def kill_etk_process(project_name, ignore_error=False):
         print 'error'
     logger.info('kill_etk_process finish: {}'.format(project_name))
     print 'kill_etk_process finish'
+
+
+def update_logstash_pipeline(project_name):
+    content = \
+'''input {
+  kafka {
+    bootstrap_servers => ["''' + '","'.join(config['output_server']) + '''"]
+    topics => ["''' + project_name + '''_out"]
+    consumer_threads => "4"
+    codec => json {}
+   }
+}
+
+output {
+  elasticsearch {
+    document_id  => "%{doc_id}"
+    document_type => "ads"
+    hosts => ["''' + config['es_server'] + '''"]
+    index => "''' + project_name + '''"
+  }
+}'''
+    path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
+    with codecs.open(path, 'w') as f:
+        f.write(content)
 
 
 if __name__ == '__main__':

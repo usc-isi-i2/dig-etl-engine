@@ -5,8 +5,10 @@ services:
   dig_etl_engine:
     build: .
     volumes:
+      - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+      - ./logstash/sandbox/pipeline/:/app/logstash_pipeline
     ports:
       - "9999:9999"
     networks:
