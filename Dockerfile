@@ -26,6 +26,16 @@ RUN wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh &
 ENV PATH=/app/miniconda/bin:${PATH}
 RUN conda update -y conda
 
+# download kafka (for command tools)
+RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz" && \
+    tar -xvzf "kafka_2.11-0.11.0.0.tgz" && rm "kafka_2.11-0.11.0.0.tgz" && \
+    mv "kafka_2.11-0.11.0.0" kafka
+
+# install logstash
+RUN pip install python-logstash
+
+ARG UPDATE_AFTER=2017-08-24-16-43-00
+
 # download etk
 RUN git clone https://github.com/usc-isi-i2/etk.git && \
     cd etk && \
@@ -35,14 +45,6 @@ RUN cd etk && conda-env create .
 # set etk_env as default env
 ENV PATH /app/miniconda/envs/etk_env/bin:$PATH
 RUN /bin/bash -c "python -m spacy download en && pip install flask"
-
-# download kafka (for command tools)
-RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz" && \
-    tar -xvzf "kafka_2.11-0.11.0.0.tgz" && rm "kafka_2.11-0.11.0.0.tgz" && \
-    mv "kafka_2.11-0.11.0.0" kafka
-
-# install logstash
-RUN pip install python-logstash
 
 # persistent data
 VOLUME /shared_data

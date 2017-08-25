@@ -33,11 +33,22 @@ def create_project():
     if 'project_name' not in args:
         return jsonify({'error_message': 'invalid project_name'}), 400
 
+    config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
+    project_config = {}
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            project_config = json.loads(f.read())
+
     # create topics
-    ensure_topic_exists(
-        args['project_name'] + '_in', config['input_zookeeper_server'], config['input_partitions'])
-    ensure_topic_exists(
-        args['project_name'] + '_out', config['output_zookeeper_server'], config['output_partitions'])
+    input_topic = project_config.get('input_topic', args['project_name'] + '_in')
+    input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
+    input_partition = project_config.get('input_partitions', config['input_partitions'])
+    ensure_topic_exists(input_topic, input_zookeeper_server, input_partition)
+
+    output_topic = project_config.get('output_topic', args['project_name'] + '_out')
+    output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
+    output_partition = project_config.get('output_partitions', config['output_partitions'])
+    ensure_topic_exists(output_topic, output_zookeeper_server, output_partition)
 
     # update logstash pipeline
     update_logstash_pipeline(args['project_name'])
@@ -54,16 +65,22 @@ def run_etk():
 
     kill_etk_process(args['project_name'], True)
     # reset input offset in `dig` group
-    if 'input_offset' in args and args['input_offset'] == 'seek_to_end':
-        seek_to_topic_end(args['project_name'] + '_in', config['input_server'], config['input_group_id'])
-    # reset output offset in all groups
-    if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
-        seek_to_topic_end(args['project_name'] + '_out', config['output_server'])
-    if 'delete_input_topic' in args and args['delete_input_topic'] is True:
-        delete_topic(args['project_name'] + '_in', config['input_zookeeper_server'])
-    if 'delete_output_topic' in args and args['delete_output_topic'] is True:
-        delete_topic(args['project_name'] + '_out', config['output_zookeeper_server'])
-    run_etk_processes(args['project_name'], args['number_of_workers'])
+    # if 'input_offset' in args and args['input_offset'] == 'seek_to_end':
+    #     seek_to_topic_end(args['project_name'] + '_in', config['input_server'], config['input_group_id'])
+    # # reset output offset in all groups
+    # if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
+    #     seek_to_topic_end(args['project_name'] + '_out', config['output_server'])
+    # if 'delete_input_topic' in args and args['delete_input_topic'] is True:
+    #     delete_topic(args['project_name'] + '_in', config['input_zookeeper_server'])
+    # if 'delete_output_topic' in args and args['delete_output_topic'] is True:
+    #     delete_topic(args['project_name'] + '_out', config['output_zookeeper_server'])
+
+    config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
+    project_config = {}
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            project_config = json.loads(f.read())
+    run_etk_processes(args['project_name'], args['number_of_workers'], project_config)
     return jsonify({}), 202
 
 
@@ -108,7 +125,7 @@ def seek_to_topic_end(topic, consumers, group_id=None):
         topic,
         bootstrap_servers=consumers,
         group_id=group_id)
-    # consumer.poll()
+    # consumer.poll() # TODO: bug here
     consumer.seek_to_end()
     logger.info('seek_to_topic_end finish: {}'.format(topic))
 
@@ -129,28 +146,33 @@ def delete_topic(topic, zookeeper_server):
     logger.info('delete_topic finish: {}'.format(topic))
 
 
-def run_etk_processes(project_name, processes):
-
+def run_etk_processes(project_name, processes, project_config):
     for i in xrange(processes):
         cmd = 'python -u {run_core_path} \
         --tag-mydig-etk-{project_name}-{idx} \
         --config "{working_dir}/etk_config.json" \
         --kafka-input-server "{input_server}" \
-        --kafka-input-topic "{project_name}_in" \
+        --kafka-input-topic "{input_topic}" \
         --kafka-input-group-id "{input_group_id}" \
         --kafka-input-session-timeout {session_timeout} \
         --kafka-output-server "{output_server}" \
-        --kafka-output-topic "{project_name}_out" \
+        --kafka-output-topic "{output_topic}" \
+        --kafka-input-args "{input_args}" \
+        --kafka-output-args "{output_args}" \
         --indexing \
         > "{working_dir}/etk_stdout_{idx}.txt"'.format(
             run_core_path=os.path.join(config['etk_path'], 'etk/run_core_kafka.py'),
             project_name=project_name,
+            input_topic=project_config.get('input_topic', project_name + '_in'),
+            output_topic=project_config.get('output_topic', project_name + '_out'),
             working_dir=os.path.join(config['projects_path'], project_name, 'working_dir'),
-            session_timeout=config['input_session_timeout'],
-            input_server=','.join(config['input_server']),
-            output_server=','.join(config['output_server']),
-            input_group_id=config['input_group_id'],
-            idx=i
+            session_timeout=project_config.get('input_session_timeout', config['input_session_timeout']),
+            input_server=','.join(project_config.get('input_server', config['input_server'])),
+            output_server=','.join(project_config.get('output_server', config['output_server'])),
+            input_group_id=project_config.get('input_group_id', config['input_group_id']),
+            idx=i,
+            input_args=json.dumps(project_config.get('input_args', {})).replace('"', '\\"'),
+            output_args=json.dumps(project_config.get('output_args', {})).replace('"', '\\"')
         )
         print cmd
         p = subprocess.Popen(cmd, shell=True) # async
@@ -198,5 +220,6 @@ if __name__ == '__main__':
     except Exception as e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        lines = ''.join(lines)
         print lines
-        logger.error('\n'.join(line for line in lines))
+        logger.error(lines)
