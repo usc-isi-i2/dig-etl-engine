@@ -35,7 +35,7 @@ for i in range(part_num):
 consumer.assign(assigned_parts)
 for p in assigned_parts:
     consumer.seek(p, 0)
-    # sometimes it is blocked, need to restart them
+    # sometimes it is blocked, need to restart
     consumer.commit({p:OffsetAndMetadata(0, meta)})
 
 print 'done'

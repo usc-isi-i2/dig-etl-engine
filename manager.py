@@ -51,7 +51,8 @@ def create_project():
     ensure_topic_exists(output_topic, output_zookeeper_server, output_partition)
 
     # update logstash pipeline
-    update_logstash_pipeline(args['project_name'])
+    output_server = project_config.get('output_server', config['output_server'])
+    update_logstash_pipeline(args['project_name'], output_server, output_topic)
 
     return jsonify({}), 201
 
@@ -190,18 +191,22 @@ def kill_etk_process(project_name, ignore_error=False):
     print 'kill_etk_process finish'
 
 
-def update_logstash_pipeline(project_name):
+def update_logstash_pipeline(project_name, output_server, output_topic):
     content = \
 '''input {
   kafka {
-    bootstrap_servers => ["''' + '","'.join(config['output_server']) + '''"]
-    topics => ["''' + project_name + '''_out"]
+    bootstrap_servers => ["''' + '","'.join(output_server) + '''"]
+    topics => ["''' + output_topic + '''"]
     consumer_threads => "4"
     codec => json {}
     type => "''' + project_name + '''"
    }
 }
-
+filter {
+  if [type] == "''' + project_name + '''" {
+    mutate { remove_field => ["_id"] }
+  }
+}
 output {
   if [type] == "''' + project_name + '''" {
     elasticsearch {
