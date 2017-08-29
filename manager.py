@@ -198,15 +198,18 @@ def update_logstash_pipeline(project_name):
     topics => ["''' + project_name + '''_out"]
     consumer_threads => "4"
     codec => json {}
+    type => "''' + project_name + '''"
    }
 }
 
 output {
-  elasticsearch {
-    document_id  => "%{doc_id}"
-    document_type => "ads"
-    hosts => ["''' + config['es_server'] + '''"]
-    index => "''' + project_name + '''"
+  if [type] == "''' + project_name + '''" {
+    elasticsearch {
+      document_id  => "%{doc_id}"
+      document_type => "ads"
+      hosts => ["''' + config['es_server'] + '''"]
+      index => "''' + project_name + '''"
+    }
   }
 }'''
     path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
