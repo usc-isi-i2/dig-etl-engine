@@ -37,7 +37,10 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - dig_net
+      dig_net:
+        # can not set ip range in docker-compose v3 to whitelist fixed ip
+        # so set it to 200, DNS still works
+        ipv4_address: 172.19.0.200
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.5.1
@@ -88,8 +91,8 @@ services:
 
   mydig_ws:
     image: mydig_ws
-    environment:
-      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
+#    environment:
+#      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
     ports:
       - "9879:9879"
       - "9880:9880"
@@ -101,6 +104,46 @@ services:
     networks:
       - dig_net
 
+  digui:
+    image: digmemex/digui:0.0.57
+    ports:
+      - "8080" # behind nginx, only expose to inner network
+    volumes:
+      - ./digapp/sandbox/logs/digapp:/var/log
+    environment:
+      NODE_ENV: 'production' # for port 8080
+      ES_HOST: '{"host": "http://localhost:8089/elasticsearchsample"}'
+      DATABASE_TYPE: 'sample'
+      CONFIG_ENDPOINT: 'http://localhost:8089/projects/'
+      TAGS_ENTITY_ENDPOINT: 'http://localhost:8089/projects/PROJECT/tags/TAG/annotations/Ad/annotations'
+      TAGS_EXTRACTION_ENDPOINT: 'http://localhost:8089/projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD/annotations'
+      TAGS_LIST_ENDPOINT: 'http://localhost:8089/projects/PROJECT/tags'
+      SEARCH_CONFIG: '{
+        "http://sandpaper:9876": "http://localhost:8089/search9876"
+      }'
+    networks:
+      - dig_net
+
+  nginxdigapp3:
+    image: nginx
+    links:
+      - digui:digui
+    ports:
+      - "8089:80"
+    volumes:
+      - ./digapp/sandbox/conf/nginx/.htpasswd:/etc/nginx/.htpasswd
+      - ./digapp/sandbox/conf/nginx_sites_enabled/dig.conf:/etc/nginx/conf.d/default.conf
+      - ./digapp/sandbox/logs/nginx:/var/log/nginx
+      - ./digapp/sandbox/logs/digapp:/var/log/diglogs
+    depends_on:
+      - elasticsearch
+    networks:
+      - dig_net
+
 networks:
   dig_net:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/24
