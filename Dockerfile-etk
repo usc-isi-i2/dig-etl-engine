@@ -1,0 +1,39 @@
+# ETK base for all
+FROM ubuntu:16.04
+
+# all packages and environments are in /app
+WORKDIR /app
+
+## install required command utils
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python \
+    python-dev \
+    git \
+    wget \
+    curl
+
+# install pip
+RUN wget https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py
+
+# install conda
+RUN wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh && \
+    chmod +x Miniconda2-latest-Linux-x86_64.sh && \
+    ./Miniconda2-latest-Linux-x86_64.sh -p /app/miniconda -b && \
+    rm Miniconda2-latest-Linux-x86_64.sh
+ENV PATH=/app/miniconda/bin:${PATH}
+RUN conda update -y conda
+
+# download etk
+RUN git clone https://github.com/usc-isi-i2/etk.git && \
+    cd etk && \
+    git checkout tags/1.0.0
+
+# create and config conda-env (install flask) for etk
+RUN cd etk && conda-env create .
+# set etk_env as default env
+ENV PATH /app/miniconda/envs/etk_env/bin:$PATH
+RUN /bin/bash -c "python -m spacy download en"
+
+CMD /bin/bash
