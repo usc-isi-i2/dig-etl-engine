@@ -5,6 +5,19 @@
 - Docker compose.
 - Sample configurations.
 
+# Getting started
+
+Make sure local port 8089, 9200, 9300, 9880 are not occupied, then all you need to do is:
+
+    docker-compose up -d
+    
+Access endpoint:
+
+- MyDIG web service GUI: `localhost:9880`
+- DIG GUI: `localhost:8089`
+- Elastic Search: `localhost:9200`
+
+# Advanced operations
 
 ## Manager's endpoints
 
@@ -20,10 +33,6 @@
     {
         "project_name" : "new_project",
         "number_of_workers": 4, // optional
-        "input_offset": "seek_to_end", // optional
-        "output_offset": "seek_to_end", // optional
-        "delete_input_topic": true, // optional
-        "delete_output_topic": true // optional
     }
     ```
     
@@ -34,19 +43,6 @@
     }
     ```
 
-## Docker image of DIG ETL Engine
-
-Build image
-
-    docker build -t dig_etl_engine .
-    
-Run in container
-
-    docker run -d -p 9999:9999 \
-    -v $(pwd)/../mydig-projects:/shared_data/projects \
-    -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
-    dig_etl_engine
-
 ## Docker compose
 
 - Create `.env` file from `.env.example` and change the environment variables.
@@ -54,18 +50,33 @@ Run in container
 
 ## Docker port mapping
 
-- DIG ETL Engine: 9999 (localhost / dig_net)
-- Kafka: 9092 (localhost / dig_net)
-- Zookeeper: 2181 (localhost / dig_net)
+- DIG ETL Engine: 9999 (dig_net)
+- Kafka: 9092 (dig_net)
+- Zookeeper: 2181 (dig_net)
 - ElasticSearch: 9200 (localhost / dig_net), 9300 (localhost / dig_net)
-- Sandpaper: 9876 (localhost / dig_net)
+- Sandpaper: 9876 (dig_net)
 - DIG App: 8080 (dig_net)
 - DIG App Nginx: 8089 (localhost / dig_net)
-- myDIG: 9879 (localhost / dig_net), 9880 (localhost / dig_get)
+- myDIG: 9879 (dig_net), 9880 (localhost / dig_get)
 
 > `dig_net` is the LAN in Docker compose.
 
+## Docker commands for development
 
+build etk base image:
+
+    docker build -t uscisii2/etk:1.0.0 -t uscisii2/etk:latest -f Dockerfile-etk .
+    
+build etl image:
+
+    docker build -t uscisii2/dig-etl-engine:1.0.0 -t uscisii2/dig-etl-engine:latest .
+    
+run etl container:
+
+    docker run -d -p 9999:9999 \
+    -v $(pwd)/../mydig-projects:/shared_data/projects \
+    -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
+    dig_etl_engine
 
 
 ## kafka input parameters of interest for Logstash

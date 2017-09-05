@@ -3,7 +3,8 @@ version: '3'
 services:
 
   dig_etl_engine:
-    build: .
+    build: . # development only
+#    image: uscisii2/dig-etl-engine:1.0.0
     volumes:
       - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
@@ -18,7 +19,7 @@ services:
 
   zookeeper:
     image: wurstmeister/zookeeper
-#    environment:
+    environment:
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
     ports:
       - "2181:2181"
@@ -33,7 +34,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka # ${DOCKER_HOST_NAME}
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_CREATE_TOPICS: "test:1:1" # development
+#      KAFKA_CREATE_TOPICS: "test:1:1" # development only
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

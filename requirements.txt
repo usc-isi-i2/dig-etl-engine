@@ -1,0 +1,3 @@
+python-logstash>=0.4.6
+kafka-python>=1.3.3
+Flask>=0.12
