@@ -7,7 +7,7 @@
 
 # Getting started
 
-Make sure local port 8089, 9200, 9300, 9880 are not occupied, then all you need to do is:
+Make sure local port 8089, 9200, 9300, 9879, 9880 are not occupied, then all you need to do is:
 
     docker-compose up -d
     
@@ -57,7 +57,7 @@ Access endpoint:
 - Sandpaper: 9876 (dig_net)
 - DIG App: 8080 (dig_net)
 - DIG App Nginx: 8089 (localhost / dig_net)
-- myDIG: 9879 (dig_net), 9880 (localhost / dig_get)
+- myDIG: 9879 (localhost / dig_net), 9880 (localhost / dig_get)
 
 > `dig_net` is the LAN in Docker compose.
 
@@ -76,7 +76,7 @@ run etl container:
     docker run -d -p 9999:9999 \
     -v $(pwd)/../mydig-projects:/shared_data/projects \
     -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
-    dig_etl_engine
+    uscisii2/dig-etl-engine:1.0.0
 
 
 ## kafka input parameters of interest for Logstash

@@ -3,17 +3,16 @@ version: '3'
 services:
 
   dig_etl_engine:
-    build: . # development only
-#    image: uscisii2/dig-etl-engine:1.0.0
+    image: uscisii2/dig-etl-engine:1.0.0
     volumes:
       - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
-      - ${DIG_RESOURCES_DIR_PATH}:/shared_data/dig3-resources
+      - dig3-resources-volume:/shared_data/dig3-resources
       - ./logstash/sandbox/pipeline/:/app/logstash_pipeline
       - ${ETK_DIR_PATH}:/app/etk # development only
     ports:
-      - "9999:9999"
+      - "9999"
     networks:
       - dig_net
 
@@ -22,14 +21,14 @@ services:
     environment:
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
     ports:
-      - "2181:2181"
+      - "2181"
     networks:
       - dig_net
 
   kafka:
     image: wurstmeister/kafka
     ports:
-      - "9092:9092"
+      - "9092"
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka # ${DOCKER_HOST_NAME}
       KAFKA_ADVERTISED_PORT: 9092
@@ -76,7 +75,7 @@ services:
   sandpaper:
     image: digsandpaper/digsandpaper
     ports:
-      - "9876:9876"
+      - "9876"
     volumes:
       - ./sandpaper/sandbox/config:/etc/sandpaper/config
     links:
@@ -95,16 +94,17 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: mydig_ws
+    image: uscisii2/mydig_ws:1.0.0
 #    environment:
 #      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
     ports:
       - "9879:9879"
       - "9880:9880"
     volumes:
-      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
-      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py
-      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+      - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
+#      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+#      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
+      - dig3-resources-volume:/shared_data/projects
       - ${DIG_RESOURCES_DIR_PATH}:/shared_data/dig3-resources
     networks:
       - dig_net
@@ -152,3 +152,6 @@ networks:
       driver: default
       config:
         - subnet: 172.19.0.0/24
+
+volumes:
+  dig3-resources-volume:
