@@ -19,6 +19,10 @@ Access endpoint:
 
 # Advanced operations
 
+If some of the docker images in docker-compose file are updated, run the following command first.
+    
+    docker-compose pull
+
 ## Manager's endpoints
 
 - `POST /create_project`

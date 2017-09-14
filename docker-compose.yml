@@ -102,10 +102,10 @@ services:
       - "9880:9880"
     volumes:
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
-#      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
-#      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
-      - dig3-resources-volume:/shared_data/projects
-      - ${DIG_RESOURCES_DIR_PATH}:/shared_data/dig3-resources
+      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
+      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+      - dig3-resources-volume:/shared_data/dig3-resources
     networks:
       - dig_net
 
@@ -145,6 +145,37 @@ services:
     networks:
       - dig_net
 
+  landmark-mysql:
+    image: inferlink/landmark-mysql
+    container_name: landmark-mysql
+    env_file:
+      - ./landmark/sandbox/landmark-mysql.docker.env
+    ports:
+      - "3306"
+    networks:
+      - dig_net
+  landmark-rest:
+    image: inferlink/landmark-rest
+    container_name: landmark-rest
+    env_file:
+      - ./landmark/sandbox/landmark-rest.docker.env
+    volumes:
+      - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
+    ports:
+      - "5000:5000"
+    networks:
+      - dig_net
+  landmark-portal:
+    image: inferlink/landmark-portal
+    container_name: landmark-portal
+    env_file:
+      - ./landmark/sandbox/landmark-portal.docker.env
+    ports:
+     - "3333:3333"
+    networks:
+      - dig_net
+
+
 networks:
   dig_net:
     driver: bridge
@@ -155,3 +186,4 @@ networks:
 
 volumes:
   dig3-resources-volume:
+#  landmark-data-volume:
