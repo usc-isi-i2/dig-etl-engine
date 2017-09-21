@@ -93,6 +93,12 @@ def kill_etk():
     kill_etk_process(args['project_name'], True)
     return jsonify({}), 201
 
+@app.route('/etk_status/<project_name>', methods=['GET'])
+def etk_status(project_name):
+    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{project_name}"'.format(project_name=project_name)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    output = p.stdout.read()
+    return jsonify({'etk_processes':len(output)})
 
 @app.route('/debug/ps', methods=['GET'])
 def debug_ps():
