@@ -17,6 +17,8 @@ Access endpoint:
 - DIG GUI: `localhost:8089`
 - Elastic Search: `localhost:9200`
 
+If you are working on OSX or Windows, make sure you give enough memory (4GB or more is recommended) to docker virtual machine.
+
 # Advanced operations
 
 If some of the docker images in docker-compose file are updated, run the following command first.

@@ -35,6 +35,11 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 #      KAFKA_CREATE_TOPICS: "test:1:1" # development only
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_LOG_CLEANER_ENABLE: true
+      KAFKA_LOG_CLEANUP_POLICY: delete
+      KAFKA_LOG_CLEANER_BACKOFF_MS: 3600 # 3600
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 21600 # 3600 * 6
+      KAFKA_LOG_CLEANER_DELETE_RETENTION_MS: 86400 # 3600 * 24
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -186,4 +191,3 @@ networks:
 
 volumes:
   dig3-resources-volume:
-#  landmark-data-volume:
