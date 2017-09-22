@@ -15,6 +15,8 @@ services:
       - "9999"
     networks:
       - dig_net
+    depends_on:
+      - elasticsearch
 
   zookeeper:
     image: wurstmeister/zookeeper
@@ -35,7 +37,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 #      KAFKA_CREATE_TOPICS: "test:1:1" # development only
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
-      KAFKA_LOG_CLEANER_ENABLE: true
+      KAFKA_LOG_CLEANER_ENABLE: "true"
       KAFKA_LOG_CLEANUP_POLICY: delete
       KAFKA_LOG_CLEANER_BACKOFF_MS: 3600 # 3600
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 21600 # 3600 * 6
@@ -115,7 +117,7 @@ services:
       - dig_net
 
   digui:
-    image: digmemex/digui:0.0.57
+    image: digmemex/digui:0.1.8
     ports:
       - "8080" # behind nginx, only expose to inner network
     volumes:
