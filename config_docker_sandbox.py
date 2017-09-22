@@ -30,5 +30,6 @@ config = {
 
     'kafka_bin_path': '/app/kafka/bin',
     'projects_path': '/shared_data/projects',
-    'etk_path': '/app/etk'
+    'etk_path': '/app/etk',
+    'es_url': 'http://elasticsearch:9200'
 }

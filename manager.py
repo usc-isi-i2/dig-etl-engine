@@ -7,9 +7,11 @@ from kafka import KafkaProducer, KafkaConsumer
 import logging
 import logstash
 import codecs
-from config import config
-
+import requests
+import time
 from flask import Flask, request, jsonify
+
+from config import config
 
 app = Flask(__name__)
 
@@ -228,8 +230,29 @@ output {
         f.write(content)
 
 
+def create_mappings(index_name, payload_file_path):
+    try:
+        url = '{}/{}'.format(config['es_url'], index_name)
+        resp = requests.get(url)
+        if resp.status_code // 100 == 4: # if no such index there
+            with codecs.open(payload_file_path, 'r') as f:
+                payload = f.read() # stringfied json
+            resp = requests.put(url, payload)
+            if resp.status_code // 100 != 2:
+                print 'can not create es index for {}'.format(index_name)
+            else:
+                print 'es index {} created'.format(index_name)
+    except requests.exceptions.ConnectionError:
+        # es if not online, retry
+        time.sleep(5)
+        create_mappings(index_name, payload_file_path)
+
+
 if __name__ == '__main__':
     try:
+        create_mappings('dig-logs', 'elasticsearch/sandbox/mappings/dig_logs.json')
+        create_mappings('dig-states', 'elasticsearch/sandbox/mappings/dig_states.json')
+        create_mappings('logs', 'elasticsearch/sandbox/mappings/logs.json')
         app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
     except Exception as e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
