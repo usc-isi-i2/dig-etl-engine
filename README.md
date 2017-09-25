@@ -7,7 +7,11 @@
 
 # Getting started
 
-Make sure local port 8089, 9200, 9300, 9879, 9880 are not occupied, then all you need to do is:
+Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). If you are working on OSX or Windows, make sure you give enough memory (4GB or more is recommended) to docker virtual machine.
+
+Clone this repo to `/your/path/dig-etl-engine`, copy `.env.example` to `.env`, then create a directory named `/your/path/mydig-projects`.
+
+Make sure local port 3333, 5000, 8089, 9200, 9300, 9879, 9880 are not occupied, then all you need to do is:
 
     docker-compose up -d
     
@@ -15,15 +19,14 @@ Access endpoint:
 
 - MyDIG web service GUI: `localhost:9880`
 - DIG GUI: `localhost:8089`
+- Landmark Tool GUI: `localhost:3333`
 - Elastic Search: `localhost:9200`
-
-If you are working on OSX or Windows, make sure you give enough memory (4GB or more is recommended) to docker virtual machine.
 
 # Advanced operations
 
 If some of the docker images in docker-compose file are updated, run the following command first.
     
-    docker-compose pull
+    docker-compose pull <service name>
 
 ## Manager's endpoints
 

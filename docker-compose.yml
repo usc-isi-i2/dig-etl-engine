@@ -5,12 +5,12 @@ services:
   dig_etl_engine:
     image: uscisii2/dig-etl-engine:1.0.0
     volumes:
-      - .:/app/dig-etl-engine # development only
+#      - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
       - dig3-resources-volume:/shared_data/dig3-resources
       - ./logstash/sandbox/pipeline/:/app/logstash_pipeline
-      - ${ETK_DIR_PATH}:/app/etk # development only
+#      - ${ETK_DIR_PATH}:/app/etk # development only
     ports:
       - "9999"
     networks:
@@ -109,8 +109,8 @@ services:
       - "9880:9880"
     volumes:
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
-      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
-      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
+#      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+#      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
       - dig3-resources-volume:/shared_data/dig3-resources
     networks:
