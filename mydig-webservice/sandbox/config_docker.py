@@ -1,5 +1,4 @@
 # this file is from mydig-webservice/ws/config_docker.py
-
 import logging
 import os
 
@@ -54,9 +53,13 @@ config = {
         'host': '0.0.0.0',
         'port': 9880,
         'debug': True,
-        'backend_url': os.getenv('MYDIG_BACKEND_URL', 'http://localhost:9879/')
+        'backend_url': os.getenv('MYDIG_BACKEND_URL', 'http://localhost:9879/'),
+        'landmark_url': 'http://localhost:3333',
+        'digui_url': 'http://localhost:8089'
     },
-    # 'default_source_credentials_path': './default_source_credentials.json',
+    'landmark': {
+        'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'
+    },
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'
