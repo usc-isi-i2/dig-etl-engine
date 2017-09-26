@@ -101,16 +101,15 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.0
+    image: uscisii2/mydig_ws:1.0.1
 #    environment:
 #      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
     ports:
       - "9879:9879"
       - "9880:9880"
     volumes:
-      - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
 #      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
-#      - ${MYDIG_DIR_PATH}/ws/config_docker.py:/app/mydig-webservice/ws/config.py # development only
+      - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
       - dig3-resources-volume:/shared_data/dig3-resources
     networks:

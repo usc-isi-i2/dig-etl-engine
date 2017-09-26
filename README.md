@@ -27,6 +27,8 @@ Access endpoint:
 If some of the docker images in docker-compose file are updated, run the following command first.
     
     docker-compose pull <service name>
+    
+Defaultly, only one process of ETK will run, if you want to run multi ETK processes, please refer to `./mydig-webservice/config_docker.py`, set the value of `etl.number_of_workers` (less or equal to the value of`input_partitions` in `config_docker_sandbox.py`) and restart docker-compose.
 
 ## Manager's endpoints
 
