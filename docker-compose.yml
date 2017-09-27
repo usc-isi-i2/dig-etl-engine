@@ -101,7 +101,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.1
+    image: uscisii2/mydig_ws:1.0.2
 #    environment:
 #      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
     ports:

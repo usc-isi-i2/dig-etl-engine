@@ -36,7 +36,7 @@ config = {
     },
     'etl': {
         'url': 'http://dig_etl_engine:9999',
-        'number_of_workers': 1,
+        'number_of_workers': 4,
         'timeout': 5
     },
     'kafka': {
