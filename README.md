@@ -21,7 +21,7 @@ Clone this repository.
     
 Create environment file from example environment file.
  
-    cp ./dig-etl-engines/.env.example ./dig-etl-engines/.env
+    cp ./dig-etl-engine/.env.example ./dig-etl-engine/.env
     
 Create projects' directory.
 
