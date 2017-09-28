@@ -2,14 +2,16 @@
 
 - Manager for ETK processes, Kafka topic and Logstash.
 - Docker image of ETL Engine.
-- Docker compose.
+- Docker compose of myDIG.
 - Sample configurations.
 
 Part of the project [DIG](http://usc-isi-i2.github.io/dig/).
 
 # Getting started
 
-Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). If you are working on OSX or Windows, make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
+Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
+
+> If you are working on OSX or Windows, **make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
 
 > If the memory is not enough, some service processes may not be fired up, or they will be killed by OS.
 
@@ -29,7 +31,7 @@ Make sure local port 3333, 5000, 8089, 9200, 9300, 9879, 9880 are not occupied, 
 
     docker-compose up -d
     
-> Docker command acquire high privilege in some of the OS, add `sudo` before it.
+> Docker commands acquire high privilege in some of the OS, add `sudo` before them.
 
 > Wait a couple of minutes to ensure all the services are up.
     
@@ -52,17 +54,17 @@ In web browser, open up `MyDIG web service GUI` at `localhost:9880`, create a pr
 
 Click `import json lines file` button on right, upload `elicit_20.jl`, then you will see `ce_news_article.org` shows up in TLD (top level domain) table. Enter `15` in the `Desired number of docs to run` input box and click `update` button. Then the desired number of this TLD will be update to `15`.
 
-Click red button named `recreate knowledge graph` to create a new knowledge graph and upload the data. Wait a few seconds, you should see updates in the column `ES` (this number will be less or equal to desired number).
+Click red button named `recreate knowledge graph` to create a new knowledge graph and upload the data. Wait a few seconds, you should see updates in the column `ES` (this number will be less than or equal to desired number).
  
 Finally, click `DIG GUI` button to open and test on DIG.
 
 # Detailed function introduction
 
-`recreate knowledge` is used to recreate the index in elastic search and regenerate ETK config. All the desired data marked previously will be re-added and re-run automatically. This function will also turn on pipeline. Only use it after you did some incompatible changes.
+- `recreate knowledge` is used to recreate the index in elastic search and regenerate ETK config. All the desired data marked previously will be re-added and re-run automatically. This function will also turn on pipeline. Only use it after you did some incompatible changes.
 
 > Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
 
-`turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for 1 hour. Then this button will turn into enable.
+- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for 1 hour. Then this button will turn into enable.
 
 # Advanced operations
 
@@ -113,6 +115,7 @@ The data in kafka queue will be cleaned after two days.
 - DIG App: 8080 (dig_net)
 - DIG App Nginx: 8089 (localhost / dig_net)
 - myDIG: 9879 (localhost / dig_net), 9880 (localhost / dig_get)
+- Landmark Tool: 3333 (localhost / dig_net), 5000 (localhost / dig_net)
 
 > `dig_net` is the LAN in Docker compose.
 

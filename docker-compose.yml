@@ -57,9 +57,11 @@ services:
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      LS_LOG_LEVEL: "debug"
     volumes:
       - ./logstash/sandbox/pipeline/:/usr/share/logstash/pipeline/
       - ./logstash/sandbox/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/sandbox/log/:/var/log/logstash
     networks:
       - dig_net
     depends_on:
@@ -101,7 +103,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.2
+    image: uscisii2/mydig_ws:1.0.3
 #    environment:
 #      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
     ports:
@@ -141,6 +143,7 @@ services:
       - digui:digui
     ports:
       - "8089:80"
+      - "8090:81"
     volumes:
       - ./digapp/sandbox/conf/nginx/.htpasswd:/etc/nginx/.htpasswd
       - ./digapp/sandbox/conf/nginx_sites_enabled/dig.conf:/etc/nginx/conf.d/default.conf

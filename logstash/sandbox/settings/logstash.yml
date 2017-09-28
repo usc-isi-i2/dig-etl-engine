@@ -1,3 +1,4 @@
 config.reload.automatic: true
 path.config: /usr/share/logstash/pipeline
+path.logs: /var/log/logstash
 xpack.monitoring.enabled: false

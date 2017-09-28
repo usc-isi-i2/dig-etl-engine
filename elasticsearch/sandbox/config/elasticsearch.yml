@@ -1,7 +1,7 @@
 cluster.name: "docker-cluster"
 network.host: 0.0.0.0
 index.number_of_replicas: 0
-
+path.logs: /var/log/elasticsearch
 
 xpack.security.enabled: false
 xpack.monitoring.enabled: false
