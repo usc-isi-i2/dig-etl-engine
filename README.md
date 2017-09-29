@@ -11,7 +11,7 @@ Part of the project [DIG](http://usc-isi-i2.github.io/dig/).
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
-> If you are working on OSX or Windows, **make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
+> If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
 
 > If the memory is not enough, some service processes may not be fired up, or they will be killed by OS.
 
@@ -48,7 +48,7 @@ To stop docker containers, run following command
     
 # Verify installation
 
-The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` (unique string), `url`, `raw_content` (encoded in UTF-8).
+The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
 
 In web browser, open up `MyDIG web service GUI` at `localhost:9880`, create a project named `test`, then click `open` to open project detail configuration page.
 
