@@ -53,9 +53,9 @@ config = {
         'host': '0.0.0.0',
         'port': 9880,
         'debug': True,
-        'backend_url': os.getenv('MYDIG_BACKEND_URL', 'http://localhost:9879/'),
-        'landmark_url': 'http://localhost:3333',
-        'digui_url': 'http://localhost:8089'
+        'backend_url': os.getenv('MYDIG_BACKEND_URL', 'http://localhost:12497/mydig/'),
+        'landmark_url': 'http://localhost:12497/landmark/',  # add slash at the end
+        'digui_url': 'http://localhost:12497'
     },
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'

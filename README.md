@@ -27,7 +27,7 @@ Create projects' directory.
 
     mkdir ./mydig-projects
 
-Make sure local port 3333, 5000, 8089, 9200, 9300, 9879, 9880 are not occupied, then all you need to do is:
+Make sure local port 12497 is not occupied, then all you need to do is:
 
     docker-compose up -d
     
@@ -37,10 +37,8 @@ Make sure local port 3333, 5000, 8089, 9200, 9300, 9879, 9880 are not occupied, 
     
 Access endpoint:
 
-- MyDIG web service GUI: `localhost:9880`
-- DIG GUI: `localhost:8089`
-- Landmark Tool GUI: `localhost:3333`
-- Elastic Search: `localhost:9200`
+- MyDIG web service GUI: `http://localhost:12497/mydig/ui`
+- Elastic Search: `http://localhost:12497/es`
 
 To stop docker containers, run following command
 
@@ -107,15 +105,19 @@ The data in kafka queue will be cleaned after two days.
 
 ## Docker port mapping
 
-- DIG ETL Engine: 9999 (dig_net)
-- Kafka: 9092 (dig_net)
-- Zookeeper: 2181 (dig_net)
-- ElasticSearch: 9200 (localhost / dig_net), 9300 (localhost / dig_net)
-- Sandpaper: 9876 (dig_net)
-- DIG App: 8080 (dig_net)
-- DIG App Nginx: 8089 (localhost / dig_net)
-- myDIG: 9879 (localhost / dig_net), 9880 (localhost / dig_get)
-- Landmark Tool: 3333 (localhost / dig_net), 5000 (localhost / dig_net)
+- dig_net:
+    - DIG ETL Engine: 9999
+    - Kafka: 9092
+    - Zookeeper: 2181
+    - ElasticSearch: 9200, 9300
+    - Sandpaper: 9876
+    - DIG UI: 8080
+    - myDIG: 9879, 9880
+    - Landmark Tool: 3333, 5000, 3306
+    - Logstash: 5044, 9600
+    - Nginx: 80
+- localhost:
+    - Nginx: 12497
 
 > `dig_net` is the LAN in Docker compose.
 
