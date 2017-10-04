@@ -90,6 +90,7 @@ services:
     volumes:
 #      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${DIG_PROJECTS_DIR_PATH}/.es/data:/usr/share/elasticsearch/data
 #    ports:
 #      - "9200:9200"
 #      - "9300:9300"
@@ -161,7 +162,7 @@ services:
     env_file:
       - ./landmark/sandbox/landmark-mysql.docker.env
     volumes:
-      - ${DIG_PROJECTS_DIR_PATH}/.landmark_mysql:/var/lib/mysql
+      - ${DIG_PROJECTS_DIR_PATH}/.landmark/mysql:/var/lib/mysql
 #    ports:
 #      - "3306"
     networks:
