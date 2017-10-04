@@ -37,7 +37,7 @@ Make sure local port 12497 is not occupied, then all you need to do is:
     
 Access endpoint:
 
-- MyDIG web service GUI: `http://localhost:12497/mydig/ui`
+- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es`
 
 To stop docker containers, run following command
