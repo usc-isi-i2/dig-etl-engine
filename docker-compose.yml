@@ -122,8 +122,9 @@ services:
 
   mydig_ws:
     image: uscisii2/mydig_ws:1.0.4
-#    environment:
-#      MYDIG_BACKEND_URL: http://${DOCKER_HOST_NAME}:9879/
+    environment:
+      DOMAIN: ${DOMAIN}
+      NUM_ETK_PROCESSES: ${NUM_ETK_PROCESSES}
 #    ports:
 #      - "9879:9879"
 #      - "9880:9880"
@@ -143,15 +144,15 @@ services:
       - ./digapp/sandbox/logs/digapp:/var/log
     environment:
       NODE_ENV: 'production' # for port 8080
-      ES_HOST: '{"host": "http://localhost:12497/es"}'
+      ES_HOST: '{"host": "http://${DOMAIN}:12497/es"}'
       DATABASE_TYPE: 'sample'
-      CONFIG_ENDPOINT: 'http://localhost:12497/mydig_projects/'
-      TAGS_ENTITY_ENDPOINT: 'http://localhost:12497/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
-      TAGS_EXTRACTION_ENDPOINT: 'http://localhost:12497/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
+      CONFIG_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/'
+      TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
+      TAGS_EXTRACTION_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
       /annotations'
-      TAGS_LIST_ENDPOINT: 'http://localhost:12497/mydig_projects/PROJECT/tags'
+      TAGS_LIST_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/tags'
       SEARCH_CONFIG: '{
-        "http://sandpaper:9876": "http://localhost:12497/search9876"
+        "http://sandpaper:9876": "http://${DOMAIN}:12497/search9876"
       }'
     networks:
       - dig_net

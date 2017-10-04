@@ -74,6 +74,8 @@ Defaultly, 4 process of ETK will run, if you want to run multi ETK processes, pl
 
 The data in kafka queue will be cleaned after two days.
 
+On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
+
 ## Manager's endpoints
 
 - `POST /create_project`

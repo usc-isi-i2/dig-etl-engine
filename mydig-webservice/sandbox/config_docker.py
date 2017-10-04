@@ -36,7 +36,7 @@ config = {
     },
     'etl': {
         'url': 'http://dig_etl_engine:9999',
-        'number_of_workers': 4,
+        'number_of_workers': int(os.getenv('NUM_ETK_PROCESSES', '4')),
         'timeout': 5
     },
     'kafka': {
@@ -53,9 +53,9 @@ config = {
         'host': '0.0.0.0',
         'port': 9880,
         'debug': True,
-        'backend_url': os.getenv('MYDIG_BACKEND_URL', 'http://localhost:12497/mydig/'),
-        'landmark_url': 'http://localhost:12497/landmark/',  # add slash at the end
-        'digui_url': 'http://localhost:12497'
+        'backend_url': 'http://{}:12497/mydig/'.foramt(os.getenv('DOMAIN', 'localhost')),
+        'landmark_url': 'http://{}:12497/landmark/'.foramt(os.getenv('DOMAIN', 'localhost')),  # add slash at the end
+        'digui_url': 'http://{}:12497'.foramt(os.getenv('DOMAIN', 'localhost'))
     },
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'
