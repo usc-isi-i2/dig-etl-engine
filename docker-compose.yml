@@ -5,7 +5,7 @@ services:
   nginx:
     image: nginx
     ports:
-      - "12497:80"
+      - "${PORT}:80"
     volumes:
       - ./nginx/sandbox/nginx/.htpasswd:/etc/nginx/.htpasswd
       - ./nginx/sandbox/conf.d/dig.conf:/etc/nginx/conf.d/default.conf
@@ -99,6 +99,17 @@ services:
     networks:
       - dig_net
 
+#  kibana:
+#    image: kibana:4.6 # compatible with es 2.4
+#    volumes:
+#      - ./kibana/sandbox/config/:/usr/share/kibana/config
+#    ports:
+#      - "5601:5601"
+#    networks:
+#      - dig_net
+#    depends_on:
+#      - elasticsearch
+
   sandpaper:
     image: digsandpaper/digsandpaper:0.1.4-r043
 #    ports:
@@ -124,6 +135,7 @@ services:
     image: uscisii2/mydig_ws:1.0.4
     environment:
       DOMAIN: ${DOMAIN}
+      PORT: ${PORT}
       NUM_ETK_PROCESSES: ${NUM_ETK_PROCESSES}
 #    ports:
 #      - "9879:9879"
@@ -144,15 +156,15 @@ services:
       - ./digapp/sandbox/logs/digapp:/var/log
     environment:
       NODE_ENV: 'production' # for port 8080
-      ES_HOST: '{"host": "http://${DOMAIN}:12497/es"}'
+      ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es"}'
       DATABASE_TYPE: 'sample'
-      CONFIG_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/'
-      TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
-      TAGS_EXTRACTION_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
+      CONFIG_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/'
+      TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
+      TAGS_EXTRACTION_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
       /annotations'
-      TAGS_LIST_ENDPOINT: 'http://${DOMAIN}:12497/mydig_projects/PROJECT/tags'
+      TAGS_LIST_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags'
       SEARCH_CONFIG: '{
-        "http://sandpaper:9876": "http://${DOMAIN}:12497/search9876"
+        "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search9876"
       }'
     networks:
       - dig_net

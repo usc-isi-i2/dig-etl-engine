@@ -53,9 +53,12 @@ config = {
         'host': '0.0.0.0',
         'port': 9880,
         'debug': True,
-        'backend_url': 'http://{}:12497/mydig/'.format(os.getenv('DOMAIN', 'localhost')),
-        'landmark_url': 'http://{}:12497/landmark/'.format(os.getenv('DOMAIN', 'localhost')),  # add slash at the end
-        'digui_url': 'http://{}:12497'.format(os.getenv('DOMAIN', 'localhost'))
+        'backend_url': 'http://{}:{}/mydig/'.format(
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
+        'landmark_url': 'http://{}:{}/landmark/'.format(
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),  # add slash at the end
+        'digui_url': 'http://{}:{}'.format(
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))
     },
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'
