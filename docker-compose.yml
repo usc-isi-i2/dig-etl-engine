@@ -195,7 +195,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.19.0.0/24
+        - subnet: 172.19.0.0/16
 
 volumes:
   dig3-resources-volume:
