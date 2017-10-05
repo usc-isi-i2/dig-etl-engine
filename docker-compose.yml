@@ -99,16 +99,16 @@ services:
     networks:
       - dig_net
 
-#  kibana:
-#    image: kibana:4.6 # compatible with es 2.4
-#    volumes:
-#      - ./kibana/sandbox/config/:/usr/share/kibana/config
+  kibana:
+    image: kibana:4.6 # compatible with es 2.4
+    volumes:
+      - ./kibana/sandbox/config/:/usr/share/kibana/config
 #    ports:
 #      - "5601:5601"
-#    networks:
-#      - dig_net
-#    depends_on:
-#      - elasticsearch
+    networks:
+      - dig_net
+    depends_on:
+      - elasticsearch
 
   sandpaper:
     image: digsandpaper/digsandpaper:0.1.4-r043
@@ -132,7 +132,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.4
+    image: uscisii2/mydig_ws:1.0.5
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}

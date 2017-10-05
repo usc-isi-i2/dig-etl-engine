@@ -48,7 +48,7 @@ To stop docker containers, run following command
 
 The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
 
-In web browser, open up `MyDIG web service GUI` at `localhost:9880`, create a project named `test`, then click `open` to open project detail configuration page.
+In web browser, open up `MyDIG web service GUI` at `http://localhost:12497/mydig/ui/`, create a project named `test`, then click `open` to open project detail configuration page.
 
 Click `import json lines file` button on right, upload `elicit_20.jl`, then you will see `ce_news_article.org` shows up in TLD (top level domain) table. Enter `15` in the `Desired number of docs to run` input box and click `update` button. Then the desired number of this TLD will be update to `15`.
 
