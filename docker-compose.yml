@@ -20,7 +20,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.0.0
+    image: uscisii2/dig-etl-engine:1.0.1
     volumes:
 #      - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
@@ -59,6 +59,11 @@ services:
       KAFKA_LOG_CLEANER_BACKOFF_MS: 3600 # 3600
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 21600 # 3600 * 6
       KAFKA_LOG_CLEANER_DELETE_RETENTION_MS: 86400 # 3600 * 24
+      KAFKA_NUM_PARTITIONS: 4
+      KAFKA_MESSAGE_MAX_BYTES: 10485760 # 10MB
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 10485760 # 10MB
+      KAFKA_REPLICA_FETCH_RESPONSE_MAX_BYTES: 10485760 # 10MB
+      KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 300000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -132,7 +137,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.5
+    image: uscisii2/mydig_ws:1.0.6
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -147,6 +152,9 @@ services:
       - dig3-resources-volume:/shared_data/dig3-resources
     networks:
       - dig_net
+    depends_on:
+      - sandpaper
+      - elasticsearch
 
   digui:
     image: digmemex/digui:0.1.8
