@@ -44,7 +44,7 @@ config = {
     },
     'sandpaper': {
         'url': 'http://sandpaper:9876',
-        'ws_url': 'http://admin:123@mydig_ws:9879'
+        'ws_url': 'http://mydig_ws:9879'
     },
     'users': {
         'admin': '123' # basic YWRtaW46MTIz

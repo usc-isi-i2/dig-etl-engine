@@ -208,6 +208,10 @@ def update_logstash_pipeline(project_name, output_server, output_topic):
     consumer_threads => "4"
     codec => json {}
     type => "''' + project_name + '''"
+    max_partition_fetch_bytes => "10485760"
+    max_poll_records => "10"
+    fetch_max_wait_ms => "1000"
+    poll_timeout_ms => "1000"
    }
 }
 filter {
