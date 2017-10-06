@@ -27,7 +27,7 @@ Create projects' directory.
 
     mkdir ./mydig-projects
 
-Make sure local port 12497 is not occupied, then all you need to do is:
+Make sure local port 12497 is not occupied (or change `PORT` in `.env` file), then all you need to do is:
 
     docker-compose up -d
     
@@ -39,6 +39,7 @@ Access endpoint:
 
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es`
+- Kibana: `http://localhost:12497/app/kibana/`
 
 To stop docker containers, run following command
 
@@ -66,15 +67,23 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 # Advanced operations
 
-If some of the docker images in docker-compose file are updated, run the following command first.
-    
-    docker-compose pull <service name>
-    
-Defaultly, 4 process of ETK will run, if you want to run multi ETK processes, please refer to `./mydig-webservice/config_docker.py`, set the value of `etl.number_of_workers` (less or equal to the value of`input_partitions` in `config_docker_sandbox.py`) and restart docker-compose.
+- If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
 
-The data in kafka queue will be cleaned after two days.
+- The `NUM_ETK_PROCESSES` should less or equal to the value of`input_partitions` in `config_docker_sandbox.py`.
 
-On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
+- The data in kafka queue will be cleaned after two days.
+
+- If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. Your `DIG_PROJECTS_DIR_PATH` will be mapped to `/shared_data/projects` in docker, so make sure all the paths you used in config is start with this prefix.
+
+- If you want to clean up all ElasticSearch data, remove `.es` directory in your `DIG_PROJECTS_DIR_PATH`.
+
+- If you want to clean up all Landmark Tool's database data, remove `.landmark` directory in your `DIG_PROJECTS_DIR_PATH`. But this will make published rules untraceable.
+
+- On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
+
+- On Linux, If you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
+
+- On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
 ## Manager's endpoints
 
@@ -105,21 +114,19 @@ On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstas
 - Create `.env` file from `.env.example` and change the environment variables.
 - Run `docker-compose up` for sandbox version, run `docker-compose -f docker-compose-production.yml up` for production version.
 
-## Docker port mapping
+## Ports allocation in dig_net
 
-- dig_net:
-    - DIG ETL Engine: 9999
-    - Kafka: 9092
-    - Zookeeper: 2181
-    - ElasticSearch: 9200, 9300
-    - Sandpaper: 9876
-    - DIG UI: 8080
-    - myDIG: 9879, 9880
-    - Landmark Tool: 3333, 5000, 3306
-    - Logstash: 5044, 9600
-    - Nginx: 80
-- localhost:
-    - Nginx: 12497
+- DIG ETL Engine: 9999
+- Kafka: 9092
+- Zookeeper: 2181
+- ElasticSearch: 9200, 9300
+- Sandpaper: 9876
+- DIG UI: 8080
+- myDIG: 9879, 9880
+- Landmark Tool: 3333, 5000, 3306
+- Logstash: 5044, 9600
+- Kibana: 5601
+- Nginx: 80
 
 > `dig_net` is the LAN in Docker compose.
 
