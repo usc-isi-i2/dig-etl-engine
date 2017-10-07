@@ -59,7 +59,7 @@ config = {
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),  # add slash at the end
         'digui_url': 'http://{}:{}'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
-        'kibana_url': 'http://{}:{}/app/kibana/'.format(
+        'kibana_url': 'http://{}:{}/kibana/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))
     },
     'landmark': {

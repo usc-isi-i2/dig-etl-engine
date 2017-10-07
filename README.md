@@ -132,6 +132,10 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 ## Docker commands for development
 
+build kibana image:
+
+    docker build -t uscisii2/kibana:4.6-sense -f Dockerfile-kibana .
+
 build etk base image:
 
     docker build -t uscisii2/etk:1.0.0 -t uscisii2/etk:latest -f Dockerfile-etk .
