@@ -39,7 +39,7 @@ Access endpoint:
 
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es`
-- Kibana: `http://localhost:12497/app/kibana/`
+- Kibana: `http://localhost:12497/kibana/`
 
 To stop docker containers, run following command
 
