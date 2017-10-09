@@ -110,15 +110,15 @@ services:
     image: uscisii2/kibana:4.6-sense # compatible with es 2.4
     volumes:
       - ./kibana/sandbox/config:/opt/kibana/config
-    ports:
-      - "5601:5601"
+#    ports:
+#      - "5601:5601"
     networks:
       - dig_net
     depends_on:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r043
+    image: digsandpaper/digsandpaper:0.1.4-r044
 #    ports:
 #      - "9876"
     volumes:
@@ -139,7 +139,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.6
+    image: uscisii2/mydig_ws:1.0.7
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
