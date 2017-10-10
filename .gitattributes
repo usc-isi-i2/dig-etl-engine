@@ -1,2 +1,1 @@
-* linguist-vendored=false
-*.py linguist-vendored
+* linguist-language=python
