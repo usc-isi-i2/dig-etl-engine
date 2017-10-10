@@ -1,1 +1,1 @@
-*.py linguist-vendored
+!*.py linguist-vendored
