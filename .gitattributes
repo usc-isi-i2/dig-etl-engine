@@ -1,1 +1,3 @@
-!*.py linguist-vendored
+*/* linguist-vendored
+*.yml linguist-vendored
+Dockerfile* linguist-language=Dockerfile
