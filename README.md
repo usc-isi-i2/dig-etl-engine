@@ -41,6 +41,10 @@ Access endpoint:
 - Elastic Search: `http://localhost:12497/es`
 - Kibana: `http://localhost:12497/kibana/`
 
+Authentication:
+
+The default username is `admin`, password is `123`.
+
 To stop docker containers, run following command
 
     docker-compose stop
@@ -132,19 +136,23 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 ## Docker commands for development
 
-build kibana image:
+build Kibana image:
 
-    docker build -t uscisii2/kibana:4.6-sense -f Dockerfile-kibana .
+    docker build -t uscisii2/kibana:4.6-sense kibana/.
+    
+build Nginx image:
 
-build etk base image:
+    docker build -t uscisii2/nginx:auth-1.0 nginx/.
+
+build ETK base image:
 
     docker build -t uscisii2/etk:1.0.0 -t uscisii2/etk:latest -f Dockerfile-etk .
     
-build etl image:
+build ETL image:
 
     docker build -t uscisii2/dig-etl-engine:1.0.0 -t uscisii2/dig-etl-engine:latest .
     
-run etl container:
+run ETL container:
 
     docker run -d -p 9999:9999 \
     -v $(pwd)/../mydig-projects:/shared_data/projects \
