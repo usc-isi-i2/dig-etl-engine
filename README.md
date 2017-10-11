@@ -43,7 +43,7 @@ Access endpoint:
 
 Authentication:
 
-The default username is `admin`, password is `123`.
+The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUTH_PASSWORD` can not be empty, or they will be overwrote by their default values.
 
 To stop docker containers, run following command
 
