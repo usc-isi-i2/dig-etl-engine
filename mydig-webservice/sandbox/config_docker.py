@@ -1,6 +1,7 @@
 # this file is from mydig-webservice/ws/config_docker.py
 import logging
 import os
+import base64
 
 config = {
     'debug': True,
@@ -62,7 +63,11 @@ config = {
         'kibana_url': 'http://{}:{}/kibana/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'spacy_ui_url': 'http://{}:{}/spacy_ui/'.format(
-            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
+        'spacy_backend_sever_name_base64': base64.b64encode('{}:{}/mydig'.format(
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))),
+        'spacy_backend_auth_base64': base64.b64encode('{}:{}'.format(
+            os.getenv('DIG_AUTH_USER', ''), os.getenv('DIG_AUTH_PASSWORD', '')))
     },
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'

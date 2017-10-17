@@ -143,11 +143,13 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.8
+    image: uscisii2/mydig_ws:1.0.9
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
       NUM_ETK_PROCESSES: ${NUM_ETK_PROCESSES}
+      DIG_AUTH_USER: ${DIG_AUTH_USER}
+      DIG_AUTH_PASSWORD: ${DIG_AUTH_PASSWORD}
 #    ports:
 #      - "9879:9879"
 #      - "9880:9880"
