@@ -60,6 +60,8 @@ config = {
         'digui_url': 'http://{}:{}'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'kibana_url': 'http://{}:{}/kibana/'.format(
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
+        'spacy_ui_url': 'http://{}:{}/spacy_ui/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))
     },
     'landmark': {

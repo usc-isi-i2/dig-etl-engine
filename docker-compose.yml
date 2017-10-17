@@ -151,6 +151,7 @@ services:
 #    ports:
 #      - "9879:9879"
 #      - "9880:9880"
+#      - "9881:9881"
     volumes:
 #      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
@@ -163,23 +164,24 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.1.8
+    image: digmemex/digui:0.2.3
 #    ports:
 #      - "8080" # behind nginx, only expose to inner network
     volumes:
       - ./digapp/sandbox/logs/digapp:/var/log
     environment:
-      NODE_ENV: 'production' # for port 8080
+      NODE_ENV: 'production'
       ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es"}'
-      DATABASE_TYPE: 'sample'
       CONFIG_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/'
       TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
       TAGS_EXTRACTION_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
       /annotations'
       TAGS_LIST_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags'
       SEARCH_CONFIG: '{
-        "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search9876"
+        "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search"
       }'
+    depends_on:
+      - elasticsearch
     networks:
       - dig_net
 
