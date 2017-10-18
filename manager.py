@@ -254,9 +254,13 @@ def create_mappings(index_name, payload_file_path):
 
 if __name__ == '__main__':
     try:
-        create_mappings('dig-logs', 'elasticsearch/sandbox/mappings/dig_logs.json')
-        create_mappings('dig-states', 'elasticsearch/sandbox/mappings/dig_states.json')
+        # digui will create indices itself
+        # create_mappings('dig-logs', 'elasticsearch/sandbox/mappings/dig_logs.json')
+        # create_mappings('dig-states', 'elasticsearch/sandbox/mappings/dig_states.json')
+
+        # general logs
         create_mappings('logs', 'elasticsearch/sandbox/mappings/logs.json')
+
         app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
     except Exception as e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
