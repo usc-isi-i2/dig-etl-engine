@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.0.1
+    image: uscisii2/dig-etl-engine:1.0.2
     volumes:
 #      - .:/app/dig-etl-engine # development only
       - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
@@ -143,7 +143,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.9
+    image: uscisii2/mydig_ws:1.0.10
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -166,7 +166,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.2.3
+    image: digmemex/digui:0.2.8
 #    ports:
 #      - "8080" # behind nginx, only expose to inner network
     volumes:
@@ -174,6 +174,7 @@ services:
     environment:
       NODE_ENV: 'production'
       ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es"}'
+      ES_HOST_STRING: 'http://elasticsearch:9200/'
       CONFIG_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/'
       TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
       TAGS_EXTRACTION_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/entities/ENTITY_ID/fields/EXTRACTION_FIELD
