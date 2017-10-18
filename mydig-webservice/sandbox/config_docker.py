@@ -62,7 +62,7 @@ config = {
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'kibana_url': 'http://{}:{}/kibana/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
-        'spacy_ui_url': 'http://{}:{}/spacy_ui/'.format(
+        'spacy_ui_url': 'http://{}:{}/mydig/spacy_ui/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'spacy_backend_sever_name_base64': base64.b64encode('{}:{}/mydig'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))),

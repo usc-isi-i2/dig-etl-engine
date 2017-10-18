@@ -126,9 +126,9 @@ Finally, click `DIG GUI` button to open and test on DIG.
 - ElasticSearch: 9200, 9300
 - Sandpaper: 9876
 - DIG UI: 8080
-- myDIG: 9879, 9880
+- myDIG: 9879 (ws), 9880 (gui), 9881 (spacy ui), 12121 (daemon, bind to localhost)
 - Landmark Tool: 3333, 5000, 3306
-- Logstash: 5044, 9600
+- Logstash: 5959 (udp, used by etk log)
 - Kibana: 5601
 - Nginx: 80
 

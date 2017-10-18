@@ -1,5 +1,5 @@
 # mydig-webservice
-FROM uscisii2/etk:1.0.2
+FROM uscisii2/etk:1.0.3
 
 # all packages and environments are in /app
 WORKDIR /app
