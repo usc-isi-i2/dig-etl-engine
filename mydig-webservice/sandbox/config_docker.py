@@ -38,7 +38,7 @@ config = {
     'etl': {
         'url': 'http://dig_etl_engine:9999',
         'number_of_workers': int(os.getenv('NUM_ETK_PROCESSES', '4')),
-        'timeout': 5
+        'timeout': 10
     },
     'kafka': {
         'servers': ['kafka:9092']
@@ -67,7 +67,7 @@ config = {
         'spacy_backend_sever_name_base64': base64.b64encode('{}:{}/mydig'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))),
         'spacy_backend_auth_base64': base64.b64encode('{}:{}'.format(
-            os.getenv('DIG_AUTH_USER', ''), os.getenv('DIG_AUTH_PASSWORD', '')))
+            os.getenv('DIG_AUTH_USER', 'admin'), os.getenv('DIG_AUTH_PASSWORD', '123')))
     },
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'

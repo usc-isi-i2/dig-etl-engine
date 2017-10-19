@@ -2,7 +2,8 @@
 *.out
 *.err
 *.zip
-*.git
-*.dist
+.git
+.idea
+.DS_Store
 *.test
 *.log
