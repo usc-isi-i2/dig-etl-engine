@@ -49,6 +49,15 @@ To stop docker containers, run following command
 
     docker-compose stop
     
+# Upgrade issues
+
+There are incompatible changes in Landmark tool (1.1.0), you will lose all the rules of it.
+
+- Delete `DIG_PROJECTS_DIR_PATH/.landmark`
+- Delete files in `DIG_PROJECTS_DIR_PATH/<project_name>/landmark_rules/*`
+
+There are also incompatible changes in myDIG webservice (1.0.11). Instead of crashing, it will show `N/A`s in TLD table, you need to update the desired number.
+    
 # Verify installation
 
 The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
@@ -69,7 +78,9 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 - `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for 1 hour. Then this button will turn into enable.
 
-# Advanced operations
+- `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
+
+# Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
 

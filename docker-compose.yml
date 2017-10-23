@@ -143,7 +143,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.10
+    image: uscisii2/mydig_ws:1.0.11
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -155,7 +155,7 @@ services:
 #      - "9880:9880"
 #      - "9881:9881"
     volumes:
-      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+#      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
 #      - ${SPACY_DIR_PATH}:/app/spacy-ui # development only
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
@@ -190,7 +190,7 @@ services:
       - dig_net
 
   landmark-mysql:
-    image: inferlink/landmark-mysql:1.0.0
+    image: inferlink/landmark-mysql:1.1.0
     container_name: landmark-mysql
     env_file:
       - ./landmark/sandbox/landmark-mysql.docker.env
@@ -201,7 +201,7 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.0.0
+    image: inferlink/landmark-rest:1.1.0
     container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
@@ -212,7 +212,7 @@ services:
     networks:
       - dig_net
   landmark-portal:
-    image: inferlink/landmark-portal:1.0.1
+    image: inferlink/landmark-portal:1.1.0
     container_name: landmark-portal
     env_file:
       - ./landmark/sandbox/landmark-portal.docker.env
