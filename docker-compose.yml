@@ -156,6 +156,7 @@ services:
 #      - "9881:9881"
     volumes:
 #      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
+#      - ${ETK_DIR_PATH}:/app/etk # development only, for spacy
 #      - ${SPACY_DIR_PATH}:/app/spacy-ui # development only
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
