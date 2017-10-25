@@ -192,7 +192,7 @@ services:
 
   landmark-mysql:
     image: inferlink/landmark-mysql:1.1.0
-    container_name: landmark-mysql
+#    container_name: landmark-mysql
     env_file:
       - ./landmark/sandbox/landmark-mysql.docker.env
     volumes:
@@ -202,8 +202,8 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.1.0
-    container_name: landmark-rest
+    image: inferlink/landmark-rest:1.1.2
+#    container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
     volumes:
@@ -214,7 +214,7 @@ services:
       - dig_net
   landmark-portal:
     image: inferlink/landmark-portal:1.1.0
-    container_name: landmark-portal
+#    container_name: landmark-portal
     env_file:
       - ./landmark/sandbox/landmark-portal.docker.env
 #    ports:
