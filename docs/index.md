@@ -64,7 +64,7 @@ Before you do that, you need to understand a little bit about the _extraction pi
 Think of the extraction pipeline as a queue. 
 If you put documents in the queue, myDIG will process them a few at a time, incrementally loading them in the kG until the queue is empty.
 
-When you import documents, myDIG **doesn't** put them in the queue automatically, but rather puts them in a holding area so that you can add them to the KG whenever you want.
+When you import documents, myDIG **doesn't** put them in the queue automatically, but rather puts them in a holding area so that you can add them to the queue whenever you want.
 Use the `Desired number of documents` field to tell myDIG how many documents from each TLD you want to have in your KG.
 Set it to `25` so that they process quickly, then press `Update`.
 The table of TLDs now shows 25 in the `Desired` column.
