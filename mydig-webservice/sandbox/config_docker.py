@@ -72,6 +72,18 @@ config = {
     'landmark': {
         'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'
     },
+    'ache': {
+        'kafka_topic': 'ache',
+        'group_id': 'mydig',
+        'upload': {
+            'endpoint': 'http://mydig_ws:9879/projects/{project_name}/data?sync=true&log=false',
+            'file_name': 'ache', # file name in data folder
+            # send to endpoint when get more than max_size or max_wait_time
+            # 'max_size': 10, # 10 docs
+            # 'max_wait_time': 10 * 1000, # 10s, float('inf')
+        }
+    },
+    'project_name_blacklist': ('logs', 'ache', 'dig-logs', 'dig-states', 'dig-profiles'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'

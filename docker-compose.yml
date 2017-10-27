@@ -56,7 +56,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka # ${DOCKER_HOST_NAME}
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_CREATE_TOPICS: "test:1:1" # development only
+      KAFKA_CREATE_TOPICS: "ache:1:1"
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
       KAFKA_LOG_CLEANER_ENABLE: "true"
       KAFKA_LOG_CLEANUP_POLICY: delete
@@ -202,7 +202,7 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.1.2
+    image: inferlink/landmark-rest:1.1.3
 #    container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
@@ -213,7 +213,7 @@ services:
     networks:
       - dig_net
   landmark-portal:
-    image: inferlink/landmark-portal:1.1.0
+    image: inferlink/landmark-portal:1.1.1
 #    container_name: landmark-portal
     env_file:
       - ./landmark/sandbox/landmark-portal.docker.env
