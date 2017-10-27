@@ -5,7 +5,7 @@
 - Docker compose of myDIG.
 - Sample configurations.
 
-Part of the project [DIG](http://usc-isi-i2.github.io/dig/).
+Part of project [DIG](http://usc-isi-i2.github.io/dig/).
 
 # Getting started
 
@@ -35,7 +35,7 @@ Make sure local port 12497 is not occupied (or change `PORT` in `.env` file), th
 
 > Wait a couple of minutes to ensure all the services are up.
     
-Access endpoint:
+Access endpoints:
 
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es`
@@ -43,7 +43,7 @@ Access endpoint:
 
 Authentication:
 
-The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUTH_PASSWORD` can not be empty, or they will be overwrote by their default values.
+The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUTH_PASSWORD` can not be empty, or they will be overwritten by their default values.
 
 To stop docker containers, run following command
 
@@ -60,7 +60,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
     
 # Verify installation
 
-The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
+The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` / `_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
 
 In web browser, open up `MyDIG web service GUI` at `http://localhost:12497/mydig/ui/`, create a project named `test`, then click `open` to open project detail configuration page.
 
@@ -72,11 +72,11 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 # Detailed function introduction
 
-- `recreate knowledge` is used to recreate the index in elastic search and regenerate ETK config. All the desired data marked previously will be re-added and re-run automatically. This function will also turn on pipeline. Only use it after you did some incompatible changes.
+- `recreate knowledge graph` is used to recreate the index in elastic search and regenerate ETK config. Desired number of data will be added and run automatically. This function will also turn pipeline on. Only use it after you did some incompatible changes.
 
-> Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
+  > Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
 
-- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for 1 hour. Then this button will turn into enable.
+- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for an hour. Then this button will turn into enable.
 
 - `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
 
@@ -96,7 +96,7 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 - On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
 
-- On Linux, If you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
+- On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
