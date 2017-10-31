@@ -183,7 +183,7 @@ services:
       /annotations'
       TAGS_LIST_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags'
       SEARCH_CONFIG: '{
-        "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search"
+        "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search/coarse"
       }'
     depends_on:
       - elasticsearch
