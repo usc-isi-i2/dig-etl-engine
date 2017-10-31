@@ -13,7 +13,7 @@ Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compo
 
 > If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
 
-> If the memory is not enough, some service processes may not be fired up, or they will be killed by OS.
+> If the memory is not enough, some service processes may not be fired up, or they will be killed by OS. Atleast 6 GB of memory should be allotted to docker-compose(mac and windows)
 
 Clone this repository.
 
