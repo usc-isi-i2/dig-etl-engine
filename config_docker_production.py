@@ -1,6 +1,9 @@
 import logging
+import os
 
 config = {
+    'version': 'production',
+
     'debug': True,
     'server': {
         'host': '0.0.0.0',
@@ -12,7 +15,8 @@ config = {
         'port': 5959,
         'level': logging.INFO,
         'version': 1,
-        'name': 'dig_etl_engine'
+        'name': 'dig_etl_engine',
+        'pipeline': '/app/logstash_pipeline'
     },
 
     'input_zookeeper_server': ['zookeeper:2181'],
@@ -21,10 +25,11 @@ config = {
     'output_server': ['kafka:9092'],
 
     # per project topic
-    'input_partitions': 4,
-    'output_partitions': 4,
-    'input_session_timeout': 60*60*1000,
-    'input_group_id': 'dig',
+    'input_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
+    'output_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
+    'input_session_timeout': float('inf'),
+    'input_group_id': 'dig_etk',
+    'logstash_group_id': 'dig_logstash',
 
     'kafka_bin_path': '/app/kafka/bin',
     'projects_path': '/shared_data/projects',

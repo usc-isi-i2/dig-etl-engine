@@ -1,6 +1,9 @@
 import logging
+import os
 
 config = {
+    'version': 'sandbox',
+
     'debug': True,
     'server': {
         'host': '0.0.0.0',
@@ -23,10 +26,11 @@ config = {
     'es_server': 'elasticsearch:9200',
 
     # per project topic
-    'input_partitions': 4,
-    'output_partitions': 4,
+    'input_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
+    'output_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
     'input_session_timeout': 60*60*1000,
-    'input_group_id': 'dig',
+    'input_group_id': 'dig_etk',
+    'logstash_group_id': 'dig_logstash',
 
     'kafka_bin_path': '/app/kafka/bin',
     'projects_path': '/shared_data/projects',

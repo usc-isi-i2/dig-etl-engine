@@ -22,7 +22,7 @@ logger.setLevel(config['logstash']['level'])
 #     logstash.LogstashHandler(
 #         config['logstash']['host'], config['logstash']['port'], version=config['logstash']['version']))
 logger.addHandler(logging.FileHandler('log.log'))
-
+# logging.getLogger('werkzeug').setLevel(logging.ERROR) # turn off werkzeug logger for normal info
 
 @app.route('/')
 def home():
@@ -41,20 +41,21 @@ def create_project():
         with open(config_path, 'r') as f:
             project_config = json.loads(f.read())
 
-    # create topics
-    input_topic = project_config.get('input_topic', args['project_name'] + '_in')
-    input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
-    input_partition = project_config.get('input_partitions', config['input_partitions'])
-    ensure_topic_exists(input_topic, input_zookeeper_server, input_partition)
+    # # create topics
+    # input_topic = project_config.get('input_topic', args['project_name'] + '_in')
+    # input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
+    # input_partition = project_config.get('input_partitions', config['input_partitions'])
+    # ensure_topic_exists(input_topic, input_zookeeper_server, input_partition)
 
     output_topic = project_config.get('output_topic', args['project_name'] + '_out')
-    output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
+    # output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
     output_partition = project_config.get('output_partitions', config['output_partitions'])
-    ensure_topic_exists(output_topic, output_zookeeper_server, output_partition)
+    # ensure_topic_exists(output_topic, output_zookeeper_server, output_partition)
 
     # update logstash pipeline
     output_server = project_config.get('output_server', config['output_server'])
-    update_logstash_pipeline(args['project_name'], output_server, output_topic)
+    if config['version'] == 'sandbox':
+        update_logstash_pipeline(args['project_name'], output_server, output_topic, output_partition)
 
     return jsonify({}), 201
 
@@ -199,13 +200,13 @@ def kill_etk_process(project_name, ignore_error=False):
     print 'kill_etk_process finish'
 
 
-def update_logstash_pipeline(project_name, output_server, output_topic):
+def update_logstash_pipeline(project_name, output_server, output_topic, output_partition):
     content = \
 '''input {
   kafka {
     bootstrap_servers => ["''' + '","'.join(output_server) + '''"]
     topics => ["''' + output_topic + '''"]
-    consumer_threads => "4"
+    consumer_threads => "''' + output_partition + '''"
     codec => json {}
     type => "''' + project_name + '''"
     max_partition_fetch_bytes => "10485760"
