@@ -11,9 +11,9 @@ Part of project [DIG](http://usc-isi-i2.github.io/dig/).
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
-> If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory (5GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
+> If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory (6GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
 
-> If the memory is not enough, some service processes may not be fired up, or they will be killed by OS. Atleast 6 GB of memory should be allotted to docker-compose(mac and windows)
+> If the memory is not enough, some service processes may not be fired up, or they will be killed by OS.
 
 Clone this repository.
 
@@ -100,6 +100,8 @@ Finally, click `DIG GUI` button to open and test on DIG.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
+- If you reset `KAFKA_NUM_PARTITIONS`, it will not affect the partition number in KAFKA topics unless you drop the KAFKA container (you will lose all data in KAFKA topics).
+
 ## Manager's endpoints
 
 - `POST /create_project`
@@ -113,7 +115,7 @@ Finally, click `DIG GUI` button to open and test on DIG.
     ```
     {
         "project_name" : "new_project",
-        "number_of_workers": 4, // optional
+        "number_of_workers": 4
     }
     ```
     

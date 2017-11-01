@@ -65,7 +65,7 @@ def run_etk():
     args = request.get_json(force=True)
     if 'project_name' not in args:
         return jsonify({'error_message': 'invalid project_name'}), 400
-    args['number_of_workers'] = args.get('number_of_workers', 4)
+    args['number_of_workers'] = args.get('number_of_workers')
 
     kill_etk_process(args['project_name'], True)
     # reset input offset in `dig` group
@@ -94,6 +94,26 @@ def kill_etk():
     if 'project_name' not in args:
         return jsonify({'error_message': 'invalid project_name'}), 400
     kill_etk_process(args['project_name'], True)
+    return jsonify({}), 201
+
+@app.route('/delete_topics', methods=['POST'])
+def delete_topics():
+    args = request.get_json(force=True)
+    if 'project_name' not in args:
+        return jsonify({'error_message': 'invalid project_name'}), 400
+
+    config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
+    project_config = {}
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            project_config = json.loads(f.read())
+
+    input_topic = project_config.get('input_topic', args['project_name'] + '_in')
+    output_topic = project_config.get('output_topic', args['project_name'] + '_out')
+    input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
+    output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
+    delete_topic(input_topic, input_zookeeper_server)
+    delete_topic(output_topic, output_zookeeper_server)
     return jsonify({}), 201
 
 @app.route('/etk_status/<project_name>', methods=['GET'])

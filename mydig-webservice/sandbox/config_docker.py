@@ -38,7 +38,7 @@ config = {
     'etl': {
         'url': 'http://dig_etl_engine:9999',
         'number_of_workers': int(os.getenv('NUM_ETK_PROCESSES', '4')),
-        'timeout': 10
+        'timeout': 20
     },
     'kafka': {
         'servers': ['kafka:9092']
@@ -83,7 +83,7 @@ config = {
             # 'max_wait_time': 10 * 1000, # 10s, float('inf')
         }
     },
-    'project_name_blacklist': ('logs', 'ache', 'dig-logs', 'dig-states', 'dig-profiles'),
+    'project_name_blacklist': ('logs', 'ache', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'
