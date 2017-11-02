@@ -1,13 +1,22 @@
-# DIG ETL Engine
+# myDIG Domain-Specific Search
+myDIG is a tool to build pipelines that crawl the web, extract information, build a knowledge graph (KG) from the extractions and provide an easy to user interface to query the KG.
+The project web page is [DIG](http://usc-isi-i2.github.io/dig/).
 
-- Manager for ETK processes, Kafka topic and Logstash.
-- Docker image of ETL Engine.
-- Docker compose of myDIG.
-- Sample configurations.
+You can install myDIG in a laptop or server and use it to build a domain specific search application for any corpus of web pages, CSV, JSON and a variety of other files.
 
-Part of project [DIG](http://usc-isi-i2.github.io/dig/).
+- the nstallation guide is below
+- [user guide](docs/index.md)
 
-# Getting started
+## Installation
+
+### Installation Requirements
+
+- Operating systems: Linux, MacOS or Windows
+- System requirements: minimum 8GB of memory
+
+### Installation Instructions
+
+myDIG uses Docker to make installation easy:
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
@@ -19,66 +28,63 @@ Clone this repository.
 
     git clone https://github.com/usc-isi-i2/dig-etl-engine.git
     
-Create environment file from example environment file.
+myDIG stores your project files on your disk, so you need to tell it where to put the files. You provide this information in the `.env` file in the folder where you installed myDIG. Create the `.env` file by copying the example environment file available in your installation. 
  
     cp ./dig-etl-engine/.env.example ./dig-etl-engine/.env
-    
-Create projects' directory.
 
-    mkdir ./mydig-projects
+After you create your `.env` file, open it in a text editor and customize it. Here is a typical `.env` file:
 
-Make sure local port 12497 is not occupied (or change `PORT` in `.env` file), then all you need to do is:
+```
+COMPOSE_PROJECT_NAME=dig
+DIG_PROJECTS_DIR_PATH=/Users/pszekely/Documents/mydig-projects
+DOMAIN=localhost
+PORT=12497
+NUM_ETK_PROCESSES=2
+DIG_AUTH_USER=admin
+DIG_AUTH_PASSWORD=123
+```
 
-    docker-compose up -d
+- `COMPOSE_PROJECT_NAME`: leave this one alone
+- `DIG_PROJECTS_DIR_PATH`: this is the folder where myDIG will store your project files. Make sure the directory exists. The default setting will store your files in `./mydig-projects`, so do `mkdir ./mydig-projects` if you want to use the default folder.
+- `DOMAIN`: change this if you install on a server that will be accessed from other machines.
+- `PORT`: you can customize the port where myDIG runs.
+- `NUM_ETK_PROCESSES`: myDIG uses multi-processing to ingest files. Set this number according to the number of cores you have on the machine. We don't recommend setting it to more than 4 on a laptop.
+- `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
+
+To run myDIG do:
+
+    docker-compose up
     
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
-
+> You can also run `docker-compose up -d` to run myDIG as a deamon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
+
+To stop myDIG do:
+
+    docker-compose down
     
-Access endpoints:
+Once myDIG is running, go to your browser and visit `http://localhost:12497/mydig/ui/`
 
-- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
-- Elastic Search: `http://localhost:12497/es`
-- Kibana: `http://localhost:12497/kibana/`
+> Note: myDIG currently works only on Chrome
 
-Authentication:
+To use myDIG, look at the [user guide](docs/index.md)
 
-The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUTH_PASSWORD` can not be empty, or they will be overwritten by their default values.
+#### Upgrade Issues (20 Oct 2017)
 
-To stop docker containers, run following command
-
-    docker-compose stop
-    
-# Upgrade issues
-
-There are incompatible changes in Landmark tool (1.1.0), you will lose all the rules of it.
+On 20 Oct 2017 there are incompatible changes in Landmark tool (1.1.0), the rules you defined will get deleted when you upgrade to the new system. Please follow these instructions:
 
 - Delete `DIG_PROJECTS_DIR_PATH/.landmark`
 - Delete files in `DIG_PROJECTS_DIR_PATH/<project_name>/landmark_rules/*`
 
 There are also incompatible changes in myDIG webservice (1.0.11). Instead of crashing, it will show `N/A`s in TLD table, you need to update the desired number.
-    
-# Verify installation
 
-The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` / `_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
 
-In web browser, open up `MyDIG web service GUI` at `http://localhost:12497/mydig/ui/`, create a project named `test`, then click `open` to open project detail configuration page.
+### Access Endpoints:
 
-Click `import json lines file` button on right, upload `elicit_20.jl`, then you will see `ce_news_article.org` shows up in TLD (top level domain) table. Enter `15` in the `Desired number of docs to run` input box and click `update` button. Then the desired number of this TLD will be update to `15`.
+- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
+- Elastic Search: `http://localhost:12497/es`
+- Kibana: `http://localhost:12497/kibana/`
 
-Click red button named `recreate knowledge graph` to create a new knowledge graph and upload the data. Wait a few seconds, you should see updates in the column `ES` (this number will be less than or equal to desired number).
- 
-Finally, click `DIG GUI` button to open and test on DIG.
-
-# Detailed function introduction
-
-- `recreate knowledge graph` is used to recreate the index in elastic search and regenerate ETK config. Desired number of data will be added and run automatically. This function will also turn pipeline on. Only use it after you did some incompatible changes.
-
-  > Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
-
-- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for an hour. Then this button will turn into enable.
-
-- `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
 
 # Advanced operations and solutions to known issues
 
