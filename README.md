@@ -28,27 +28,36 @@ Clone this repository.
 
     git clone https://github.com/usc-isi-i2/dig-etl-engine.git
     
-Create environment file from example environment file.
+myDIG stores your project files on your disk, so you need to tell it where to put the files. You provide this information in the `.env` file in the folder where you installed myDIG. Create the `.env` file by copying the example environment file available in your installation. 
  
     cp ./dig-etl-engine/.env.example ./dig-etl-engine/.env
-    
-Create projects' directory.
 
-    mkdir ./mydig-projects
+After you create your `.env` file, open it in a text editor and customize it. Here is what a typical `.env` file looks like:
 
-Make sure local port 12497 is not occupied (or change `PORT` in `.env` file), then all you need to do is:
+```
+COMPOSE_PROJECT_NAME=dig
+DIG_PROJECTS_DIR_PATH=/Users/pszekely/Documents/mydig-projects
+DOMAIN=localhost
+PORT=12497
+NUM_ETK_PROCESSES=2
+DIG_AUTH_USER=admin
+DIG_AUTH_PASSWORD=123
+```
 
-    docker-compose up -d
+- `COMPOSE_PROJECT_NAME`: leave this one alone
+- `DIG_PROJECTS_DIR_PATH`: this is the folder where myDIG will store your project files. Make sure the directory exists. The default setting will store your files in `./mydig-projects`, so do `mkdir ./mydig-projects` if you want to use the default folder.
+- `DOMAIN`: change this if you install on a server that will be accessed from other machines.
+- `PORT`: you can customize the port where myDIG runs.
+- `NUM_ETK_PROCESSES`: myDIG uses multi-processing to ingest files. Set this number according to the number of cores you have on the machine. We don't recommend setting it to more than 4 on a laptop.
+- `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
+
+To run myDIG do:
+
+    docker-compose up
     
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
 
 > Wait a couple of minutes to ensure all the services are up.
-    
-Access endpoints:
-
-- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
-- Elastic Search: `http://localhost:12497/es`
-- Kibana: `http://localhost:12497/kibana/`
 
 Authentication:
 
@@ -57,6 +66,14 @@ The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUT
 To stop docker containers, run following command
 
     docker-compose stop
+    
+
+    
+Access endpoints:
+
+- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
+- Elastic Search: `http://localhost:12497/es`
+- Kibana: `http://localhost:12497/kibana/`
     
 # Upgrade issues
 
