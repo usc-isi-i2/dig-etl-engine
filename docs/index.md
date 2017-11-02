@@ -1,7 +1,5 @@
 # myDIG User Guide
 
-myDIG is a tool to build pipelines that crawl the web, extract information, build a knowledge graph (KG) from the extractions and provide an easy to user interface to query the KG.
-
 This guide takes you through the steps to build a simple application starting with a collection of web pages.
 Before continuing, install myDIG by following the instructions in the [README.md](https://github.com/usc-isi-i2/dig-etl-engine/blob/master/README.md) file.
 Once the installation completes, visit the page [http://localhost:12497/mydig/ui/](http://localhost:12497/mydig/ui/) to bring up the home page.
@@ -47,6 +45,7 @@ Your new project screen contains several tabs to configure your project.
 ![New Project][new-project]
 
 Use `Import JSON lines File` to import data in your project and select the `museum-200.jl` file, which contains a sample of 200 pages from the museum.
+This file is part of the myDIG installation, in `datasets/museum-200.jl`.
 After a few seconds, myDIG will load the data, and show that it has loaded 200 pages:
 
 ![Data Loaded][load-data]
@@ -154,3 +153,18 @@ We describe the most important attributes in this section, and come back later t
 | Name | Information about the birth of a person, including location and year |
 | Type |  |
 | Show Ib Results | |
+
+
+
+
+# To Do: Add to docs:
+
+# Detailed function introduction
+
+- `recreate knowledge graph` is used to recreate the index in elastic search and regenerate ETK config. Desired number of data will be added and run automatically. This function will also turn pipeline on. Only use it after you did some incompatible changes.
+
+  > Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
+
+- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for an hour. Then this button will turn into enable.
+
+- `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
