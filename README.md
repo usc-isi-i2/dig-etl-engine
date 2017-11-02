@@ -59,40 +59,32 @@ To run myDIG do:
 > You can also run `docker-compose up -d` to run myDIG as a deamon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
 
-Authentication:
+To stop myDIG do:
 
-The default username is `admin`, password is `123`. `DIG_AUTH_USER` and `DIG_AUTH_PASSWORD` can not be empty, or they will be overwritten by their default values.
-
-To stop docker containers, run following command
-
-    docker-compose stop
+    docker-compose down
     
+Once myDIG is running, go to your browser and visit `http://localhost:12497/mydig/ui/`
 
-    
-Access endpoints:
+> Note: myDIG currently works only on Chrome
 
-- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
-- Elastic Search: `http://localhost:12497/es`
-- Kibana: `http://localhost:12497/kibana/`
-    
-# Upgrade issues
+To use myDIG, look at the [user guide](docs/index.md)
 
-There are incompatible changes in Landmark tool (1.1.0), you will lose all the rules of it.
+#### Upgrade Issues (20 Oct 2017)
+
+On 20 Oct 2017 there are incompatible changes in Landmark tool (1.1.0), the rules you defined will get deleted when you upgrade to the new system. Please follow these instructions:
 
 - Delete `DIG_PROJECTS_DIR_PATH/.landmark`
 - Delete files in `DIG_PROJECTS_DIR_PATH/<project_name>/landmark_rules/*`
 
 There are also incompatible changes in myDIG webservice (1.0.11). Instead of crashing, it will show `N/A`s in TLD table, you need to update the desired number.
 
-# Detailed function introduction
 
-- `recreate knowledge graph` is used to recreate the index in elastic search and regenerate ETK config. Desired number of data will be added and run automatically. This function will also turn pipeline on. Only use it after you did some incompatible changes.
+### Access Endpoints:
 
-  > Incompatible changes: upload new glossaries, update fields, update tags, update Landmark rules.
+- MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
+- Elastic Search: `http://localhost:12497/es`
+- Kibana: `http://localhost:12497/kibana/`
 
-- `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for an hour. Then this button will turn into enable.
-
-- `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
 
 # Advanced operations and solutions to known issues
 
