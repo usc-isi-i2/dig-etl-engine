@@ -1,13 +1,13 @@
-# DIG ETL Engine
+# myDIG Domain-Specific Search
+myDIG is a tool to build pipelines that crawl the web, extract information, build a knowledge graph (KG) from the extractions and provide an easy to user interface to query the KG.
+The project web page is [DIG](http://usc-isi-i2.github.io/dig/).
 
-- Manager for ETK processes, Kafka topic and Logstash.
-- Docker image of ETL Engine.
-- Docker compose of myDIG.
-- Sample configurations.
+You can install myDIG in a laptop or server:
 
-Part of project [DIG](http://usc-isi-i2.github.io/dig/).
+- Installation guide is below
+- User guide: [getting started with myDIG](docs/index.md)
 
-# Getting started
+# Installation
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
@@ -57,18 +57,6 @@ There are incompatible changes in Landmark tool (1.1.0), you will lose all the r
 - Delete files in `DIG_PROJECTS_DIR_PATH/<project_name>/landmark_rules/*`
 
 There are also incompatible changes in myDIG webservice (1.0.11). Instead of crashing, it will show `N/A`s in TLD table, you need to update the desired number.
-    
-# Verify installation
-
-The file `./datasets/elicit_20.jl` can be used for verification, it is formatted in [JSON LINES](http://jsonlines.org/) and includes 20 documents. Each document at least contains `doc_id` / `_id` (unique string), `url`, `raw_content` (encoded in UTF-8), meanwhile can not contain `type` (will be converted to `original_type`).
-
-In web browser, open up `MyDIG web service GUI` at `http://localhost:12497/mydig/ui/`, create a project named `test`, then click `open` to open project detail configuration page.
-
-Click `import json lines file` button on right, upload `elicit_20.jl`, then you will see `ce_news_article.org` shows up in TLD (top level domain) table. Enter `15` in the `Desired number of docs to run` input box and click `update` button. Then the desired number of this TLD will be update to `15`.
-
-Click red button named `recreate knowledge graph` to create a new knowledge graph and upload the data. Wait a few seconds, you should see updates in the column `ES` (this number will be less than or equal to desired number).
- 
-Finally, click `DIG GUI` button to open and test on DIG.
 
 # Detailed function introduction
 
