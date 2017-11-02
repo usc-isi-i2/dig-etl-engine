@@ -2,12 +2,21 @@
 myDIG is a tool to build pipelines that crawl the web, extract information, build a knowledge graph (KG) from the extractions and provide an easy to user interface to query the KG.
 The project web page is [DIG](http://usc-isi-i2.github.io/dig/).
 
-You can install myDIG in a laptop or server:
+You can install myDIG in a laptop or server and use it to build a domain specific search application for any corpus of web pages, CSV, JSON and a variety of other files.
 
-- Installation guide is below
-- User guide: [getting started with myDIG](docs/index.md)
+- the nstallation guide is below
+- [user guide](docs/index.md)
 
-# Installation
+## Installation
+
+### Installation Requirements
+
+- Operating systems: Linux, MacOS or Windows
+- System requirements: minimum 8GB of memory
+
+### Installation Instructions
+
+myDIG uses Docker to make installation easy:
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
