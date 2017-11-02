@@ -32,7 +32,7 @@ myDIG stores your project files on your disk, so you need to tell it where to pu
  
     cp ./dig-etl-engine/.env.example ./dig-etl-engine/.env
 
-After you create your `.env` file, open it in a text editor and customize it. Here is what a typical `.env` file looks like:
+After you create your `.env` file, open it in a text editor and customize it. Here is a typical `.env` file:
 
 ```
 COMPOSE_PROJECT_NAME=dig
@@ -56,7 +56,7 @@ To run myDIG do:
     docker-compose up
     
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
-
+> You can also run `docker-compose up -d` to run myDIG as a deamon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
 
 Authentication:
