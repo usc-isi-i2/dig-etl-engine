@@ -103,31 +103,30 @@ Select the `Fields` tab to view the fields in your project:
 
 ![Fields][fields]
 
-The table below shows the fields that we want in the museum KG:
+The table below shows the fields that we want in the museum KG. The ones with `yes` in the `custom` column are fields that you need to add to your sample project.
 
-
-| field | description |
-| :----- | :--- |
-| birth\_info | Information about the birth of a person, including location and year |
+| field | description | custom |
+| :----- | :--- | :-- |
+| birth\_info | Information about the birth of a person, including location and year | yes |
 | city | default field, don't change or delete |
-| city\_name | default field, don't change or delete |
-| country | default field, don't change or delete |
-| credit | person or organization who provided an artwork |
-| date\_birth | birth date of an artist |
-| date\_creation | creation date of an artwork |
-| date\_death | death date of an artist |
-| description | default field, don't change or delete |
-| dimensions | dimensions of an artwork |
-| email | email addresses present in the text |
-| identifier_object | the identifier of an artwork |
-| keywords | keywords associated with an artwork or artist |
-| medium | medium used to create an artwork |
-| name | name of an artist |
-| phone | phone numbers present in the text |
-| state | default field, don't change or delete |
-| states\_usa\_codes | default field, don't change or delete |
-| title | default field, don't change or delete |
-| website | default field, don't change or delete |
+| city\_name | default field, don't change or delete | |
+| country | default field, don't change or delete | |
+| credit | person or organization who provided an artwork | yes |
+| date\_birth | birth date of an artist | yes|
+| date\_creation | creation date of an artwork | yes |
+| date\_death | death date of an artist | yes |
+| description | default field, don't change or delete | |
+| dimensions | dimensions of an artwork | yes |
+| email | email addresses present in the text | | 
+| identifier_object | the identifier of an artwork | yes |
+| keywords | keywords associated with an artwork or artist | yes |
+| medium | medium used to create an artwork | yes |
+| name | name of an artist | |
+| phone | phone numbers present in the text | |
+| state | default field, don't change or delete | |
+| states\_usa\_codes | default field, don't change or delete | |
+| title | default field, don't change or delete | |
+| website | default field, don't change or delete | |
 
 ### Deleting Fields
 
@@ -136,6 +135,9 @@ We don't need and `address` field in our KG, so go ahean and delete it.
 
 > Deleting fields in not undoable.
 
+For our sample project, delete all fields that are not in the table above.
+
+> Note: deleting the fields is optional, as extra fields don't do harm
 
 ### Adding Fields
 
@@ -146,16 +148,21 @@ Fill in the form as follows:
 ![Date Creation][date-creation]
 
 There are several attributes to fill in for every field.
-We describe the most important attributes in this section, and come back later to review the attributes that control finer details:
+The following attributes specify features related to how the field is stored in the KG:
 
 | field | description |
 | :----- | :--- |
 | Name | Information about the birth of a person, including location and year |
-| Type |  |
-| Show Ib Results | |
+| Type | Select `date` from the menu |
+| Predefined Extractor | one of the myDIG built in extractors, leave in our example |
+| Search Importance | Contribution of this field to the overall ranking results, set to high number when the field is an important selector in your domain |
 
+The other attributes in the field dialog control the appearance of the field and can be changed after you load data in the KG.
+We discuss these attributes later.
 
+Once you fill in the form for `date_creation`, click `Save` and proceed to add the other fields listed in the table above.
 
+> Note: you can add fields at any time, so you don't have to add all of them right now.
 
 # To Do: Add to docs:
 
@@ -168,3 +175,10 @@ We describe the most important attributes in this section, and come back later t
 - `turn on pipleine` is used to fire up ETK processes with previous config. If you only want to add some new data, use this function. ETK processes will exit after idle for an hour. Then this button will turn into enable.
 
 - `Add to queue`: if you updated desired number, you need to click this button to actually invoke backend to push data. However, data will be automatically pushed to queue in two conditions: 1) if your desired number is greater than your total document numbers and you are going to add more new documents 2) recreate the knowledge graph.
+
+
+
+| Screen Label | The label that appears in the DIG page for end users |
+| Screen Label Plural | Plural of the screen label |
+| Show in Facets | Select to make the field appear in the facets
+
