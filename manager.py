@@ -222,34 +222,41 @@ def kill_etk_process(project_name, ignore_error=False):
 
 def update_logstash_pipeline(project_name, output_server, output_topic, output_partition):
     content = \
-'''input {
-  kafka {
-    bootstrap_servers => ["''' + '","'.join(output_server) + '''"]
-    topics => ["''' + output_topic + '''"]
-    consumer_threads => "''' + output_partition + '''"
-    codec => json {}
-    type => "''' + project_name + '''"
+'''input {{
+  kafka {{
+    bootstrap_servers => ["{server}"]
+    topics => ["{output_topic}"]
+    consumer_threads => "{output_partition}"
+    codec => json {{}}
+    type => "{project_name}"
     max_partition_fetch_bytes => "10485760"
     max_poll_records => "10"
     fetch_max_wait_ms => "1000"
     poll_timeout_ms => "1000"
-   }
-}
-filter {
-  if [type] == "''' + project_name + '''" {
-    mutate { remove_field => ["_id"] }
-  }
-}
-output {
-  if [type] == "''' + project_name + '''" {
-    elasticsearch {
-      document_id  => "%{doc_id}"
+   }}
+}}
+filter {{
+  if [type] == "{project_name}" {{
+    mutate {{ remove_field => ["_id"] }}
+  }}
+}}
+output {{
+  if [type] == "{project_name}" {{
+    elasticsearch {{
+      document_id  => "%{{doc_id}}"
       document_type => "ads"
-      hosts => ["''' + config['es_server'] + '''"]
-      index => "''' + project_name + '''"
-    }
-  }
-}'''
+      hosts => ["{es_server}"]
+      index => "{project_name}"
+    }}
+  }}
+}}'''.format(
+    server='","'.join(output_server),
+    output_topic=output_topic,
+    output_partition=output_partition,
+    project_name=project_name,
+    es_server=config['es_server']
+)
+
     path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
     with codecs.open(path, 'w') as f:
         f.write(content)
