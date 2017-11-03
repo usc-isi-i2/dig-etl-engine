@@ -4,7 +4,7 @@ The project web page is [DIG](http://usc-isi-i2.github.io/dig/).
 
 You can install myDIG in a laptop or server and use it to build a domain specific search application for any corpus of web pages, CSV, JSON and a variety of other files.
 
-- the nstallation guide is below
+- the installation guide is below
 - [user guide](docs/index.md)
 
 ## Installation
@@ -20,7 +20,7 @@ myDIG uses Docker to make installation easy:
 
 Install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/). 
 
-> If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory (6GB or more is recommended) to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
+> If you are working on [Mac](https://docs.docker.com/docker-for-mac/#advanced) or [Windows](https://docs.docker.com/docker-for-windows/#advanced), **make sure you allocate enough memory to docker virtual machine**. In Linux, Docker is built on LXC of kernel, the latest version of kernel and enough memory on host are required.
 
 > If the memory is not enough, some service processes may not be fired up, or they will be killed by OS.
 
@@ -40,15 +40,17 @@ DIG_PROJECTS_DIR_PATH=/Users/pszekely/Documents/mydig-projects
 DOMAIN=localhost
 PORT=12497
 NUM_ETK_PROCESSES=2
+KAFKA_NUM_PARTITIONS=2
 DIG_AUTH_USER=admin
 DIG_AUTH_PASSWORD=123
 ```
 
-- `COMPOSE_PROJECT_NAME`: leave this one alone
+- `COMPOSE_PROJECT_NAME`: leave this one alone if you only have one myDIG instance. This is the prefix to differentiate docker-compose instances.
 - `DIG_PROJECTS_DIR_PATH`: this is the folder where myDIG will store your project files. Make sure the directory exists. The default setting will store your files in `./mydig-projects`, so do `mkdir ./mydig-projects` if you want to use the default folder.
 - `DOMAIN`: change this if you install on a server that will be accessed from other machines.
 - `PORT`: you can customize the port where myDIG runs.
 - `NUM_ETK_PROCESSES`: myDIG uses multi-processing to ingest files. Set this number according to the number of cores you have on the machine. We don't recommend setting it to more than 4 on a laptop.
+- `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
 To run myDIG do:
@@ -56,7 +58,7 @@ To run myDIG do:
     docker-compose up
     
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
-> You can also run `docker-compose up -d` to run myDIG as a deamon process in the background.
+> You can also run `docker-compose up -d` to run myDIG as a daemon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
 
 To stop myDIG do:
@@ -105,8 +107,6 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
-
-- If you reset `KAFKA_NUM_PARTITIONS`, it will not affect the partition number in KAFKA topics unless you drop the KAFKA container (you will lose all data in KAFKA topics).
 
 ## Manager's endpoints
 
