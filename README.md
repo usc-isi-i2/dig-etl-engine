@@ -92,8 +92,6 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
 
-- The `NUM_ETK_PROCESSES` should less or equal to the value of`input_partitions` in `config_docker_sandbox.py`.
-
 - The data in kafka queue will be cleaned after two days. If you want to delete the data immediately, drop the kafka container.
 
 - If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. Your `DIG_PROJECTS_DIR_PATH` will be mapped to `/shared_data/projects` in docker, so make sure all the paths you used in config are start with this prefix.
@@ -107,6 +105,8 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
+
+- If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
 
 ## Manager's endpoints
 
