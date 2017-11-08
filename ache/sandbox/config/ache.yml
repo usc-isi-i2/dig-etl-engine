@@ -1,0 +1,23 @@
+target_storage.store_negative_pages: false
+
+target_storage.data_format.type: KAFKA
+target_storage.data_format.kafka.topic_name: ache
+target_storage.data_format.kafka.format: CDR31
+target_storage.data_format.kafka.properties:
+  # The properties to be used while initializing the Kafka Producer
+  bootstrap.servers: kafka:9092
+
+crawler_manager.downloader.user_agent.name: ACHE
+crawler_manager.downloader.user_agent.url: https://github.com/ViDA-NYU/ache
+crawler_manager.downloader.valid_mime_types:
+  - text/xml
+  - text/html
+  - text/plain
+  - application/x-asp
+  - application/xhtml+xml
+  - application/vnd.wap.xhtml+xml
+
+# Discovery of new links using sitemap.xml protocol
+link_storage.download_sitemap_xml: false
+
+http.base_path: /ache
