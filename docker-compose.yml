@@ -22,9 +22,10 @@ services:
       - sandpaper
       - mydig_ws
       - digui
+#      - ache
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.0.2
+    image: uscisii2/dig-etl-engine:1.0.3
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -83,6 +84,21 @@ services:
         # can not set ip range in docker-compose v3 to whitelist fixed ip
         # so set it to 200, DNS still works
         ipv4_address: 172.19.0.200
+
+#  kafka_manager:
+#    image: sheepkiller/kafka-manager
+#    environment:
+#      ZK_HOSTS: "zookeeper:2181"
+#      KM_CONFIGFILE: "/opt/application.conf"
+#    volumes:
+#      - ./kafka_manager/sandbox/conf/application.conf:/opt/application.conf
+##    ports:
+##      - "9000:9000"
+#    depends_on:
+#      - zookeeper
+#      - kafka
+#    networks:
+#      dig_net:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.5.1
@@ -147,7 +163,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.12
+    image: uscisii2/mydig_ws:1.0.13
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -217,7 +233,7 @@ services:
     networks:
       - dig_net
   landmark-portal:
-    image: inferlink/landmark-portal:1.1.1
+    image: inferlink/landmark-portal:1.1.2
 #    container_name: landmark-portal
     env_file:
       - ./landmark/sandbox/landmark-portal.docker.env
@@ -225,6 +241,17 @@ services:
 #     - "3333:3333"
     networks:
       - dig_net
+
+#  ache:
+#    image: vidanyu/ache:latest
+#    volumes:
+#      - ./ache/sandbox/config:/config
+#      - ${DIG_PROJECTS_DIR_PATH}/.ache/data:/data
+#    ports:
+#      - "8080:8080"
+#    entrypoint: sh -c 'sleep 10 && /ache/bin/ache startServer -c /config/ -d /data'
+#    networks:
+#      - dig_net
 
 
 networks:

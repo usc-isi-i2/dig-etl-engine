@@ -83,7 +83,8 @@ config = {
             # 'max_wait_time': 10 * 1000, # 10s, float('inf')
         }
     },
-    'project_name_blacklist': ('logs', 'ache', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
+    'data_pushing_worker_backoff_time': 5,
+    'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'
