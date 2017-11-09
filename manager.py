@@ -3,7 +3,7 @@ import sys
 import traceback
 import subprocess
 import json
-from kafka import KafkaProducer, KafkaConsumer
+from kafka import KafkaProducer, KafkaConsumer, TopicPartition
 import logging
 import logstash
 import codecs
@@ -67,23 +67,25 @@ def run_etk():
         return jsonify({'error_message': 'invalid project_name'}), 400
     args['number_of_workers'] = args.get('number_of_workers')
 
-    kill_etk_process(args['project_name'], True)
-    # reset input offset in `dig` group
-    # if 'input_offset' in args and args['input_offset'] == 'seek_to_end':
-    #     seek_to_topic_end(args['project_name'] + '_in', config['input_server'], config['input_group_id'])
-    # # reset output offset in all groups
-    # if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
-    #     seek_to_topic_end(args['project_name'] + '_out', config['output_server'])
-    # if 'delete_input_topic' in args and args['delete_input_topic'] is True:
-    #     delete_topic(args['project_name'] + '_in', config['input_zookeeper_server'])
-    # if 'delete_output_topic' in args and args['delete_output_topic'] is True:
-    #     delete_topic(args['project_name'] + '_out', config['output_zookeeper_server'])
-
     config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
     project_config = {}
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             project_config = json.loads(f.read())
+
+    kill_etk_process(args['project_name'], True)
+
+    # reset input offset in `dig` group
+    if 'input_offset' in args and args['input_offset'] == 'seek_to_end':
+        input_partitions = project_config.get('input_partitions', config['input_partitions'])
+        seek_to_topic_end(args['project_name'] + '_in', input_partitions,
+                          config['input_server'], config['input_group_id'])
+    # reset output offset in default group
+    if 'output_offset' in args and args['output_offset'] == 'seek_to_end':
+        output_partitions = project_config.get('output_partitions', config['output_partitions'])
+        seek_to_topic_end(args['project_name'] + '_out', output_partitions,
+                          config['output_server'])
+
     run_etk_processes(args['project_name'], args['number_of_workers'], project_config)
     return jsonify({}), 202
 
@@ -96,25 +98,25 @@ def kill_etk():
     kill_etk_process(args['project_name'], True)
     return jsonify({}), 201
 
-@app.route('/delete_topics', methods=['POST'])
-def delete_topics():
-    args = request.get_json(force=True)
-    if 'project_name' not in args:
-        return jsonify({'error_message': 'invalid project_name'}), 400
-
-    config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
-    project_config = {}
-    if os.path.exists(config_path):
-        with open(config_path, 'r') as f:
-            project_config = json.loads(f.read())
-
-    input_topic = project_config.get('input_topic', args['project_name'] + '_in')
-    output_topic = project_config.get('output_topic', args['project_name'] + '_out')
-    input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
-    output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
-    delete_topic(input_topic, input_zookeeper_server)
-    delete_topic(output_topic, output_zookeeper_server)
-    return jsonify({}), 201
+# @app.route('/delete_topics', methods=['POST'])
+# def delete_topics():
+#     args = request.get_json(force=True)
+#     if 'project_name' not in args:
+#         return jsonify({'error_message': 'invalid project_name'}), 400
+#
+#     config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
+#     project_config = {}
+#     if os.path.exists(config_path):
+#         with open(config_path, 'r') as f:
+#             project_config = json.loads(f.read())
+#
+#     input_topic = project_config.get('input_topic', args['project_name'] + '_in')
+#     output_topic = project_config.get('output_topic', args['project_name'] + '_out')
+#     input_zookeeper_server = project_config.get('input_zookeeper_server', config['input_zookeeper_server'])
+#     output_zookeeper_server = project_config.get('output_zookeeper_server', config['output_zookeeper_server'])
+#     delete_topic(input_topic, input_zookeeper_server)
+#     delete_topic(output_topic, output_zookeeper_server)
+#     return jsonify({}), 201
 
 @app.route('/etk_status/<project_name>', methods=['GET'])
 def etk_status(project_name):
@@ -128,7 +130,6 @@ def debug_ps():
     p = subprocess.Popen('ps -ef | grep -v grep | grep "tag-mydig-etk"', stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read()
     return output, 200
-
 
 def ensure_topic_exists(topic, zookeeper_server, partitions):
     # kafka-topics.sh --create --if-not-exists
@@ -150,30 +151,31 @@ def ensure_topic_exists(topic, zookeeper_server, partitions):
     logger.info('ensure_topic_exists finish: {}'.format(topic))
 
 
-def seek_to_topic_end(topic, consumers, group_id=None):
+def seek_to_topic_end(topic, num_partitions, consumers, group_id=None):
     consumer = KafkaConsumer(
-        topic,
         bootstrap_servers=consumers,
         group_id=group_id)
-    # consumer.poll() # TODO: bug here
+    # need to manually assign partitions if seek_to_end needs to be used here
+    partitions = [TopicPartition(topic, i) for i in xrange(num_partitions)]
+    consumer.assign(partitions) # conflict to subscribe
     consumer.seek_to_end()
     logger.info('seek_to_topic_end finish: {}'.format(topic))
 
 
-def delete_topic(topic, zookeeper_server):
-    # in broker, set `delete.topic.enable` to `true`
-    # kafka-topics.sh --delete --if-exists --zookeeper localhost:2181 --topic test
-    # may have side effects
-    cmd = '{} --delete --if-exists --zookeeper {} --topic {}'.format(
-        os.path.join(config['kafka_bin_path'], 'kafka-topics.sh'),
-        ','.join(zookeeper_server),
-        topic
-    )
-    ret = subprocess.call(cmd, shell=True)
-    if ret != 0:
-        logger.error('delete_topic: {}'.format(topic))
-        return
-    logger.info('delete_topic finish: {}'.format(topic))
+# def delete_topic(topic, zookeeper_server):
+#     # in broker, set `delete.topic.enable` to `true`
+#     # kafka-topics.sh --delete --if-exists --zookeeper localhost:2181 --topic test
+#     # may have side effects
+#     cmd = '{} --delete --if-exists --zookeeper {} --topic {}'.format(
+#         os.path.join(config['kafka_bin_path'], 'kafka-topics.sh'),
+#         ','.join(zookeeper_server),
+#         topic
+#     )
+#     ret = subprocess.call(cmd, shell=True)
+#     if ret != 0:
+#         logger.error('delete_topic: {}'.format(topic))
+#         return
+#     logger.info('delete_topic finish: {}'.format(topic))
 
 
 def run_etk_processes(project_name, processes, project_config):
@@ -190,6 +192,7 @@ def run_etk_processes(project_name, processes, project_config):
         --kafka-input-args "{input_args}" \
         --kafka-output-args "{output_args}" \
         --indexing \
+        --worker-id "{idx}" \
         > "{working_dir}/etk_stdout_{idx}.txt"'.format(
             run_core_path=os.path.join(config['etk_path'], 'etk/run_core_kafka.py'),
             project_name=project_name,
