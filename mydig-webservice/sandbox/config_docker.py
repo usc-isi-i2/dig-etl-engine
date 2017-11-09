@@ -4,7 +4,9 @@ import os
 import base64
 
 config = {
-    'debug': True,
+    # if it's True, two daemon threads (one by flask, one by flask spawn) in mydig
+    # will overwrite the same status file, which will cause a conflict
+    'debug': False,
     'server': {
         'host': '0.0.0.0',
         'port': 9879,
