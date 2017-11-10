@@ -86,6 +86,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es`
 - Kibana: `http://localhost:12497/kibana/`
+- Kafka Manager: `http://localhost:12497/kafka_manager/`
 
 
 # Advanced operations and solutions to known issues

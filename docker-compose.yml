@@ -85,20 +85,20 @@ services:
         # so set it to 200, DNS still works
         ipv4_address: 172.19.0.200
 
-#  kafka_manager:
-#    image: sheepkiller/kafka-manager
-#    environment:
-#      ZK_HOSTS: "zookeeper:2181"
-#      KM_CONFIGFILE: "/opt/application.conf"
-#    volumes:
-#      - ./kafka_manager/sandbox/conf/application.conf:/opt/application.conf
-##    ports:
-##      - "9000:9000"
-#    depends_on:
-#      - zookeeper
-#      - kafka
-#    networks:
-#      dig_net:
+  kafka_manager:
+    image: sheepkiller/kafka-manager
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      KM_CONFIGFILE: "/opt/application.conf"
+    volumes:
+      - ./kafka_manager/sandbox/conf/application.conf:/opt/application.conf
+#    ports:
+#      - "9000:9000"
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      dig_net:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.5.1
