@@ -6,7 +6,7 @@ You can install myDIG in a laptop or server and use it to build a domain specifi
 
 - the installation guide is below
 - [user guide](docs/index.md)
-- [advance user guide](docs/advanced.md)
+- [advanced user guide](docs/advanced.md)
 
 ## Installation
 
