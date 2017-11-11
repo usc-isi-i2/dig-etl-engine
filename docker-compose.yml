@@ -163,7 +163,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.0.14
+    image: uscisii2/mydig_ws:1.0.15
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -188,7 +188,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.3.2
+    image: digmemex/digui:0.3.6
 #    ports:
 #      - "8080"
     volumes:

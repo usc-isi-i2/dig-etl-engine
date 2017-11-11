@@ -63,7 +63,9 @@ To run myDIG do:
 
 To stop myDIG do:
 
-    docker-compose down
+    docker-compose stop
+    
+(Use `docker-compose down` to drop all containers)
     
 Once myDIG is running, go to your browser and visit `http://localhost:12497/mydig/ui/`
 
@@ -108,6 +110,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
+
 
 ## Manager's endpoints
 
