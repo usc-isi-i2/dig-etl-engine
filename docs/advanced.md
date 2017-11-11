@@ -408,7 +408,7 @@ THe DIG screens require that you define `title` and `description` fields. You co
 
 ## Creating Maps
 
-Maps are created from fields whose `type` is `location` as defined in the field editor in my DIG.
+Maps are created from fields whose `type` is `location` as defined in the field editor in my DIG. 
 
 By default, when you create a new project, it will have fields `city`, `city_name`, `state` and `country`. In addition, DIG includes an entity resolution algorithm that resolves city_name/state/country fields to geonames, and stores the resolved cities in field `city`. 
 
