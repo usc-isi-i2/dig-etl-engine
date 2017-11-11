@@ -14,6 +14,7 @@ I encourage you to build the example shown in this guide. It will take about 30 
 > Hands-on: start myDIG and define a new project called `events`.
 
 [search-screen]: assets/events/1-search-screen.png 
+[boko-haram]: assets/events/boko-haram.png 
 
 ## Ingesting JSON Documents
 
@@ -413,6 +414,10 @@ By default, when you create a new project, it will have fields `city`, `city_nam
 
 To take advantage of this capability, you should define `data_extraction` sections to populate the values of `city_name`, `state` and `country`.
 
-> **Super important**: **never** define extractions for field `city`. if you have city names, put them in field `city_name`. Otherwise you will mess things up, and you won't get cities.
+> **Super important**: **never** define extractions for field `city`. if you have city names, put them in field `city_name`. Otherwise you will mess things up, and the cities will not be displayed on the map.
 
+> Note: in the week of November 12 we will release a version of DIG that can ingest latitude/longitude values from JSON files and create locations that can appear on maps.
 
+Here is an example of a page that shows a map. It is the page for entity "boko haram":
+
+![Boko Haram Entity Page][boko-haram]
