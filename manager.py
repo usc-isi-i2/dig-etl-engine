@@ -55,7 +55,8 @@ def create_project():
     # update logstash pipeline
     output_server = project_config.get('output_server', config['output_server'])
     if config['version'] == 'sandbox':
-        update_logstash_pipeline(args['project_name'], output_server, output_topic, output_partition)
+        update_logstash_pipeline(
+            args['project_name'], output_server, output_topic, output_partition)
 
     return jsonify({}), 201
 
@@ -215,7 +216,7 @@ def run_etk_processes(project_name, processes, project_config):
 
 
 def kill_etk_process(project_name, ignore_error=False):
-    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{}" | awk \'{{print $2}}\' | xargs kill -9'.format(project_name)
+    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{}" | awk \'{{print $2}}\' | xargs kill '.format(project_name)
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and ignore_error:
         print 'error'
@@ -261,8 +262,9 @@ output {{
 )
 
     path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
-    with codecs.open(path, 'w') as f:
-        f.write(content)
+    if not os.path.exists(path):
+        with codecs.open(path, 'w') as f:
+            f.write(content)
 
 
 def create_mappings(index_name, payload_file_path):
