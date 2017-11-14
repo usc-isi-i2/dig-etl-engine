@@ -12,6 +12,10 @@ The guide covers the following topics:
 I encourage you to build the example shown in this guide. It will take about 30 minutes and you will have a working application as a starting point for importing files into your own project.
 
 > Hands-on: start myDIG and define a new project called `events`.
+> 
+> You can follow along and build the project step by step, or you can import the premade `sample-projects/events.tar.gz` and see the complete project.
+> 
+> Note: to import a project, first define an empty project, then use the `Import Project` command to import the `events.tar.gz`. The data for the project is in `datasets/events/`, import both files, set desire docs to 100 and click the red button to run the project.
 
 [search-screen]: assets/events/1-search-screen.png 
 [boko-haram]: assets/events/boko-haram.png 
