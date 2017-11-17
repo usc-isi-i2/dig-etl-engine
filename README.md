@@ -74,6 +74,16 @@ Once myDIG is running, go to your browser and visit `http://localhost:12497/mydi
 
 To use myDIG, look at the [user guide](docs/index.md)
 
+#### Upgrade Issues (16 Nov 2017)
+
+ELK (Elastic Search, LogStash & Kibana) components had been upgraded to 5.6.4 and other services in myDIG also got 
+update. What you need to do is:
+
+- Do `docker-compose down`
+- Delete directory `DIG_PROJECTS_DIR_PATH/.es`.
+
+You will lose all data and indices in previous Elastic Search and Kibana.
+
 #### Upgrade Issues (20 Oct 2017)
 
 On 20 Oct 2017 there are incompatible changes in Landmark tool (1.1.0), the rules you defined will get deleted when you upgrade to the new system. Please follow these instructions:
@@ -170,11 +180,11 @@ build Nginx image:
 
 build ETK base image:
 
-    docker build -t uscisii2/etk:1.0.0 -t uscisii2/etk:latest -f Dockerfile-etk .
+    docker build -t uscisii2/etk:1.0.0 -f Dockerfile-etk .
     
 build ETL image:
 
-    docker build -t uscisii2/dig-etl-engine:1.0.0 -t uscisii2/dig-etl-engine:latest .
+    docker build -t uscisii2/dig-etl-engine:1.0.0 .
     
 run ETL container:
 
