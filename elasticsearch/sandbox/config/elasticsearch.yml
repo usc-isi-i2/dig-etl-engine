@@ -1,5 +1,6 @@
 cluster.name: "docker-cluster"
 network.host: 0.0.0.0
+index.mapping.total_fields.limit: 5000
 #index.number_of_replicas: 0 # does not work for 5.x
 #path.logs: /var/log/elasticsearch  # does not work for 5.x
 
