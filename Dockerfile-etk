@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     python-dev \
     git \
     wget \
-    curl
+    curl \
+    vim
 
 # install pip
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
@@ -28,7 +29,7 @@ RUN conda update -y conda
 # download etk
 RUN git clone https://github.com/usc-isi-i2/etk.git && \
     cd etk && \
-    git checkout tags/1.0.5-br
+    git checkout tags/1.0.5
 
 # create and config conda-env (install flask) for etk
 RUN cd etk && conda-env create .
