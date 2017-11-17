@@ -142,7 +142,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r050
+    image: digsandpaper/digsandpaper:0.1.4-r051
 #    ports:
 #      - "9876"
     volumes:
