@@ -25,7 +25,7 @@ services:
 #      - ache
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.1.0
+    image: uscisii2/dig-etl-engine:1.1.1
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -101,7 +101,8 @@ services:
       dig_net:
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:5.6.4
+#    image: docker.elastic.co/logstash/logstash:5.6.4
+    image: docker.elastic.co/logstash/logstash:5.5.1
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -117,7 +118,8 @@ services:
       - elasticsearch
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+#    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+    image: elasticsearch:2.4.6
     volumes:
 #      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -131,7 +133,8 @@ services:
       - dig_net
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:5.6.4
+#    image: docker.elastic.co/kibana/kibana:5.6.4
+    image: uscisii2/kibana:4.6-sense # compatible with es 2.4
     volumes:
       - ./kibana/sandbox/config:/opt/kibana/config
 #    ports:
@@ -142,13 +145,13 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r051
+    image: digsandpaper/digsandpaper:0.1.4-r055
 #    ports:
 #      - "9876"
     volumes:
       - ./sandpaper/sandbox/config:/etc/sandpaper/config
-    environment:
-      ES_MAJOR_VERSION: 5
+#    environment:
+#      ES_MAJOR_VERSION: 5
     links:
       - elasticsearch
     command:
@@ -164,7 +167,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.1.0
+    image: uscisii2/mydig_ws:1.1.1
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
