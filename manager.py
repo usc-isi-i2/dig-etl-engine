@@ -195,7 +195,8 @@ def run_etk_processes(project_name, processes, project_config):
         --indexing \
         --worker-id "{idx}" \
         > "{working_dir}/etk_stdout_{idx}.txt"'.format(
-            run_core_path=os.path.join(config['etk_path'], 'etk/run_core_kafka.py'),
+            # os.path.join(config['etk_path'], 'etk/run_core_kafka.py')
+            run_core_path=os.path.abspath('run_core_kafka.py'),
             project_name=project_name,
             input_topic=project_config.get('input_topic', project_name + '_in'),
             output_topic=project_config.get('output_topic', project_name + '_out'),
