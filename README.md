@@ -186,12 +186,9 @@ build ETL image:
 
     docker build -t uscisii2/dig-etl-engine:1.0.0 .
     
-run ETL container:
+run in development mode:
 
-    docker run -d -p 9999:9999 \
-    -v $(pwd)/../mydig-projects:/shared_data/projects \
-    -v $(pwd)/config_docker_sample.py:/app/dig-etl-engine/config.py \
-    uscisii2/dig-etl-engine:1.0.0
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 
 ## kafka input parameters of interest for Logstash

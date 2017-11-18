@@ -11,7 +11,6 @@ services:
       DIG_AUTH_PASSWORD: ${DIG_AUTH_PASSWORD}
 #      DIG_AUTH_ENABLE: ${DIG_AUTH_ENABLE}
     volumes:
-#      - ./nginx/sandbox/nginx/.htpasswd:/etc/nginx/.htpasswd # development only
       - ./nginx/sandbox/conf.d/dig.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/sandbox/logs:/var/log/nginx
       - ./digapp/sandbox/logs/digapp:/var/log/diglogs
@@ -29,12 +28,9 @@ services:
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
-#      - .:/app/dig-etl-engine # development only
-      - ./config_docker_sandbox.py:/app/dig-etl-engine/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
       - dig3-resources-volume:/shared_data/dig3-resources
       - ./logstash/sandbox/pipeline/:/app/logstash_pipeline
-#      - ${ETK_DIR_PATH}:/app/etk # development only
 #    ports:
 #      - "9999"
     networks:
@@ -179,9 +175,6 @@ services:
 #      - "9880:9880"
 #      - "9881:9881"
     volumes:
-#      - ${MYDIG_DIR_PATH}:/app/mydig-webservice # development only
-#      - ${ETK_DIR_PATH}:/app/etk # development only, for spacy
-#      - ${SPACY_DIR_PATH}:/app/spacy-ui # development only
       - ./mydig-webservice/sandbox/config_docker.py:/app/mydig-webservice/ws/config.py
       - ${DIG_PROJECTS_DIR_PATH}:/shared_data/projects
       - dig3-resources-volume:/shared_data/dig3-resources
