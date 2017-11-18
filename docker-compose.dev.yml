@@ -3,7 +3,7 @@ version: '3'
 services:
 
   nginx:
-    volumnes:
+    volumes:
       - ./nginx/sandbox/nginx/.htpasswd:/etc/nginx/.htpasswd
 
   dig_etl_engine:
