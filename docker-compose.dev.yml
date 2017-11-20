@@ -2,10 +2,6 @@ version: '3'
 
 services:
 
-  nginx:
-    volumes:
-      - ./nginx/sandbox/nginx/.htpasswd:/etc/nginx/.htpasswd
-
   dig_etl_engine:
     volumes:
       - .:/app/dig-etl-engine
