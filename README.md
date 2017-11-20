@@ -186,8 +186,22 @@ build ETL image:
 
     docker build -t uscisii2/dig-etl-engine:1.0.0 .
     
-run in development mode:
-
+Invoke development mode:
+    
+    # clone a new etl to avoid conflict
+    git clone https://github.com/usc-isi-i2/dig-etl-engine.git dig-etl-engine-dev
+    
+    # swith to dev branch or other feature branches
+    git checkout dev
+    
+    # create .env from .env.example
+    # change `COMPOSE_PROJECT_NAME` in .env from `dig` to `digdev`
+    # you also need a new project folder
+    
+    # run docker
+    docker-compose up
+    
+    # add dev environment varaibles to .env if you want to mount libraries (optional)
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 
