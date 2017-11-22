@@ -15,7 +15,9 @@ from config import config
 sys.path.append(os.path.join(config['etk_path'], 'etk'))
 import core
 
+
 consumer_pointer = None
+producer_pointer = None
 
 
 def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False, worker_id=0):
@@ -81,14 +83,15 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
         sys.exit()
 
 
-
 def termination_handler(signum, frame):
-    global consumer_pointer
+    global consumer_pointer, producer_pointer
 
     print 'SIGNAL #{} received, trying to exit...'.format(signum)
 
     if consumer_pointer:
         consumer_pointer.close()
+    if producer_pointer:
+        producer_pointer.close()
 
 
 def usage():
@@ -166,6 +169,7 @@ if __name__ == "__main__":
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
             **output_args
         )
+        producer_pointer = producer
 
         c = core.Core(json.load(codecs.open(c_options.configPath, 'r')))
 
