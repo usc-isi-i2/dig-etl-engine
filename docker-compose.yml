@@ -185,14 +185,15 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.4.0
+#    image: digmemex/digui:0.4.0
+    image: digmemex/digui:0.3.6
 #    ports:
 #      - "8080"
     volumes:
       - ./digapp/sandbox/logs/digapp:/var/log
     environment:
       NODE_ENV: 'production'
-      ES_HOST: '{"apiVersion":"5.0", "host": "http://${DOMAIN}:${PORT}/es"}'
+      ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es"}' # "apiVersion":"5.0",
       ES_HOST_STRING: 'http://elasticsearch:9200/'
       CONFIG_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/'
       TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
