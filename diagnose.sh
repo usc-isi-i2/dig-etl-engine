@@ -10,7 +10,7 @@ echo "--------------------------------------------------"
 
 echo "CPU and Memory information:"
 if [[ "$OSTYPE" == "linux-gnu" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "msys" ]]; then
-    top -b 1 | head -n 5
+    top -n 1 | head -n 5
 elif [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "freebsd"* ]]; then
     top -l 1 | head -n 10 # only for mac
 elif [[ "$OSTYPE" == "win32" ]]; then
