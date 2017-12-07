@@ -50,6 +50,8 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                 if indexing:
                     result = index_knowledge_graph_fields(result)
                 cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
+                if not result:
+                    raise Exception('indexing in sandpaper failed')
 
                 # nested docs
                 if 'nested_docs' in result:
