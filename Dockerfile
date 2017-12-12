@@ -1,5 +1,5 @@
 # mydig-webservice
-FROM uscisii2/etk:1.0.6
+FROM uscisii2/etk:1.0.7-dev1
 
 # all packages and environments are in /app
 WORKDIR /app
@@ -9,9 +9,9 @@ RUN mkdir /app/dig-etl-engine
 RUN apt-get update && apt-get install -y default-jre
 
 # download kafka (for command tools)
-RUN wget "http://apache.claz.org/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz" && \
-    tar -xvzf "kafka_2.11-0.11.0.0.tgz" && rm "kafka_2.11-0.11.0.0.tgz" && \
-    mv "kafka_2.11-0.11.0.0" kafka
+RUN wget "http://apache.claz.org/kafka/0.11.0.2/kafka_2.11-0.11.0.2.tgz" && \
+    tar -xvzf "kafka_2.11-0.11.0.2.tgz" && rm "kafka_2.11-0.11.0.2.tgz" && \
+    mv "kafka_2.11-0.11.0.2" kafka
 
 # install dependencies
 ADD requirements.txt /app/dig-etl-engine

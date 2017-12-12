@@ -29,7 +29,8 @@ config = {
     'input_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
     'output_partitions': int(os.getenv('KAFKA_NUM_PARTITIONS', '4')),
     'input_session_timeout': 60*60*1000,
-    'input_group_id': 'dig_etk',
+    'input_group_id': 'dig_etk', # used by etk
+    # 'output_group_id': 'default', # used by logstash
     'logstash_group_id': 'dig_logstash',
 
     'kafka_bin_path': '/app/kafka/bin',
