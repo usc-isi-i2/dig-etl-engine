@@ -1,6 +1,9 @@
 version: '3'
 
 services:
+  nginx:
+    volumes:
+      - ./nginx/sandbox/conf.d/kafka_manager.addon:/etc/nginx/conf.d/kafka_manager.addon
 
   kafka_manager:
     image: sheepkiller/kafka-manager

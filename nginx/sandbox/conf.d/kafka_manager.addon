@@ -1,0 +1,7 @@
+# Kafka manager
+location /kafka_manager/ {
+    proxy_set_header X-NginX-Proxy true;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $http_host;
+    proxy_pass http://kafka_manager:9000/kafka_manager/;
+}
