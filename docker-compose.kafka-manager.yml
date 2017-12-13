@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+
+  kafka_manager:
+    image: sheepkiller/kafka-manager
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      KM_CONFIGFILE: "/opt/application.conf"
+    volumes:
+      - ./kafka_manager/sandbox/conf/application.conf:/opt/application.conf
+  #    ports:
+  #      - "9000:9000"
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - dig_net
