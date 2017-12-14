@@ -21,7 +21,6 @@ services:
       - sandpaper
       - mydig_ws
       - digui
-#      - ache
 
   dig_etl_engine:
     image: uscisii2/dig-etl-engine:1.1.3-dev1
@@ -224,17 +223,6 @@ services:
 #     - "3333:3333"
     networks:
       - dig_net
-
-#  ache:
-#    image: vidanyu/ache:latest
-#    volumes:
-#      - ./ache/sandbox/config:/config
-#      - ${DIG_PROJECTS_DIR_PATH}/.ache/data:/data
-#    ports:
-#      - "8080:8080"
-#    entrypoint: sh -c 'sleep 10 && /ache/bin/ache startServer -c /config/ -d /data'
-#    networks:
-#      - dig_net
 
 
 networks:

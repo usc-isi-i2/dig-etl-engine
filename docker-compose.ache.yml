@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  nginx:
+    volumes:
+      - ./nginx/sandbox/conf.d/ache.addon:/etc/nginx/conf.d/ache.addon
+    depends_on:
+      - ache
+
+  ache:
+    image: vidanyu/ache:latest
+    volumes:
+      - ./ache/sandbox/config:/config
+      - ${DIG_PROJECTS_DIR_PATH}/.ache/data:/data
+    ports:
+      - "8080:8080"
+    entrypoint: sh -c 'sleep 10 && /ache/bin/ache startServer -c /config/ -d /data'
+    networks:
+      - dig_net
