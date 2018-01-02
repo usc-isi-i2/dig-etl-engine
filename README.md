@@ -64,9 +64,9 @@ To run myDIG do:
 
 To stop myDIG do:
 
-    docker-compose stop
+    ./engine.sh stop
     
-(Use `docker-compose down` to drop all containers)
+(Use `/engine.sh down` to drop all containers)
     
 Once myDIG is running, go to your browser and visit `http://localhost:12497/mydig/ui/`
 
