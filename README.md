@@ -56,10 +56,10 @@ DIG_AUTH_PASSWORD=123
 
 To run myDIG do:
 
-    docker-compose up
+    ./engine.sh up
     
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
-> You can also run `docker-compose up -d` to run myDIG as a daemon process in the background.
+> You can also run `./engine.sh up -d` to run myDIG as a daemon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
 
 To stop myDIG do:
@@ -150,7 +150,8 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 ## Docker compose
 
 - Create `.env` file from `.env.example` and change the environment variables.
-- Run `docker-compose up` for sandbox version, run `docker-compose -f docker-compose-production.yml up` for production version.
+- Run `./engine.sh up` for sandbox version.
+- Run `docker-compose -f docker-compose-production.yml up` for production version.
 
 ## Ports allocation in dig_net
 
@@ -199,10 +200,10 @@ Invoke development mode:
     # you also need a new project folder
     
     # run docker
-    docker-compose up
+    ./engine.sh up
     
-    # add dev environment varaibles to .env if you want to mount libraries (optional)
-    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+    # add dev environment varaibles to .env if you want to mount add-ons (optional)
+    ./engine.sh +dev up
 
 
 ## kafka input parameters of interest for Logstash
