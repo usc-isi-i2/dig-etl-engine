@@ -125,7 +125,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r055
+    image: digsandpaper/digsandpaper:0.1.4-r058
 #    ports:
 #      - "9876"
     volumes:
@@ -147,7 +147,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.1.4-dev2
+    image: uscisii2/mydig_ws:1.1.5-dev1
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -169,7 +169,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.5.5
+    image: digmemex/digui:0.6.4
 #    ports:
 #      - "8080"
     volumes:
@@ -203,7 +203,7 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.1.4
+    image: inferlink/landmark-rest:1.1.5
 #    container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
