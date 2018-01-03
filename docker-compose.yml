@@ -186,6 +186,7 @@ services:
       SEARCH_CONFIG: '{
         "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search/coarse"
       }'
+      PATH_PREFIX: 'digui'
     depends_on:
       - elasticsearch
     networks:
