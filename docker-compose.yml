@@ -82,8 +82,8 @@ services:
         ipv4_address: 172.19.0.200
 
   logstash:
-#    image: docker.elastic.co/logstash/logstash:5.6.4
-    image: docker.elastic.co/logstash/logstash:5.5.1
+    image: docker.elastic.co/logstash/logstash:5.6.4
+#    image: docker.elastic.co/logstash/logstash:5.5.1
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -99,8 +99,8 @@ services:
       - elasticsearch
 
   elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
-    image: elasticsearch:2.4.6
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+#    image: elasticsearch:2.4.6
     volumes:
 #      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -109,13 +109,13 @@ services:
 #      - "9200:9200"
 #      - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
     networks:
       - dig_net
 
   kibana:
-#    image: docker.elastic.co/kibana/kibana:5.6.4
-    image: uscisii2/kibana:4.6-sense # compatible with es 2.4
+    image: docker.elastic.co/kibana/kibana:5.6.4
+#    image: uscisii2/kibana:4.6-sense # compatible with es 2.4
     volumes:
       - ./kibana/sandbox/config:/opt/kibana/config
 #    ports:
@@ -177,7 +177,7 @@ services:
       - ./digapp/sandbox/logs/digapp:/var/log
     environment:
       NODE_ENV: 'production'
-      ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es"}' # "apiVersion":"5.0",
+      ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es", "apiVersion":"5.0"}'
       ES_HOST_STRING: 'http://elasticsearch:9200/'
       CONFIG_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/'
       TAGS_ENTITY_ENDPOINT: 'http://${DOMAIN}:${PORT}/mydig_projects/PROJECT/tags/TAG/annotations/Ad/annotations'
@@ -204,7 +204,7 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.1.5
+    image: inferlink/landmark-rest:1.1.6
 #    container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
