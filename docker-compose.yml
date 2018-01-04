@@ -170,7 +170,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.6.4
+    image: digmemex/digui:0.6.6
 #    ports:
 #      - "8080"
     volumes:
@@ -204,7 +204,7 @@ services:
     networks:
       - dig_net
   landmark-rest:
-    image: inferlink/landmark-rest:1.1.6
+    image: inferlink/landmark-rest:1.1.7
 #    container_name: landmark-rest
     env_file:
       - ./landmark/sandbox/landmark-rest.docker.env
