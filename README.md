@@ -1,4 +1,5 @@
 # myDIG Domain-Specific Search
+
 myDIG is a tool to build pipelines that crawl the web, extract information, build a knowledge graph (KG) from the extractions and provide an easy to user interface to query the KG.
 The project web page is [DIG](http://usc-isi-i2.github.io/dig/).
 
@@ -102,7 +103,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - Kafka Manager: `http://localhost:12497/kafka_manager/`
 
 
-# Advanced operations and solutions to known issues
+## Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
 
@@ -126,7 +127,9 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
 
-## Manager's endpoints
+## Development Instructions
+
+### Manager's endpoints
 
 - `POST /create_project`
     ```
@@ -139,24 +142,28 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
     ```
     {
         "project_name" : "new_project",
-        "number_of_workers": 4
+        "number_of_workers": 4,
+        "input_offset": "seek_to_end", // optional
+        "output_offset": "seek_to_end" // optional
     }
     ```
     
 - `POST /kill_etk`
     ```
     {
-        "project_name" : "new_project"
+        "project_name" : "new_project",
+        "input_offset": "seek_to_end", // optional
+        "output_offset": "seek_to_end" // optional
     }
     ```
 
-## Docker compose
+### Docker compose
 
 - Create `.env` file from `.env.example` and change the environment variables.
 - Run `./engine.sh up` for sandbox version.
 - Run `docker-compose -f docker-compose-production.yml up` for production version.
 
-## Ports allocation in dig_net
+### Ports allocation in dig_net
 
 - DIG ETL Engine: 9999
 - Kafka: 9092
@@ -172,9 +179,9 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
 > `dig_net` is the LAN in Docker compose.
 
-## Docker commands for development
+### Docker commands for development
 
-build Kibana image:
+build Kibana 4 image:
 
     docker build -t uscisii2/kibana:4.6-sense kibana/.
     
@@ -209,7 +216,7 @@ Invoke development mode:
     ./engine.sh +dev up
 
 
-## kafka input parameters of interest for Logstash
+### kafka input parameters of interest for Logstash
 `auto_offset_resetedit`
 - Value type is string
 - There is no default value for this setting.
