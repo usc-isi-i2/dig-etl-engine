@@ -1,0 +1,138 @@
+{
+  "prefix": "privacyrights",
+  "website": "http://privacyrights.org",
+  "file_url": "https://www.privacyrights.org/data-breaches/Privacy_Rights_Clearinghouse-Data-Breaches-Export.csv",
+  "id_path": "",
+  "remove_leading_trailing_whitespace": true,
+  "remove_blank_fields": true,
+  "nested_configs": [
+    {
+      "path": "organization",
+      "field": "victim",
+      "config": {
+        "type": "Organization",
+        "title": "{Company}",
+        "rules": [
+          {
+            "path": "Company",
+            "field": "label"
+          },
+          {
+            "path": "Type of organization",
+            "field": "type"
+          },
+          {
+            "path": "type",
+            "field": "type"
+          },
+          {
+            "path": "title",
+            "field": "title"
+          }
+        ]
+      }
+    },
+    {
+      "path": "damage",
+      "field": "damage",
+      "config": {
+        "type": "Damage",
+        "title": "{Type of breach} breach, {Total Records} records",
+        "rules": [
+          {
+            "path": "Type of breach",
+            "field": "type"
+          },
+          {
+            "path": "Total Records",
+            "field": "size",
+            "join_indexing": true
+          },
+          {
+            "path": "type",
+            "field": "type"
+          },
+          {
+            "path": "title",
+            "field": "title"
+          }
+        ]
+      }
+    },
+    {
+      "path": "provenance",
+      "field": "citation",
+      "config": {
+        "type": "Citation",
+        "title": "{Information Source} {Source URL}",
+        "rules": [
+          {
+            "path": "Information Source",
+            "field": "label"
+          },
+          {
+            "path": "Source URL",
+            "field": "reference"
+          },
+          {
+            "path": "type",
+            "field": "type"
+          },
+          {
+            "path": "title",
+            "field": "title"
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "title": "{Date Made Public}: data breach in {Location}",
+    "type": [
+      "Event",
+      "Data Breach"
+    ],
+    "rules": [
+      {
+        "path": "Date Made Public",
+        "field": "event_date"
+      },
+      {
+        "path": "Description of incident",
+        "field": "description"
+      },
+      {
+        "path": "Location",
+        "field": "city_name"
+      },
+      {
+        "path": "Location",
+        "field": "state"
+      },
+      {
+        "path": "Location",
+        "field": "country"
+      },
+      {
+        "path": "provenance",
+        "field": "citation"
+      },
+      {
+        "path": "damage",
+        "field": "damage"
+      },
+      {
+        "path": "organization",
+        "field": "victim"
+      },
+      {
+        "path": "type",
+        "field": "type"
+      },
+      {
+        "path": "title",
+        "field": "title"
+      }
+    ]
+  }
+}
