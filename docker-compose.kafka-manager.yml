@@ -21,3 +21,7 @@ services:
       - kafka
     networks:
       - dig_net
+
+  mydig_ws:
+    environment:
+      ADDON_KAFKA_MANAGER: "true"

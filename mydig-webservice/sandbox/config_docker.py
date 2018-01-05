@@ -77,6 +77,7 @@ config = {
         'import': 'http://landmark-rest:5000/project/import/{project_name}'
     },
     'ache': {
+        'enable': len(os.getenv('ADDON_ACHE', '')) != 0,
         'kafka_topic': 'ache',
         'group_id': 'mydig',
         'upload': {

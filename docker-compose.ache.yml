@@ -17,3 +17,7 @@ services:
     entrypoint: sh -c 'sleep 10 && /ache/bin/ache startServer -c /config/ -d /data'
     networks:
       - dig_net
+
+  mydig_ws:
+    environment:
+      ADDON_ACHE: "true"
