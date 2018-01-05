@@ -116,12 +116,15 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
 - On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
 
+- In Linux, if Elastic Search 5.x exits for `[1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`, set `max_map_count` by `sudo sysctl -w vm.max_map_count=262144`.
+
+- In Linux, if Elastic Search 5.x fails to start for obtaining node locks, change the ownership of myDIG project directory (e.g.,`chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>`).
+
 - On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
-
 
 ## Manager's endpoints
 
