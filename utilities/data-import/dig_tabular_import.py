@@ -303,14 +303,16 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         print "Wrote default mapping file:", new_file
 
 
-path = "/Users/pszekely/Downloads/"
-filename = path + "Privacy_Rights_Clearinghouse-Data-Breaches-Export_test.csv"
-mapping_file = "/Users/pszekely/Documents/mydig-projects/data_breaches/working_dir/privacyrights-mapping.json"
-# mapping_file = "/Users/pszekely/Downloads/empty-mapping.json"
+filename = "./examples/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.csv"
+mapping_file = "./examples/privacyrights-mapping.json"
 
-create_jl_file_from_csv(filename, mapping_file=mapping_file)
+# 1. generate default mappings
+# create_default_mapping_for_csv_file(filename, "output/default-mapping")
 
-create_default_mapping_for_csv_file(filename, "xxx")
+# 2. create jl file
+create_jl_file_from_csv(filename, mapping_file=mapping_file,
+        output_filename="./examples/output/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.jl")
+
 
 
 

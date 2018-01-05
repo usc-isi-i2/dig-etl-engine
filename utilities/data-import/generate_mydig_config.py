@@ -443,14 +443,14 @@ class FieldProperties(object):
 # test1 = Rule(spec["config"]["rules"][0], spec["prefix"])
 # print "content_extraction: ", test1.content_extraction()
 # print "data_extraction: ", test1.data_extraction()
-mapping_file = "/Users/pszekely/Downloads/privacyrights-mapping.json"
+mapping_file = "./examples/privacyrights-mapping.json"
 with open(mapping_file, 'r') as open_file:
     spec_nested = json.loads(open_file.read())
     # print spec_nested
     test2 = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
     # print "content_extraction: ", test2.content_extraction()
     # print "data_extraction: ", test2.data_extraction()
-    outputdir = "/Users/pszekely/Documents/mydig-projects/data_breaches/working_dir/additional_etk_config/"
+    outputdir = "./examples/output/"
     test2.generate_config_files(outputdir + "Privacy_Rights_Clearinghouse-Data-Breaches-config.json")
 
 # supl_config = {
