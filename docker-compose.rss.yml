@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  rss_feed_crawler:
+    image: uscisii2/rss_feed_crawler:0.1.0
+    volumes:
+#      - ./rss_crawler/sandbox/config.py:/app/config.py
+      - /Users/yixiang/Projects/ISI/dig-rss-feed-crawler:/app
+      - ./rss_feed_crawler/sandbox/latest_feed_state.json:/app/latest_feed_state.json
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "while true; do sleep 1000; done"
+    networks:
+      - dig_net
+    depends_on:
+      - kafka
+
+  mydig_ws:
+    environment:
+      ADDON_RSS_FEED_CRAWLER: "true"
