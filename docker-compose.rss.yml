@@ -2,7 +2,7 @@ version: '3'
 
 services:
   rss_feed_crawler:
-    image: uscisii2/rss_feed_crawler:0.1.0
+    image: uscisii2/rss-feed-crawler:0.1.0
     volumes:
 #      - ./rss_crawler/sandbox/config.py:/app/config.py
       - /Users/yixiang/Projects/ISI/dig-rss-feed-crawler:/app

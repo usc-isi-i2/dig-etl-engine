@@ -38,6 +38,9 @@ CONTAINER_DIGUI="${COMPOSE_PROJECT_NAME}_digui_1"
 # use mydig_ws container as test container for inner network
 TEST_CONTAINER_NAME=${CONTAINER_MYDIG_WS}
 
+echo "[Core Containers]"
+echo "--------------------------------------------------"
+
 echo "Diagnose mydig_ws:"
 echo -n "Checking container ... "
 container_id=$(docker ps -q --filter "name=${CONTAINER_MYDIG_WS}")
@@ -131,17 +134,6 @@ fi
 echo "--------------------------------------------------"
 
 
-echo "Diagnose kafka_manager:"
-echo -n "Checking container ... "
-container_id=$(docker ps -q --filter "name=${CONTAINER_KAFKA_MANAGER}")
-if [ -z ${container_id} ]; then
-    echo "[ERROR]"
-else
-    echo "[done]"
-fi
-echo "--------------------------------------------------"
-
-
 echo "Diagnose kibana:"
 echo -n "Checking container ... "
 container_id=$(docker ps -q --filter "name=${CONTAINER_KIBANA}")
@@ -218,6 +210,20 @@ echo "--------------------------------------------------"
 echo "Diagnose digui:"
 echo -n "Checking container ... "
 container_id=$(docker ps -q --filter "name=${CONTAINER_DIGUI}")
+if [ -z ${container_id} ]; then
+    echo "[ERROR]"
+else
+    echo "[done]"
+fi
+echo "--------------------------------------------------"
+
+
+echo "[Add-on Containers]"
+echo "--------------------------------------------------"
+
+echo "Diagnose kafka_manager:"
+echo -n "Checking container ... "
+container_id=$(docker ps -q --filter "name=${CONTAINER_KAFKA_MANAGER}")
 if [ -z ${container_id} ]; then
     echo "[ERROR]"
 else
