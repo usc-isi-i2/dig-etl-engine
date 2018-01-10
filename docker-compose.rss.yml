@@ -5,7 +5,7 @@ services:
     image: uscisii2/rss-feed-crawler:0.1.0
     volumes:
 #      - /Users/yixiang/Projects/ISI/dig-rss-feed-crawler:/app
-      - ./rss_crawler/sandbox/config.py:/app/config.py
+      - ./rss_feed_crawler/sandbox/config.py:/app/config.py
       - ./rss_feed_crawler/sandbox/latest_feed_state.json:/app/latest_feed_state.json
     command:
       - "/bin/sh"
