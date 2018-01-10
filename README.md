@@ -125,7 +125,17 @@ In `.env` file, add comma separated add-on names:
 
     DIG_ADD_ONS=ache,rss
     
-Then, simply do `./engine.sh up`. To stop, do `./engine.sh stop`.
+Then, simply do `./engine.sh up`. 
+
+To stop, do `./engine.sh stop`.
+
+
+### Add-on list
+
+- `ache`: ACHE Crawler (coming soon).
+- `rss`: RSS Feed Crawler (coming soon).
+- `kafka-manager`: Kafka Manager.
+- `dev`: Development mode.
 
 
 ## Advanced operations and solutions to known issues
