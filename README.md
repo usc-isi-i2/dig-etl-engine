@@ -103,6 +103,31 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - Kafka Manager: `http://localhost:12497/kafka_manager/`
 
 
+## Run with Add-ons
+
+### From command line
+
+    # run with ache
+    ./engine.sh +ache up
+    # stop
+    ./engine.sh +ache stop
+    
+    # run with ache and rss crawler
+    ./engine.sh +ache +rss up
+    # stop
+    ./engine.sh +ache +rss stop
+    
+> `./engine.sh stop` only stops core containers.
+    
+### From env file
+
+In `.env` file, add comma separated add-on names:
+
+    DIG_ADD_ONS=ache,rss
+    
+Then, simply do `./engine.sh up`. To stop, do `./engine.sh stop`.
+
+
 ## Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
