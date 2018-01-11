@@ -62,6 +62,7 @@ To run myDIG do:
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
 > You can also run `./engine.sh up -d` to run myDIG as a daemon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
+> On Linux, there are several more additional step, please refer to `Advanced operations and solutions to known issues`.
 
 To stop myDIG do:
 
@@ -103,6 +104,41 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - Kafka Manager: `http://localhost:12497/kafka_manager/`
 
 
+## Run with Add-ons
+
+### From command line
+
+    # run with ache
+    ./engine.sh +ache up
+    # stop
+    ./engine.sh +ache stop
+    
+    # run with ache and rss crawler
+    ./engine.sh +ache +rss up
+    # stop
+    ./engine.sh +ache +rss stop
+    
+> `./engine.sh stop` only stops core containers.
+    
+### From env file
+
+In `.env` file, add comma separated add-on names:
+
+    DIG_ADD_ONS=ache,rss
+    
+Then, simply do `./engine.sh up`. 
+
+To stop, do `./engine.sh stop`.
+
+
+### Add-on list
+
+- `ache`: ACHE Crawler (coming soon).
+- `rss`: RSS Feed Crawler (coming soon).
+- `kafka-manager`: Kafka Manager.
+- `dev`: Development mode.
+
+
 ## Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
@@ -117,9 +153,9 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
 - On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
 
-- In Linux, if Elastic Search 5.x exits for `[1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`, set `max_map_count` by `sudo sysctl -w vm.max_map_count=262144`.
+- On Linux, if Elastic Search 5.x exits for `[1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`, set `max_map_count` by `sudo sysctl -w vm.max_map_count=262144`.
 
-- In Linux, if Elastic Search 5.x fails to start for obtaining node locks, change the ownership of myDIG project directory (e.g.,`chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>`).
+- On Linux, if Elastic Search 5.x fails to start for obtaining node locks, change the ownership of myDIG project directory (e.g.,`chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>`).
 
 - On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 

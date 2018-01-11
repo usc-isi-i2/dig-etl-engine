@@ -88,6 +88,15 @@ config = {
             # 'max_wait_time': 10 * 1000, # 10s, float('inf')
         }
     },
+    'rss_feed_crawler': {
+        'enable': len(os.getenv('ADDON_RSS_FEED_CRAWLER', '')) != 0,
+        'kafka_topic': 'rss',
+        'group_id': 'mydig',
+        'upload': {
+            'endpoint': 'http://mydig_ws:9879/projects/{project_name}/data?sync=true&log=false',
+            'file_name': 'rss'
+        }
+    },
     'data_pushing_worker_backoff_time': 5,
     'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
