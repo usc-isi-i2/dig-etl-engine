@@ -1,0 +1,5 @@
+http://rss.cnn.com/rss/money_markets.rss
+http://rss.cnn.com/rss/money_news_economy.rss
+http://rss.cnn.com/rss/money_news_companies.rss
+http://feeds.reuters.com/news/wealth.rss
+http://feeds.reuters.com/reuters/businessNews.rss
