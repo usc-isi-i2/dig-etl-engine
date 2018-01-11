@@ -1,0 +1,40 @@
+[
+	{
+		"TimeSeriesRegions":
+		[
+			{
+				"orientation": "row",
+				"rows": "[5:41]",
+				"locs": "[J:S]",
+				"metadata": [
+					{
+						"orientation": "col",
+						"loc": "A",
+						"name": "location"
+					},
+					{
+						"orientation": "col",
+						"loc": "T",
+						"name": "yearly_change"
+					},
+					{
+						"orientation": "col",
+						"loc": "U",
+						"name": "monthly_change"
+					}										
+				],
+				"times": {
+					"locs": [4]
+				}
+			}
+		],
+		"Metadata":
+		[
+			{
+				"source": "cell",
+				"name": "name",
+				"loc": "(A,1)"
+			}
+		]
+	}
+]
