@@ -1,0 +1,24 @@
+This folder contains two tools for data translating structured time series data. The first, extract_spreadsheet.py, will translate an Excel spreadsheet into a JSON representation. The second, triplify.py, will convert the JSON representation into a list of triples.
+
+---
+extract_spreadsheet.py
+Takes as input JSON annotation file, an Excel spreadsheet (or CSV file), and an output filename.
+The script loads the JSON annotations, then parses each sheet in the Excel spreadsheet, storing the output into the supplied file (overwriting if the file exists).
+The output format is JSON, consisting of an array of data from each sheet or tab in the Excel file. For a single sheet, the output is an array of time series objects with two keys - metadata and timeseries (ts). The metadata is a key-value dictionary of metadata properties. The ts field is an array of tuples of the form (time, value).
+
+Dependencies:
+argparse
+pyexcel
+pyexcel-xls 
+pyexcel-xlsx
+demjson
+
+Usage:
+extract_spreadsheet.py <annotation> <spreadsheet> <output>
+
+Example:
+extract_spreadsheet.py annotations\DIESEL_june\ 2017.json DIESEL_june\ 2017.xlsx results\DIESEL_june_2017.json
+
+Data and annotations can be found at ./examples
+
+
