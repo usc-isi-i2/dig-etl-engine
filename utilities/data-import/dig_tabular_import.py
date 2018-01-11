@@ -39,6 +39,7 @@ class TabularImport(object):
             self.remove_blank_fields = True
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
+        self.config = mapping_spec.get("config")
         loader = ptr.CsvTableFileLoader(filename)
         for table_data in loader.load():
             # print "headers", table_data.header_list
@@ -51,14 +52,34 @@ class TabularImport(object):
             writer.write_table()
             self.object_list = json.loads(output.getvalue())
 
-            title_template = mapping_spec["config"].get("title")
+            title_template = self.config.get("title")
+
+            # preprocess all rules in the config and create a dict for faster processing
+            rules = self.config['rules']
+
+            for nested_config in self.nested_configs:
+                if 'config' in nested_config and 'rules' in nested_config['config']:
+                    rules.extend(nested_config['config']['rules'])
+
+            delete_dict = dict()
+            for rule in rules:
+                if 'delete' in rule:
+                    delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
+
             for ob in self.object_list:
                 ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
-                kg_type = mapping_spec["config"].get("type")
+                kg_type = self.config.get("type")
                 if kg_type:
                     ob["type"] = self.listify(kg_type)
                 if title_template:
                     ob["title"] = self.apply_format_template(title_template, ob)
+
+                # go through the csv and delete all values marked to be deleted
+
+                for k in delete_dict.keys():
+                    if k in ob:
+                        if ob[k] in delete_dict[k]:
+                            ob.pop(k)
 
     def listify(self, value):
         """
@@ -89,10 +110,13 @@ class TabularImport(object):
         for m in re.finditer(r'\{([\w ]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
-            if not isinstance(value, basestring):
-                value = str(value)
-            result = result.replace("{"+key+"}", value)
-        return result
+            if value:
+                if not isinstance(value, basestring):
+                    value = str(value)
+            else:
+                value = ''
+            result = result.replace("{" + key + "}", value)
+        return result.strip()
 
     def object_id(self, ob):
         """
@@ -311,8 +335,4 @@ mapping_file = "./examples/privacyrights-mapping.json"
 
 # 2. create jl file
 create_jl_file_from_csv(filename, mapping_file=mapping_file,
-        output_filename="./examples/output/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.jl")
-
-
-
-
+                        output_filename="./examples/output/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.jl")
