@@ -2,7 +2,7 @@ version: '3'
 
 services:
   rss_feed_crawler:
-    image: uscisii2/rss-feed-crawler:0.1.2
+    image: uscisii2/rss-feed-crawler:0.1.3
     volumes:
 #      - ${RSS_DIR_PATH}:/app
       - ./rss_feed_crawler/sandbox/config.py:/app/config.py
