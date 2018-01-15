@@ -41,7 +41,7 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     environment:
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx${ZK_HEAP_SIZE:-256m} -Xms${ZK_HEAP_SIZE:-256m}"
 #    ports:
 #      - "2181"
     networks:
@@ -56,7 +56,7 @@ services:
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "ache:1:1,rss:1:1"
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx${KAFKA_HEAP_SIZE:-256m} -Xms${KAFKA_HEAP_SIZE:-256m}"
       KAFKA_LOG_CLEANER_ENABLE: "true"
       KAFKA_LOG_CLEANUP_POLICY: delete
       KAFKA_LOG_CLEANER_BACKOFF_MS: 3600 # 3600
@@ -86,7 +86,7 @@ services:
 #    image: docker.elastic.co/logstash/logstash:5.5.1
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      LS_JAVA_OPTS: "-Xmx${LS_HEAP_SIZE:-256m} -Xms${LS_HEAP_SIZE:-256m}"
       LS_LOG_LEVEL: "debug"
     volumes:
       - ./logstash/sandbox/pipeline/:/usr/share/logstash/pipeline/
@@ -109,7 +109,7 @@ services:
 #      - "9200:9200"
 #      - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ES_JAVA_OPTS: "-Xmx${ES_HEAP_SIZE:-512m} -Xms${ES_HEAP_SIZE:-512m}"
     networks:
       - dig_net
 
