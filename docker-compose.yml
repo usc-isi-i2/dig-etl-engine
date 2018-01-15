@@ -79,7 +79,7 @@ services:
       dig_net:
         # can not set ip range in docker-compose v3 to whitelist fixed ip
         # so set it to 200, DNS still works
-        ipv4_address: 172.19.0.200
+        ipv4_address: ${DIG_NET_KAFKA_IP:-172.19.0.200}
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.6.4
@@ -231,7 +231,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.19.0.0/16
+        - subnet: ${DIG_NET_SUBNET:-172.19.0.0/16}
 
 volumes:
   dig3-resources-volume:
