@@ -67,19 +67,23 @@ class TabularImport(object):
                     delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
 
             for ob in self.object_list:
+                # go through the csv and delete all values marked to be deleted
+                for k in delete_dict.keys():
+                    if k in ob:
+                        if ob[k] in delete_dict[k]:
+                            ob.pop(k)
+
+                # apply templates to combine fields
+                for rule in rules:
+                    if "template" in rule:
+                        ob[rule["path"]] = self.apply_format_template(rule["template"], ob)
+
                 ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
                 kg_type = self.config.get("type")
                 if kg_type:
                     ob["type"] = self.listify(kg_type)
                 if title_template:
                     ob["title"] = self.apply_format_template(title_template, ob)
-
-                # go through the csv and delete all values marked to be deleted
-
-                for k in delete_dict.keys():
-                    if k in ob:
-                        if ob[k] in delete_dict[k]:
-                            ob.pop(k)
 
     def listify(self, value):
         """
@@ -327,12 +331,40 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         print "Wrote default mapping file:", new_file
 
 
-filename = "./examples/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.csv"
-mapping_file = "./examples/privacyrights-mapping.json"
+home_dir = "/Users/pszekely/github/sage/"
+prefix_dir = "sage-research-tool/datasets/"
+files = [
+    {
+        "csv": "reigncoups/example/couplist_raw.csv",
+        "mapping": "reigncoups/reigncoups_mapping.json",
+        "jl": "reigncoups/example/couplist_diginput.jl"
+    }
+    # ,
+    # {
+    #     "csv": "privacyrights/example/Privacy_Rights_Clearinghouse-Data-Breaches-Export_raw.csv",
+    #     "mapping": "privacyrights/privacyrights_mapping.json",
+    #     "jl": "privacyrights/example/Privacy_Rights_Clearinghouse-Data-Breaches-Export_diginput.jl"
+    # }
+]
+
+# filename = "./examples/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.csv"
+# filename = "/Users/pszekely/Downloads/couplist.csv"
+# mapping_file = "./examples/privacyrights-mapping.json"
+# mapping_file = "/Users/pszekely/Downloads/reigncoups-mapping.json"
 
 # 1. generate default mappings
 # create_default_mapping_for_csv_file(filename, "output/default-mapping")
 
 # 2. create jl file
-create_jl_file_from_csv(filename, mapping_file=mapping_file,
-                        output_filename="./examples/output/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.jl")
+# create_jl_file_from_csv(filename, mapping_file=mapping_file,
+#                         output_filename="/Users/pszekely/Downloads/couplist.jl")
+# create_jl_file_from_csv(filename, mapping_file=mapping_file,
+#                         output_filename="./examples/privacyrights_diginput.jl")
+
+for item in files:
+    create_jl_file_from_csv(
+        home_dir + prefix_dir + item["csv"],
+        mapping_file=home_dir + prefix_dir + item["mapping"],
+        output_filename=home_dir + prefix_dir + item["jl"])
+
+
