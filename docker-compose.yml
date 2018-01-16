@@ -170,7 +170,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.6.6
+    image: digmemex/digui:3.0.1
 #    ports:
 #      - "8080"
     volumes:
@@ -186,7 +186,7 @@ services:
       SEARCH_CONFIG: '{
         "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search/coarse"
       }'
-      PATH_PREFIX: 'digui'
+      PATH_PREFIX: 'dig-ui'
     depends_on:
       - elasticsearch
     networks:
