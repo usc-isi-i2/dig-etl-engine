@@ -243,7 +243,8 @@ class Rule(object):
         """
         if "extract_as_is" in extractor:
             extractor["extract_as_is"]["config"] = {
-                "post_filter": "parse_date"
+                "post_filter": "parse_date",
+                "ignore_past_years": 100
             }
 
 
@@ -443,15 +444,24 @@ class FieldProperties(object):
 # test1 = Rule(spec["config"]["rules"][0], spec["prefix"])
 # print "content_extraction: ", test1.content_extraction()
 # print "data_extraction: ", test1.data_extraction()
-mapping_file = "./examples/privacyrights-mapping.json"
-with open(mapping_file, 'r') as open_file:
-    spec_nested = json.loads(open_file.read())
-    # print spec_nested
-    test2 = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
-    # print "content_extraction: ", test2.content_extraction()
-    # print "data_extraction: ", test2.data_extraction()
-    outputdir = "./examples/output/"
-    test2.generate_config_files(outputdir + "Privacy_Rights_Clearinghouse-Data-Breaches-config.json")
+
+home_dir = "/Users/pszekely/github/sage/"
+prefix_dir = "sage-research-tool/datasets/"
+output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
+mapping_files = [
+    "privacyrights/privacyrights",
+    "reigncoups/reigncoups"
+    ]
+
+for item in mapping_files:
+    mapping_file = home_dir + prefix_dir + item + "_mapping.json"
+    with open(mapping_file, 'r') as open_file:
+        spec_nested = json.loads(open_file.read())
+        # print spec_nested
+        gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
+        # print "content_extraction: ", test2.content_extraction()
+        # print "data_extraction: ", test2.data_extraction()
+        gen.generate_config_files(output_dir + item.split("/")[0] + "_config.json")
 
 # supl_config = {
 #     "content_extraction": test2.content_extraction(),
