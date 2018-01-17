@@ -114,6 +114,5 @@ class TestDeleteCellValues(unittest.TestCase):
         self.assertTrue('B 1' not in objs[4])
 
 
-
 if __name__ == '__main__':
     unittest.main()
