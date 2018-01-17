@@ -3,3 +3,4 @@ pyexcel
 pyexcel-xls
 pyexcel-xlsx
 demjson
+jsonlines
