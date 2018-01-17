@@ -100,7 +100,11 @@ class TabularImport(object):
                 # remove all fields with a blank value
                 if self.remove_blank_fields:
                     for k in ob.keys():
-                        if ob[k].strip() == '':
+                        val = ob[k]
+                        if val:
+                            if isinstance(val, basestring) and val.strip() == '':
+                                ob.pop(k)
+                        else:
                             ob.pop(k)
 
 

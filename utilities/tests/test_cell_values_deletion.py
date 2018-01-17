@@ -37,8 +37,8 @@ class TestDeleteCellValues(unittest.TestCase):
         }
         ti = TabularImport(self.csv_file, mapping_spec)
         objs = ti.object_list
-        self.assertTrue(objs[0]['B 1'], 'are')
-        self.assertTrue(objs[1]['B 1'], 'are')
+        self.assertTrue('B 1' not in objs[3])
+        self.assertTrue('B 1' not in objs[4])
 
 
 if __name__ == '__main__':
