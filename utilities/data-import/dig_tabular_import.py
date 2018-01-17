@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 import pytablereader as ptr
 import pytablewriter as ptw
+from optparse import OptionParser
 
 
 class TabularImport(object):
@@ -325,6 +326,16 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         outfile.write("\n")
         outfile.close()
         print "Wrote default mapping file:", new_file
+
+
+if __name__ == '__main__':
+    compression = "org.apache.hadoop.io.compress.GzipCodec"
+
+    parser = OptionParser()
+
+    (c_options, args) = parser.parse_args()
+    filename = args[0]
+    output_path = args[1]
 
 
 filename = "./examples/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.csv"
