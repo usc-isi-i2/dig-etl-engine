@@ -398,3 +398,15 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         home_dir + prefix_dir + item["csv"],
 #         mapping_file=home_dir + prefix_dir + item["mapping"],
 #         output_filename=home_dir + prefix_dir + item["jl"])
+
+
+if __name__ == '__main__':
+    compression = "org.apache.hadoop.io.compress.GzipCodec"
+
+    parser = OptionParser()
+
+    (c_options, args) = parser.parse_args()
+    input_path = args[0]
+    mapping_file = args[1]
+    output_file = args[2]
+    create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
