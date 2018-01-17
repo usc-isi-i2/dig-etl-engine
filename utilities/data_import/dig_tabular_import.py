@@ -97,6 +97,13 @@ class TabularImport(object):
                 if title_template:
                     ob["title"] = self.apply_format_template(title_template, ob)
 
+                # remove all fields with a blank value
+                if self.remove_blank_fields:
+                    for k in ob.keys():
+                        if ob[k].strip() == '':
+                            ob.pop(k)
+
+
     def listify(self, value):
         """
         Make into a list if not already a list
