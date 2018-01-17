@@ -41,7 +41,7 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     environment:
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx${ZK_HEAP_SIZE:-256m} -Xms${ZK_HEAP_SIZE:-256m}"
 #    ports:
 #      - "2181"
     networks:
@@ -56,7 +56,7 @@ services:
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "ache:1:1,rss:1:1"
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx${KAFKA_HEAP_SIZE:-256m} -Xms${KAFKA_HEAP_SIZE:-256m}"
       KAFKA_LOG_CLEANER_ENABLE: "true"
       KAFKA_LOG_CLEANUP_POLICY: delete
       KAFKA_LOG_CLEANER_BACKOFF_MS: 3600 # 3600
@@ -79,14 +79,14 @@ services:
       dig_net:
         # can not set ip range in docker-compose v3 to whitelist fixed ip
         # so set it to 200, DNS still works
-        ipv4_address: 172.19.0.200
+        ipv4_address: ${DIG_NET_KAFKA_IP:-172.19.0.200}
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.6.4
 #    image: docker.elastic.co/logstash/logstash:5.5.1
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      LS_JAVA_OPTS: "-Xmx${LS_HEAP_SIZE:-256m} -Xms${LS_HEAP_SIZE:-256m}"
       LS_LOG_LEVEL: "debug"
     volumes:
       - ./logstash/sandbox/pipeline/:/usr/share/logstash/pipeline/
@@ -109,7 +109,7 @@ services:
 #      - "9200:9200"
 #      - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ES_JAVA_OPTS: "-Xmx${ES_HEAP_SIZE:-512m} -Xms${ES_HEAP_SIZE:-512m}"
     networks:
       - dig_net
 
@@ -126,7 +126,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r058
+    image: digsandpaper/digsandpaper:0.1.4-r059
 #    ports:
 #      - "9876"
     volumes:
@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.1.5-dev3
+    image: uscisii2/mydig_ws:1.1.5-dev5
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -170,7 +170,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:0.6.6
+    image: digmemex/digui:3.0.1
 #    ports:
 #      - "8080"
     volumes:
@@ -186,7 +186,7 @@ services:
       SEARCH_CONFIG: '{
         "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search/coarse"
       }'
-      PATH_PREFIX: 'digui'
+      PATH_PREFIX: 'dig-ui'
     depends_on:
       - elasticsearch
     networks:
@@ -231,7 +231,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.19.0.0/16
+        - subnet: ${DIG_NET_SUBNET:-172.19.0.0/16}
 
 volumes:
   dig3-resources-volume:
