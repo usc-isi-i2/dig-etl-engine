@@ -165,29 +165,29 @@ To stop, do `./engine.sh stop`.
 
 - All env variables:
 
-    COMPOSE_PROJECT_NAME=dig
-    DIG_PROJECTS_DIR_PATH=./../mydig-projects
-    DOMAIN=localhost
-    PORT=12497
-    NUM_ETK_PROCESSES=2
-    KAFKA_NUM_PARTITIONS=2
-    DIG_AUTH_USER=admin
-    DIG_AUTH_PASSWORD=123
-    DIG_ADD_ONS=ache
-    
-    KAFKA_HEAP_SIZE=512m
-    ZK_HEAP_SIZE=512m
-    LS_HEAP_SIZE=512m
-    ES_HEAP_SIZE=1g
-    
-    DIG_NET_SUBNET=172.30.0.0/16
-    DIG_NET_KAFKA_IP=172.30.0.200
-    
-    # development only
-    MYDIG_DIR_PATH=./../mydig-webservice
-    ETK_DIR_PATH=./../etk
-    SPACY_DIR_PATH=./../spacy-ui
-    RSS_DIR_PATH=./../dig-rss-feed-crawler
+        COMPOSE_PROJECT_NAME=dig
+        DIG_PROJECTS_DIR_PATH=./../mydig-projects
+        DOMAIN=localhost
+        PORT=12497
+        NUM_ETK_PROCESSES=2
+        KAFKA_NUM_PARTITIONS=2
+        DIG_AUTH_USER=admin
+        DIG_AUTH_PASSWORD=123
+        DIG_ADD_ONS=ache
+        
+        KAFKA_HEAP_SIZE=512m
+        ZK_HEAP_SIZE=512m
+        LS_HEAP_SIZE=512m
+        ES_HEAP_SIZE=1g
+        
+        DIG_NET_SUBNET=172.30.0.0/16
+        DIG_NET_KAFKA_IP=172.30.0.200
+        
+        # development only
+        MYDIG_DIR_PATH=./../mydig-webservice
+        ETK_DIR_PATH=./../etk
+        SPACY_DIR_PATH=./../spacy-ui
+        RSS_DIR_PATH=./../dig-rss-feed-crawler
 
 
 ## Development Instructions
