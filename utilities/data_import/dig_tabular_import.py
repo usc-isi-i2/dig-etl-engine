@@ -70,7 +70,11 @@ class TabularImport(object):
                     delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
 
                 if 'decoding_dict' in rule:
-                    decoding_dict[rule['path']] = rule['decoding_dict']
+                    decoding_dict[rule['path']] = dict()
+                    decoding_dict[rule['path']]['decoding_dict'] = rule['decoding_dict']['keys']
+                    # default action can be `preserve` or `delete`, default = `preserve`
+                    decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
+                        'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
 
             for ob in self.object_list:
                 ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
@@ -83,8 +87,14 @@ class TabularImport(object):
 
                 # decode the values if there is anything to decode
                 for k in decoding_dict.keys():
-                    if k in ob and ob[k] in decoding_dict[k]:
-                        ob[k] = decoding_dict[k][ob[k]]
+                    # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
+                    if k in ob:
+                        if ob[k] in decoding_dict[k]['decoding_dict']:
+                            ob[k] = decoding_dict[k]['decoding_dict'][ob[k]]
+                        else:
+                            # no decoding dict defined for this value, do the default_action
+                            if decoding_dict[k]['default_action'] == 'delete':
+                                ob.pop(k)
 
                 # apply templates to combine fields
                 for rule in rules:
