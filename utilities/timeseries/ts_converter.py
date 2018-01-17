@@ -5,7 +5,6 @@ import logging
 import hashlib
 import numbers
 import sys
-import jsonlines
 
 
 class DecimalJSONEncoder(json.JSONEncoder):
@@ -139,20 +138,18 @@ class ProcessTimeSeries():
         return json_decoded[0]
 
     def write_result_to_file(self, output_fn, output):
-        json_output = []
-        for item in output:
-            json_output.append(json.dumps(item, cls=DecimalJSONEncoder))
 
-        with open(output_fn, "wb") as fp:
-            writer = jsonlines.Writer(fp)
-            writer.write_all(json_output)
+        with open(output_fn, 'w') as fp:
+            for obj in output:
+                fp.write(json.dumps(obj, cls=DecimalJSONEncoder))
+                fp.write('\n')
 
 
 
 def main():
     test = ProcessTimeSeries()
     tables = test.load_json(sys.argv[1])
-    print test.processs(tables)
+    # print test.processs(tables)
     test.write_result_to_file(sys.argv[2], test.processs(tables))
 
 
