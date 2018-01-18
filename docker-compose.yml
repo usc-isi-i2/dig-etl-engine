@@ -170,7 +170,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:3.0.1
+    image: digmemex/digui:3.0.4
 #    ports:
 #      - "8080"
     volumes:

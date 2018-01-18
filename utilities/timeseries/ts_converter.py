@@ -39,7 +39,7 @@ class Measurement(object):
 
         dct['timeseries'] = self.timeseries_id
         dct['doc_id'] = self.doc_id
-
+        dct['type'] = "Measurement"
         return dct
 
 
