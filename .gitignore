@@ -102,3 +102,4 @@ ENV/
 .mypy_cache/
 
 .idea/*
+utilities/data-import/.idea/*

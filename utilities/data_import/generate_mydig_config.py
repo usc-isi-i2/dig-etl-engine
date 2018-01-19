@@ -74,7 +74,7 @@ class Rule(object):
         if self.field_of_nested_object:
             return "content_extraction." + self.field_of_nested_object + "." + self.prefix + ".\"" + self.path + "\""
         else:
-            return self.prefix + ".\"" + self.path + "\""
+            return self.prefix + "." + self.path
 
     def path_to_content_extraction(self):
         """
@@ -445,12 +445,21 @@ class FieldProperties(object):
 # print "content_extraction: ", test1.content_extraction()
 # print "data_extraction: ", test1.data_extraction()
 
+# home_dir = "/Users/pszekely/github/sage/"
+# prefix_dir = "sage-research-tool/datasets/"
+# output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
+# mapping_files = [
+#     "privacyrights/privacyrights",
+#     "reigncoups/reigncoups"
+#     ]
+
+# sage-research-tool/other-additional-etk-configs/measurement
 home_dir = "/Users/pszekely/github/sage/"
-prefix_dir = "sage-research-tool/datasets/"
+prefix_dir = "sage-research-tool/other-additional-etk-configs/"
 output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
 mapping_files = [
-    "privacyrights/privacyrights",
-    "reigncoups/reigncoups"
+    "measurement/measurement",
+    "measure/measure"
     ]
 
 for item in mapping_files:
