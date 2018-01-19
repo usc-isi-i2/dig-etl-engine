@@ -82,6 +82,12 @@
             "path": "title",
             "field": "title"
           }
+        ],
+        "constants": [
+          {
+            "field": "test_type",
+            "value": "Nested"
+          }
         ]
       }
     }
@@ -132,6 +138,19 @@
       {
         "path": "title",
         "field": "title"
+      }
+    ],
+    "constants": [
+      {
+        "field": "test_type",
+        "value": "Type A"
+      },
+      {
+        "field": "collection",
+        "value": [
+          "Hybrid",
+          "Electric"
+        ]
       }
     ]
   }
