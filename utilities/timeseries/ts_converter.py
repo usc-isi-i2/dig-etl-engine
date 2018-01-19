@@ -31,15 +31,16 @@ class Measurement(object):
 
     def to_dict(self):
         dct = {}
-        dct['date'] = self.date
+        dct["measurement"] = {}
+        dct["measurement"]['date'] = self.date
         if isinstance(self.value, numbers.Number):
-            dct['number'] = self.value
+            dct["measurement"]['number'] = self.value
         elif isinstance(self.value, basestring):
-            dct['text'] = self.value
+            dct["measurement"]['text'] = self.value
 
-        dct['timeseries'] = self.timeseries_id
+        dct["measurement"]['timeseries'] = self.timeseries_id
+        dct["measurement"]['type'] = "Measurement"
         dct['doc_id'] = self.doc_id
-
         return dct
 
 
@@ -55,9 +56,10 @@ class TimeSeries(object):
 
     def to_dict(self):
         dct = {}
-        dct["metadata"] = self.meta_data
+        dct["measure"] = {}
+        dct["measure"]["metadata"] = self.meta_data
+        dct["measure"]['type'] = "Measure"
         dct['doc_id'] = self.doc_id
-        dct['type'] = "TimeSeries"
         return dct
 
 
