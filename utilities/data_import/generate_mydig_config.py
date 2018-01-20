@@ -1,6 +1,8 @@
 import json
 import re
 import os
+from optparse import OptionParser
+import codecs
 
 
 class Rule(object):
@@ -287,7 +289,7 @@ class ConfigGenerator(object):
         Returns: the dict to insert in the etk supplemental config
         """
         entries = list()
-        signatures = set() # to prevent duplicates
+        signatures = set()  # to prevent duplicates
         for rule in self.rules:
             ce = rule.content_extraction()
             if ce:
@@ -316,6 +318,39 @@ class ConfigGenerator(object):
             if de:
                 entries.append(de)
         return entries
+
+    def kg_enhancement(self):
+        priority = 0
+        kge = None
+        constants = self.config.get("constants")
+        if constants:
+            kge = {
+                "fields": {}
+            }
+            for constant in constants:
+                if 'priority' in constant:
+                    user_priority = constant["priority"]
+                else:
+                    user_priority = None
+                kge["fields"][constant["field"]] = {
+                    "priority": user_priority if user_priority else priority,
+                    "extractors": {
+                        "add_constant_kg": {
+                            "config": {
+                                "constants": constant["value"]
+                            }
+                        }
+                    }
+
+                }
+                guard = dict()
+                guard['field'] = "dataset_identifier"
+                guard['value'] = self.prefix
+                kge["fields"][constant["field"]]['guard'] = guard
+                if not user_priority:
+                    priority += 1
+
+        return kge
 
     def segment_name_for_joins(self, config, rule):
         """
@@ -367,7 +402,7 @@ class ConfigGenerator(object):
                         data_extraction_for_joins.append(de)
         return data_extraction_for_joins
 
-    def generate_config_files(self, filename):
+    def generate_config_files(self, filename, etk_configs):
         """
         Generates all the supplemental config files for a mapping file.
 
@@ -376,19 +411,38 @@ class ConfigGenerator(object):
 
         Returns: nothing
         """
-        with open(filename, 'w') as outfile:
-            ce = self.content_extraction()
-            ce["json_content"].extend(self.content_extraction_for_join_fields())
-            de = self.data_extraction()
-            de.extend(self.data_extraction_for_joins())
-            supl_config = {
-                "content_extraction": ce,
-                "data_extraction": de
-            }
-            outfile.write(json.dumps(supl_config, indent=2, sort_keys=True))
-            outfile.write("\n")
-            outfile.close()
-            print "Wrote ", filename
+        ce = self.content_extraction()
+        ce["json_content"].extend(self.content_extraction_for_join_fields())
+        de = self.data_extraction()
+        de.extend(self.data_extraction_for_joins())
+        kge = self.kg_enhancement()
+        supl_config = {
+            "content_extraction": ce,
+            "data_extraction": de
+        }
+
+        if kge:
+            supl_config['kg_enhancement'] = kge
+
+        etk_configs.append({'etk_config': supl_config, 'filename': filename})
+
+        # with open(filename, 'w') as outfile:
+        #     ce = self.content_extraction()
+        #     ce["json_content"].extend(self.content_extraction_for_join_fields())
+        #     de = self.data_extraction()
+        #     de.extend(self.data_extraction_for_joins())
+        #     kge = self.kg_enhancement()
+        #     supl_config = {
+        #         "content_extraction": ce,
+        #         "data_extraction": de
+        #     }
+        #
+        #     if kge['fields'].keys() > 0:
+        #         supl_config['kg_enhancement'] = kge
+        #     outfile.write(json.dumps(supl_config, indent=2, sort_keys=True))
+        #     outfile.write("\n")
+        #     outfile.close()
+        #     print "Wrote ", filename
 
         if self.nested_configs:
             for config in self.nested_configs:
@@ -399,7 +453,9 @@ class ConfigGenerator(object):
                                       field_of_nested_object=config["field"])
                 nested_filename = os.path.splitext(filename)[0] \
                                   + "_" + Rule.make_alphanumeric_underscore(config["path"]) + ".json"
-                gen.generate_config_files(nested_filename)
+                gen.generate_config_files(nested_filename, etk_configs)
+
+        return etk_configs
 
 
 class FieldProperties(object):
@@ -440,7 +496,6 @@ class FieldProperties(object):
                or fieldname.find("_date_") != -1
 
 
-
 # test1 = Rule(spec["config"]["rules"][0], spec["prefix"])
 # print "content_extraction: ", test1.content_extraction()
 # print "data_extraction: ", test1.data_extraction()
@@ -454,26 +509,44 @@ class FieldProperties(object):
 #     ]
 
 # sage-research-tool/other-additional-etk-configs/measurement
-home_dir = "/Users/pszekely/github/sage/"
-prefix_dir = "sage-research-tool/other-additional-etk-configs/"
-output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
-mapping_files = [
-    "measurement/measurement",
-    "measure/measure"
-    ]
+# home_dir = "/Users/pszekely/github/sage/"
+# prefix_dir = "sage-research-tool/other-additional-etk-configs/"
+# output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
+# mapping_files = [
+#     "measurement/measurement",
+#     "measure/measure"
+# ]
+#
+# for item in mapping_files:
+#     mapping_file = home_dir + prefix_dir + item + "_mapping.json"
+#     with open(mapping_file, 'r') as open_file:
+#         spec_nested = json.loads(open_file.read())
+#         # print spec_nested
+#         gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
+#         # print "content_extraction: ", test2.content_extraction()
+#         # print "data_extraction: ", test2.data_extraction()
+#         etk_configs = gen.generate_config_files(output_dir + item.split("/")[0] + "_config.json", list())
+#
+#         # supl_config = {
+#         #     "content_extraction": test2.content_extraction(),
+#         #     "data_extraction": test2.data_extraction()
+#         # }
+#         # print json.dumps(supl_config, indent=2, sort_keys=True)
 
-for item in mapping_files:
-    mapping_file = home_dir + prefix_dir + item + "_mapping.json"
-    with open(mapping_file, 'r') as open_file:
-        spec_nested = json.loads(open_file.read())
-        # print spec_nested
-        gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
-        # print "content_extraction: ", test2.content_extraction()
-        # print "data_extraction: ", test2.data_extraction()
-        gen.generate_config_files(output_dir + item.split("/")[0] + "_config.json")
 
-# supl_config = {
-#     "content_extraction": test2.content_extraction(),
-#     "data_extraction": test2.data_extraction()
-# }
-# print json.dumps(supl_config, indent=2, sort_keys=True)
+if __name__ == '__main__':
+    compression = "org.apache.hadoop.io.compress.GzipCodec"
+
+    parser = OptionParser()
+
+    (c_options, args) = parser.parse_args()
+    mapping_file = args[0]
+    spec_nested = json.load(codecs.open(mapping_file, mode='r'))
+    gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
+
+    etk_configs = gen.generate_config_files(mapping_file.split("/")[0] + "_config.json", list())
+
+    for etk_config in etk_configs:
+        o = codecs.open('/tmp/{}'.format(etk_config['filename']), 'w')
+        o.write(json.dumps(etk_config['etk_config']))
+        o.close()
