@@ -6,6 +6,9 @@ from collections import defaultdict
 import pytablereader as ptr
 import pytablewriter as ptw
 from optparse import OptionParser
+import pyexcel_io
+import pyexcel_xlsx
+import pyexcel_xls
 
 
 class TabularImport(object):
@@ -41,81 +44,85 @@ class TabularImport(object):
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
-        loader = ptr.CsvTableFileLoader(filename)
-        for table_data in loader.load():
-            # print "headers", table_data.header_list
-            # print "matrix", table_data.value_matrix
-            writer = ptw.JsonTableWriter()
-            output = StringIO.StringIO()
-            writer.stream = output
-            writer.header_list = table_data.header_list
-            writer.value_matrix = table_data.value_matrix
-            writer.write_table()
-            self.object_list = json.loads(output.getvalue())
+        
+        fn, extention = os.path.splitext(filename)
+        if extention == ".csv":
+            get_data = pyexcel_io.get_data
+        elif extention == ".xls":
+            get_data = pyexcel_xlsx.get_data
+        elif extention == ".xlsx":
+            get_data = pyexcel_xlsx.get_data
+        else:
+            print "file extension can not read"
+        data = get_data(filename)
+        data = data.values().pop(0)
+        keys = data.pop(0)
+        for value in data:
+            self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
+    
+        title_template = self.config.get("title")
 
-            title_template = self.config.get("title")
+        # preprocess all rules in the config and create a dict for faster processing
+        rules = self.config['rules']
 
-            # preprocess all rules in the config and create a dict for faster processing
-            rules = self.config['rules']
+        if self.nested_configs:
+            for nested_config in self.nested_configs:
+                if 'config' in nested_config and 'rules' in nested_config['config']:
+                    rules.extend(nested_config['config']['rules'])
 
-            if self.nested_configs:
-                for nested_config in self.nested_configs:
-                    if 'config' in nested_config and 'rules' in nested_config['config']:
-                        rules.extend(nested_config['config']['rules'])
+        delete_dict = dict()
+        decoding_dict = dict()
+        for rule in rules:
+            if 'delete' in rule:
+                delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
 
-            delete_dict = dict()
-            decoding_dict = dict()
+            if 'decoding_dict' in rule:
+                decoding_dict[rule['path']] = dict()
+                decoding_dict[rule['path']]['decoding_dict'] = rule['decoding_dict']['keys']
+                # default action can be `preserve` or `delete`, default = `preserve`
+                decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
+                    'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
+
+        for ob in self.object_list:
+            ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
+
+            # go through the csv and delete all values marked to be deleted
+            for k in delete_dict.keys():
+                if k in ob:
+                    if ob[k] in delete_dict[k]:
+                        ob.pop(k)
+
+            # decode the values if there is anything to decode
+            for k in decoding_dict.keys():
+                # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
+                if k in ob:
+                    if ob[k] in decoding_dict[k]['decoding_dict']:
+                        ob[k] = decoding_dict[k]['decoding_dict'][ob[k]]
+                    else:
+                        # no decoding dict defined for this value, do the default_action
+                        if decoding_dict[k]['default_action'] == 'delete':
+                            ob.pop(k)
+
+            # apply templates to combine fields
             for rule in rules:
-                if 'delete' in rule:
-                    delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
+                if "template" in rule:
+                    ob[rule["path"]] = self.apply_format_template(rule["template"], ob)
 
-                if 'decoding_dict' in rule:
-                    decoding_dict[rule['path']] = dict()
-                    decoding_dict[rule['path']]['decoding_dict'] = rule['decoding_dict']['keys']
-                    # default action can be `preserve` or `delete`, default = `preserve`
-                    decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
-                        'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
+            kg_type = self.config.get("type")
+            if kg_type:
+                ob["type"] = self.listify(kg_type)
+            if title_template:
+                ob["title"] = self.apply_format_template(title_template, ob)
 
-            for ob in self.object_list:
-                ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
-
-                # go through the csv and delete all values marked to be deleted
-                for k in delete_dict.keys():
-                    if k in ob:
-                        if ob[k] in delete_dict[k]:
+            # remove all fields with a blank value
+            if self.remove_blank_fields:
+                for k in ob.keys():
+                    val = ob[k]
+                    if val:
+                        if isinstance(val, basestring) and val.strip() == '':
                             ob.pop(k)
-
-                # decode the values if there is anything to decode
-                for k in decoding_dict.keys():
-                    # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
-                    if k in ob:
-                        if ob[k] in decoding_dict[k]['decoding_dict']:
-                            ob[k] = decoding_dict[k]['decoding_dict'][ob[k]]
-                        else:
-                            # no decoding dict defined for this value, do the default_action
-                            if decoding_dict[k]['default_action'] == 'delete':
-                                ob.pop(k)
-
-                # apply templates to combine fields
-                for rule in rules:
-                    if "template" in rule:
-                        ob[rule["path"]] = self.apply_format_template(rule["template"], ob)
-
-                kg_type = self.config.get("type")
-                if kg_type:
-                    ob["type"] = self.listify(kg_type)
-                if title_template:
-                    ob["title"] = self.apply_format_template(title_template, ob)
-
-                # remove all fields with a blank value
-                if self.remove_blank_fields:
-                    for k in ob.keys():
-                        val = ob[k]
-                        if val:
-                            if isinstance(val, basestring) and val.strip() == '':
-                                ob.pop(k)
-                        else:
-                            ob.pop(k)
+                    else:
+                        ob.pop(k)
 
 
     def listify(self, value):
