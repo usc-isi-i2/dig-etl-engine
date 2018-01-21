@@ -64,13 +64,6 @@ class TabularImport(object):
         data = get_data(filename)
         data = data.values().pop(0)
         
-        #test
-        self.heading_row = 0
-        self.heading_colums = None
-        self.content_start_row = None
-        self.content_end_row = None
-        self.blank_row_ends_content = None
-        
         #find heading part
         if self.heading_colums == None:
             keys = data[self.heading_row]
