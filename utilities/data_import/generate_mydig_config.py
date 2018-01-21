@@ -22,6 +22,7 @@ class Rule(object):
         """
         self.path = rule_spec["path"]
         self.field = rule_spec["field"]
+        self.extractions = rule_spec.get("extractions")
         self.prefix = prefix
         self.field_properties = field_properties
         self.path_to_nested_object = path_to_nested_object
@@ -230,6 +231,13 @@ class Rule(object):
                 "extractors": extractor
             }
         }
+
+        # if there is an extractions section in the rule, include those extractors
+        additional_extractions = self.extractions
+        if additional_extractions:
+            for key, value in additional_extractions.items():
+                fields[key] = value
+
         return {
             "input_path": input_path,
             "fields": fields
