@@ -3,13 +3,12 @@ import json
 import os
 import re
 from collections import defaultdict
-import pytablereader as ptr
-import pytablewriter as ptw
+#import pytablereader as ptr
+#import pytablewriter as ptw
 from optparse import OptionParser
 import pyexcel_io
 import pyexcel_xlsx
 import pyexcel_xls
-
 
 class TabularImport(object):
     """
@@ -19,7 +18,8 @@ class TabularImport(object):
          {} will get substituted as appropriate
     """
 
-    def __init__(self, filename, mapping_spec):
+    def __init__(self, filename, mapping_spec, _heading_row=0, _heading_colums=None,
+     _content_start_row=None, _content_end_row=None, _blank_row_ends_content=None):
         """
         Convert a CSV file to a simple JSON that we can use for further processing.
         Creates an attribute for every column, and handles parsing of CSV, quoting, etc.
@@ -31,6 +31,13 @@ class TabularImport(object):
             mapping_spec(dict): parsed mapping spec object
 
         """
+        #test
+        self.heading_row = _heading_row 
+        self.heading_colums = _heading_colums
+        self.content_start_row = _content_start_row
+        self.content_end_row = _content_end_row
+        self.blank_row_ends_content = _blank_row_ends_content
+        
         self.website = mapping_spec.get("website")
         self.file_url = mapping_spec.get("file_url")
         self.id_path = mapping_spec.get("id_path")
@@ -56,7 +63,53 @@ class TabularImport(object):
             print "file extension can not read"
         data = get_data(filename)
         data = data.values().pop(0)
-        keys = data.pop(0)
+        
+        #test
+        self.heading_row = 0
+        self.heading_colums = None
+        self.content_start_row = None
+        self.content_end_row = None
+        self.blank_row_ends_content = None
+        
+        #find heading part
+        if self.heading_colums == None:
+            keys = data[self.heading_row]
+
+        else:
+            #deal with the erro case
+            start = heading_colum[0]
+            end = heading_colum[1]
+            keys = [str(name) for name in range(start, end + 1)]
+        
+        
+        
+        
+        if self.content_start_row is None:
+            # defalt seting of row number of colum name is 0
+            self.content_start_row = 1
+        
+        '''
+        if contend_end_row == None, 
+        data[self.content_start_row:content_end_row] will be equivalent to 
+        data[self.content_start_row:]
+        
+        if self.blank_row_ends_content is not None,
+        it will read data untill blank row
+        '''
+        
+        if self.content_end_row is not None:
+            data = data[self.content_start_row:self.content_end_row + 1]
+        
+        elif self.blank_row_ends_content is not None:
+            data = data[self.content_start_row:self.blank_row_ends_content]
+            
+        elif (self.content_end_row and self.blank_row_ends_content) is None:
+            data = data[self.content_start_row:]
+        
+        self.content_row_identification = {} 
+        self.content_row_identification["non_empty_colums"] = keys
+        #print(content_row_identification)
+        
         for value in data:
             self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
     
@@ -307,7 +360,6 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
     ti = TabularImport(csv_file, mapping_spec)
     ti.apply_nested_configs_to_all_objects()
     ti.nest_generated_json()
-
     new_file = output_filename
     if not output_filename or output_filename == "":
         new_file = os.path.splitext(filename)[0] + ".jl"
@@ -322,7 +374,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
         outfile.close()
     print "Wrote jsonlines file:", new_file
 
-
+    
 def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_url="", output_filename=""):
     """
     Create a default mapping file for a CSV file to build a KG using every column of the file.
@@ -405,7 +457,6 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         home_dir + prefix_dir + item["csv"],
 #         mapping_file=home_dir + prefix_dir + item["mapping"],
 #         output_filename=home_dir + prefix_dir + item["jl"])
-
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
