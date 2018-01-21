@@ -188,6 +188,15 @@ class Rule(object):
         """
         return self.default_extractors.get(self.field)
 
+    def datasetid_for_nested_object(self):
+        """
+        Construct a dataset identifier for a nested object
+
+        Returns: a string made form the prefix and path
+
+        """
+        return self.prefix + "/" + self.path
+
     def data_extraction(self):
         """
         Build the data extraction section for this rule.
@@ -205,7 +214,8 @@ class Rule(object):
             extractor = {
                 "create_kg_node_extractor": {
                     "config": {
-                        "segment_name": self.field
+                        "segment_name": self.field,
+                        "dataset_identifier": self.datasetid_for_nested_object()
                     }
                 }
             }
@@ -289,6 +299,42 @@ class ConfigGenerator(object):
                      path_to_nested_object=self.path_to_nested_object,
                      field_of_nested_object=self.field_of_nested_object))
 
+        # Automatically add a rule to populate the field that hold nested objects
+        # For example:
+        #  {
+        #     "path": "answers",
+        #     "field": "answer_option"
+        #  }
+        if self.nested_configs:
+            for nested_config in self.nested_configs:
+                rule_dict = {
+                    "path": nested_config["path"],
+                    "field": nested_config["field"]
+                }
+                rule = Rule(rule_dict,
+                            self.prefix,
+                            self.field_properties,
+                            path_to_nested_object=self.path_to_nested_object,
+                            field_of_nested_object=self.field_of_nested_object)
+                self.rules.append(rule)
+
+    def is_nested_config(self):
+        """
+        Is this a nested config?
+
+        Returns: True if this is a nested config
+
+        """
+        return self.path_to_nested_object is not None
+
+    def datasetid(self):
+        """
+        Construct the dataset identifier used inside nested config
+        Returns: a string
+
+        """
+        return self.prefix + "/" + self.path_to_nested_object if self.is_nested_config() else self.prefix
+
     def content_extraction(self):
         """
         Generate the content extraction section for a configuration.
@@ -354,7 +400,7 @@ class ConfigGenerator(object):
                 }
                 guard = dict()
                 guard['field'] = "dataset_identifier"
-                guard['value'] = self.prefix
+                guard['value'] = self.datasetid()
                 kge["fields"][constant["field"]]['guard'] = guard
                 if not user_priority:
                     priority += 1
@@ -480,15 +526,15 @@ class FieldProperties(object):
         for x in config["nested_configs"]:
             self.kg_properties.add(x["field"])
 
-    def stores_kg_nodes(self, path):
+    def stores_kg_nodes(self, field):
         """
         Determine whether a path leads to KG nodes (as opposed to literals)
         Args:
-            path (string): the name of a field
+            field (string): the name of a field
 
         Returns: True if path is expected to store KN nodes
         """
-        return path in self.kg_properties
+        return field in self.kg_properties
 
     def is_date_field(self, fieldname):
         """
