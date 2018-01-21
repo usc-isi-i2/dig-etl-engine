@@ -325,7 +325,8 @@ class ConfigGenerator(object):
         constants = self.config.get("constants")
         if constants:
             kge = {
-                "fields": {}
+                "fields": {},
+                "input_path": "knowledge_graph.`parent`"
             }
             for constant in constants:
                 if 'priority' in constant:
