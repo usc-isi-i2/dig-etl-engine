@@ -29,7 +29,7 @@ RUN conda update -y conda
 # download etk
 RUN git clone https://github.com/usc-isi-i2/etk.git && \
     cd etk && \
-    git checkout tags/1.0.9-dev1
+    git checkout tags/1.1.0-dev1
 
 # create and config conda-env (install flask) for etk
 RUN cd etk && conda-env create .
