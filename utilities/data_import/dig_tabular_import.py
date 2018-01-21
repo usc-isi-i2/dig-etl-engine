@@ -44,7 +44,7 @@ class TabularImport(object):
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
-        
+
         fn, extention = os.path.splitext(filename)
         if extention == ".csv":
             get_data = pyexcel_io.get_data
@@ -54,12 +54,12 @@ class TabularImport(object):
             get_data = pyexcel_xlsx.get_data
         else:
             print "file extension can not read"
-        data = get_data(filename)
+        data = get_data(filename, auto_detect_datetime=False)
         data = data.values().pop(0)
         keys = data.pop(0)
         for value in data:
-            self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
-    
+            self.object_list.append(dict(zip(keys, value + [u''] * (len(keys) - len(value)))))
+
         title_template = self.config.get("title")
 
         # preprocess all rules in the config and create a dict for faster processing
@@ -124,7 +124,6 @@ class TabularImport(object):
                             ob.pop(k)
                     else:
                         ob.pop(k)
-
 
     def listify(self, value):
         """
@@ -372,6 +371,7 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         outfile.write("\n")
         outfile.close()
         print "Wrote default mapping file:", new_file
+
 
 # home_dir = "/Users/pszekely/github/sage/"
 # prefix_dir = "sage-research-tool/datasets/"
