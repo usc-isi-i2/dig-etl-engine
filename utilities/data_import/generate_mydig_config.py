@@ -542,6 +542,7 @@ if __name__ == '__main__':
 
     (c_options, args) = parser.parse_args()
     mapping_file = args[0]
+    output_path = args[1]
     spec_nested = json.load(codecs.open(mapping_file, mode='r'))
     gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
 
@@ -551,6 +552,6 @@ if __name__ == '__main__':
     etk_configs = gen.generate_config_files(filename + "_config.json", list())
 
     for etk_config in etk_configs:
-        o = codecs.open('/tmp/{}'.format(etk_config['filename']), 'w')
+        o = codecs.open('{}/{}'.format(output_path, etk_config['filename']), 'w')
         o.write(json.dumps(etk_config['etk_config'], indent=2, sort_keys=True))
         o.close()
