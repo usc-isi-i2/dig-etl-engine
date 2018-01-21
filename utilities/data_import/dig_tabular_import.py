@@ -84,6 +84,7 @@ class TabularImport(object):
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
 
         for ob in self.object_list:
+            ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
 
             # go through the csv and delete all values marked to be deleted
@@ -201,7 +202,9 @@ class TabularImport(object):
                 new_ob["url"] = self.website + "#" + ob_id
 
             new_ob["raw_content"] = ob["raw_content"]
+            new_ob["dataset_identifier"] = ob["dataset_identifier"]
             ob.pop("raw_content")
+            ob.pop("dataset_identifier")
             result.append(new_ob)
 
             counter += 1
