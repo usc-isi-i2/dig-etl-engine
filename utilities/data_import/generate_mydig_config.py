@@ -263,7 +263,7 @@ class Rule(object):
         """
         if "extract_as_is" in extractor:
             extractor["extract_as_is"]["config"] = {
-                "post_filter": "parse_date",
+                "post_filter": "parse_date_generic",
                 "ignore_past_years": 100
             }
 
