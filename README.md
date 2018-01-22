@@ -58,7 +58,7 @@ DIG_AUTH_PASSWORD=123
 If you are working on Linux, do these additional steps:
 
     chmod 666 logstash/sandbox/settings/logstash.yml
-    sudo sysctl -w vm.max_map_count=262144
+    sysctl -w vm.max_map_count=262144
     
     # replace <DIG_PROJECTS_DIR_PATH> to you own project path
     mkdir -p <DIG_PROJECTS_DIR_PATH>/.es/data
@@ -196,7 +196,7 @@ files. `DIG_PROJECTS_DIR_PATH/<project_name>` will be mapped to `/shared_data/pr
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
-- On Linux, potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
+- On Linux, solutions for potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
 
