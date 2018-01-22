@@ -19,7 +19,7 @@ class TabularImport(object):
     """
 
     def __init__(self, filename, mapping_spec, _heading_row=0, _heading_colums=None,
-     _content_start_row=None, _content_end_row=None, _blank_row_ends_content=None):
+     _content_start_row=1, _content_end_row=None, _blank_row_ends_content=None):
         """
         Convert a CSV file to a simple JSON that we can use for further processing.
         Creates an attribute for every column, and handles parsing of CSV, quoting, etc.
@@ -65,47 +65,48 @@ class TabularImport(object):
         data = data.values().pop(0)
         
         #find heading part
-        if self.heading_colums == None:
+        if self.heading_colums is None:
             keys = data[self.heading_row]
 
-        else:
+        elif self.heading_colums is not None:
             #deal with the erro case
-            start = heading_colum[0]
-            end = heading_colum[1]
+            start = self.heading_colums[0]
+            end = self.heading_colums[1]
             keys = [str(name) for name in range(start, end + 1)]
-        
-        
-        
-        
+        '''
         if self.content_start_row is None:
             # defalt seting of row number of colum name is 0
             self.content_start_row = 1
-        
-        '''
-        if contend_end_row == None, 
-        data[self.content_start_row:content_end_row] will be equivalent to 
-        data[self.content_start_row:]
-        
-        if self.blank_row_ends_content is not None,
-        it will read data untill blank row
         '''
         
         if self.content_end_row is not None:
             data = data[self.content_start_row:self.content_end_row + 1]
         
-        elif self.blank_row_ends_content is not None:
+        #if self.blank_row_ends_content is not None, it will read the data untill blank row
+        
+        #if both content_end_row and blank_row_ends_content are provided, take former 
+        if (self.content_end_row is None) and (self.blank_row_ends_content is not None):
             data = data[self.content_start_row:self.blank_row_ends_content]
             
-        elif (self.content_end_row and self.blank_row_ends_content) is None:
+        elif (self.content_end_row is None) and (self.blank_row_ends_content is None):
             data = data[self.content_start_row:]
         
         self.content_row_identification = {} 
         self.content_row_identification["non_empty_colums"] = keys
-        #print(content_row_identification)
         
-        for value in data:
-            self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
-    
+        if self.heading_colums is None:
+            for value in data:
+                self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
+        
+        elif self.heading_colums is not None:
+            start = self.heading_colums[0]
+            end = self.heading_colums[1]
+            for value in data:
+                print dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))) 
+                self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
+        #test
+        print self.object_list
+        
         title_template = self.config.get("title")
 
         # preprocess all rules in the config and create a dict for faster processing
@@ -350,7 +351,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
             mapping_spec = json.loads(open_file.read())
             open_file.close()
 
-    ti = TabularImport(csv_file, mapping_spec)
+    ti = TabularImport(csv_file, mapping_spec, )
     ti.apply_nested_configs_to_all_objects()
     ti.nest_generated_json()
     new_file = output_filename
@@ -450,6 +451,8 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         home_dir + prefix_dir + item["csv"],
 #         mapping_file=home_dir + prefix_dir + item["mapping"],
 #         output_filename=home_dir + prefix_dir + item["jl"])
+
+#create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
