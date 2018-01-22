@@ -179,7 +179,14 @@ To stop, do `./engine.sh stop`.
 
 - The data in kafka queue will be cleaned after two days. If you want to delete the data immediately, drop the kafka container.
 
-- If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. Your `DIG_PROJECTS_DIR_PATH` will be mapped to `/shared_data/projects` in docker, so make sure all the paths you used in config are start with this prefix.
+- If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. 
+
+- If you have additional ETK config files, please paste them into 
+`DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/additional_etk_config/` (create directory `additional_etk_config` if 
+it's not there).
+
+- If you are using custom ETK config or additional etk configs, you need to take care of all file paths in these config 
+files. `DIG_PROJECTS_DIR_PATH/<project_name>` will be mapped to `/shared_data/projects/<project_name>` in docker, so make sure all the paths you used in config are start with this prefix.
 
 - If you want to clean up all ElasticSearch data, remove `.es` directory in your `DIG_PROJECTS_DIR_PATH`.
 
