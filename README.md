@@ -55,10 +55,10 @@ DIG_AUTH_PASSWORD=123
 - `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
-If you are working on Linux, do this additional steps:
+If you are working on Linux, do these additional steps:
 
     chmod 666 logstash/sandbox/settings/logstash.yml
-    sudo sysctl -w vm.max_map_count=262144
+    sysctl -w vm.max_map_count=262144
     
     # replace <DIG_PROJECTS_DIR_PATH> to you own project path
     mkdir -p <DIG_PROJECTS_DIR_PATH>/.es/data
@@ -109,7 +109,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es/`
 - Kibana: `http://localhost:12497/kibana/`
-- Kafka Manager: `http://localhost:12497/kafka_manager/`
+- Kafka Manager (optional): `http://localhost:12497/kafka_manager/`
 
 
 ## Run with Add-ons
@@ -147,13 +147,46 @@ To stop, do `./engine.sh stop`.
 - `dev`: Development mode.
 
 
+## Complete .env variable list
+
+    COMPOSE_PROJECT_NAME=dig
+    DIG_PROJECTS_DIR_PATH=./../mydig-projects
+    DOMAIN=localhost
+    PORT=12497
+    NUM_ETK_PROCESSES=2
+    KAFKA_NUM_PARTITIONS=2
+    DIG_AUTH_USER=admin
+    DIG_AUTH_PASSWORD=123
+    DIG_ADD_ONS=ache
+    
+    KAFKA_HEAP_SIZE=512m
+    ZK_HEAP_SIZE=512m
+    LS_HEAP_SIZE=512m
+    ES_HEAP_SIZE=1g
+    
+    DIG_NET_SUBNET=172.30.0.0/16
+    DIG_NET_KAFKA_IP=172.30.0.200
+    
+    # only works in development mode
+    MYDIG_DIR_PATH=./../mydig-webservice
+    ETK_DIR_PATH=./../etk
+    SPACY_DIR_PATH=./../spacy-ui
+    RSS_DIR_PATH=./../dig-rss-feed-crawler
+
 ## Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
 
 - The data in kafka queue will be cleaned after two days. If you want to delete the data immediately, drop the kafka container.
 
-- If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. Your `DIG_PROJECTS_DIR_PATH` will be mapped to `/shared_data/projects` in docker, so make sure all the paths you used in config are start with this prefix.
+- If you want to run your own ETK config, name this file to `custom_etk_config.json` and put it in `DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/`. 
+
+- If you have additional ETK config files, please paste them into 
+`DIG_PROJECTS_DIR_PATH/<project_name>/working_dir/additional_etk_config/` (create directory `additional_etk_config` if 
+it's not there).
+
+- If you are using custom ETK config or additional etk configs, you need to take care of all file paths in these config 
+files. `DIG_PROJECTS_DIR_PATH/<project_name>` will be mapped to `/shared_data/projects/<project_name>` in docker, so make sure all the paths you used in config are start with this prefix.
 
 - If you want to clean up all ElasticSearch data, remove `.es` directory in your `DIG_PROJECTS_DIR_PATH`.
 
@@ -163,35 +196,9 @@ To stop, do `./engine.sh stop`.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
 
-- On Linux, potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
+- On Linux, solutions for potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
-
-- All env variables:
-
-        COMPOSE_PROJECT_NAME=dig
-        DIG_PROJECTS_DIR_PATH=./../mydig-projects
-        DOMAIN=localhost
-        PORT=12497
-        NUM_ETK_PROCESSES=2
-        KAFKA_NUM_PARTITIONS=2
-        DIG_AUTH_USER=admin
-        DIG_AUTH_PASSWORD=123
-        DIG_ADD_ONS=ache
-        
-        KAFKA_HEAP_SIZE=512m
-        ZK_HEAP_SIZE=512m
-        LS_HEAP_SIZE=512m
-        ES_HEAP_SIZE=1g
-        
-        DIG_NET_SUBNET=172.30.0.0/16
-        DIG_NET_KAFKA_IP=172.30.0.200
-        
-        # development only
-        MYDIG_DIR_PATH=./../mydig-webservice
-        ETK_DIR_PATH=./../etk
-        SPACY_DIR_PATH=./../spacy-ui
-        RSS_DIR_PATH=./../dig-rss-feed-crawler
 
 
 ## Development Instructions

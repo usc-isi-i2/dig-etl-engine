@@ -75,7 +75,7 @@ class Rule(object):
         Returns: a json path relative to the top level object.
         """
         if self.field_of_nested_object:
-            return "content_extraction." + self.field_of_nested_object + "." + self.prefix + self.path
+            return "content_extraction." + self.field_of_nested_object + "." + self.prefix + "." + self.path
         else:
             return self.prefix + "." + self.path
 
@@ -425,7 +425,7 @@ class ConfigGenerator(object):
         content_extraction_for_joins = list()
         if self.nested_configs:
             for config in self.nested_configs:
-                input_path_prefix = self.prefix + config["path"] + self.prefix
+                input_path_prefix = self.prefix + "." + config["path"] + "." + self.prefix + "."
                 for rule in config["config"].get("rules") or []:
                     if rule.get("join_indexing"):
                         input_path = input_path_prefix + rule["path"] + "[*]"
