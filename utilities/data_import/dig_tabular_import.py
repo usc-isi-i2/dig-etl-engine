@@ -37,17 +37,25 @@ class TabularImport(object):
         """
         
         if mapping_spec.get("heading_row")   is not None:
-            self.heading_row = mapping_spec.get("heading_row") 
+            self.heading_row = mapping_spec.get("heading_row") - 1
         if mapping_spec.get("heading_row")  is None:
             self.heading_row = 0
        
         if mapping_spec.get("content_start_row") is not None:
-            self.content_start_row = mapping_spec.get("content_start_row")
+            self.content_start_row = mapping_spec.get("content_start_row") - 1
         if mapping_spec.get("content_start_row") is None:
             self.content_start_row = 1
+
         self.heading_colums = mapping_spec.get("heading_colums")
+        if  self.heading_colums is not None:
+            self.heading_colums[0] = self.heading_colums[0] - 1
+            self.heading_colums[1] = self.heading_colums[1] + 1
         self.content_end_row = mapping_spec.get("content_end_row")
+        if self.content_end_row is not None:
+            self.content_end_row = self.content_end_row +1
         self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content")
+        if self.blank_row_ends_content is not None:
+            self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content") + 1
         
         self.website = mapping_spec.get("website")
         self.file_url = mapping_spec.get("file_url")
@@ -78,12 +86,12 @@ class TabularImport(object):
         #find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
-
+        
         elif self.heading_colums is not None:
             #deal with the erro case
             start = self.heading_colums[0]
             end = self.heading_colums[1]
-            keys = [str(name) for name in range(start, end + 1)]
+            keys = [str(name) for name in range(start + 1, end)]
         
         #if both content_end_row and blank_row_ends_content are provided, take former 
         if self.content_end_row is not None:
@@ -111,7 +119,6 @@ class TabularImport(object):
                 self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
         
         title_template = self.config.get("title")
-
         # preprocess all rules in the config and create a dict for faster processing
         rules = self.config['rules']
 
@@ -459,7 +466,6 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         output_filename=home_dir + prefix_dir + item["jl"])
 
 #create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
-
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
