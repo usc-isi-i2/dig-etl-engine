@@ -55,7 +55,7 @@ DIG_AUTH_PASSWORD=123
 - `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
-If you are working on Linux, do this additional steps:
+If you are working on Linux, do these additional steps:
 
     chmod 666 logstash/sandbox/settings/logstash.yml
     sudo sysctl -w vm.max_map_count=262144
@@ -109,7 +109,7 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 - MyDIG web service GUI: `http://localhost:12497/mydig/ui/`
 - Elastic Search: `http://localhost:12497/es/`
 - Kibana: `http://localhost:12497/kibana/`
-- Kafka Manager: `http://localhost:12497/kafka_manager/`
+- Kafka Manager (optional): `http://localhost:12497/kafka_manager/`
 
 
 ## Run with Add-ons
@@ -147,6 +147,32 @@ To stop, do `./engine.sh stop`.
 - `dev`: Development mode.
 
 
+## Complete .env variable list
+
+    COMPOSE_PROJECT_NAME=dig
+    DIG_PROJECTS_DIR_PATH=./../mydig-projects
+    DOMAIN=localhost
+    PORT=12497
+    NUM_ETK_PROCESSES=2
+    KAFKA_NUM_PARTITIONS=2
+    DIG_AUTH_USER=admin
+    DIG_AUTH_PASSWORD=123
+    DIG_ADD_ONS=ache
+    
+    KAFKA_HEAP_SIZE=512m
+    ZK_HEAP_SIZE=512m
+    LS_HEAP_SIZE=512m
+    ES_HEAP_SIZE=1g
+    
+    DIG_NET_SUBNET=172.30.0.0/16
+    DIG_NET_KAFKA_IP=172.30.0.200
+    
+    # only works in development mode
+    MYDIG_DIR_PATH=./../mydig-webservice
+    ETK_DIR_PATH=./../etk
+    SPACY_DIR_PATH=./../spacy-ui
+    RSS_DIR_PATH=./../dig-rss-feed-crawler
+
 ## Advanced operations and solutions to known issues
 
 - If some of the docker images (which tagged `latest`) in docker-compose file are updated, run `docker-compose pull <service name>` first.
@@ -166,32 +192,6 @@ To stop, do `./engine.sh stop`.
 - On Linux, potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
-
-- All env variables:
-
-        COMPOSE_PROJECT_NAME=dig
-        DIG_PROJECTS_DIR_PATH=./../mydig-projects
-        DOMAIN=localhost
-        PORT=12497
-        NUM_ETK_PROCESSES=2
-        KAFKA_NUM_PARTITIONS=2
-        DIG_AUTH_USER=admin
-        DIG_AUTH_PASSWORD=123
-        DIG_ADD_ONS=ache
-        
-        KAFKA_HEAP_SIZE=512m
-        ZK_HEAP_SIZE=512m
-        LS_HEAP_SIZE=512m
-        ES_HEAP_SIZE=1g
-        
-        DIG_NET_SUBNET=172.30.0.0/16
-        DIG_NET_KAFKA_IP=172.30.0.200
-        
-        # development only
-        MYDIG_DIR_PATH=./../mydig-webservice
-        ETK_DIR_PATH=./../etk
-        SPACY_DIR_PATH=./../spacy-ui
-        RSS_DIR_PATH=./../dig-rss-feed-crawler
 
 
 ## Development Instructions
