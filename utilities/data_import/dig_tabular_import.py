@@ -3,8 +3,6 @@ import json
 import os
 import re
 from collections import defaultdict
-#import pytablereader as ptr
-#import pytablewriter as ptw
 from optparse import OptionParser
 import pyexcel_io
 import pyexcel_xlsx
@@ -18,8 +16,7 @@ class TabularImport(object):
          {} will get substituted as appropriate
     """
 
-    def __init__(self, filename, mapping_spec, _heading_row=0, _heading_colums=None,
-     _content_start_row=1, _content_end_row=None, _blank_row_ends_content=None):
+    def __init__(self, filename, mapping_spec):
         """
         Convert a CSV file to a simple JSON that we can use for further processing.
         Creates an attribute for every column, and handles parsing of CSV, quoting, etc.
@@ -30,18 +27,27 @@ class TabularImport(object):
             filename (string): the name of the CSV file
             mapping_spec(dict): parsed mapping spec object
             
-            _heading_row(int): the row index that has the heading (default=0)
-            _heading_colums(tuple or list): the range of colum indices to be taken (default=None)
-            _content_start_row (int): the index of content start row (default=1)
-            _content_end_row(int): the index of content end row (default=None)
-            _blank_row_ends_content(int): the index of blank row ends content (default=None)
+        
+        Specification
+            heading_row (int): the row index that has the heading (default=0)
+            content_start_row (int): the index of content start row (default=1)
+            heading_colums (tuple or list): the range of colum indices to be taken
+            content_end_row (int): the index of content end row
+            blank_row_ends_content (int): the index of blank row ends content
         """
         
-        self.heading_row = _heading_row 
-        self.heading_colums = _heading_colums
-        self.content_start_row = _content_start_row
-        self.content_end_row = _content_end_row
-        self.blank_row_ends_content = _blank_row_ends_content
+        if mapping_spec.get("heading_row")   is not None:
+            self.heading_row = mapping_spec.get("heading_row") 
+        if mapping_spec.get("heading_row")  is None:
+            self.heading_row = 0
+       
+        if mapping_spec.get("content_start_row") is not None:
+            self.content_start_row = mapping_spec.get("content_start_row")
+        if mapping_spec.get("content_start_row") is None:
+            self.content_start_row = 1
+        self.heading_colums = mapping_spec.get("heading_colums")
+        self.content_end_row = mapping_spec.get("content_end_row")
+        self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content")
         
         self.website = mapping_spec.get("website")
         self.file_url = mapping_spec.get("file_url")
@@ -102,7 +108,6 @@ class TabularImport(object):
             start = self.heading_colums[0]
             end = self.heading_colums[1]
             for value in data:
-                print dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))) 
                 self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
         
         title_template = self.config.get("title")
@@ -454,6 +459,7 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         output_filename=home_dir + prefix_dir + item["jl"])
 
 #create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
+
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
