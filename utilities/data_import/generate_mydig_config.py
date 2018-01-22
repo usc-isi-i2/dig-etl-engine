@@ -608,4 +608,5 @@ if __name__ == '__main__':
     for etk_config in etk_configs:
         o = codecs.open('{}/{}'.format(output_path, etk_config['filename']), 'w')
         o.write(json.dumps(etk_config['etk_config'], indent=2, sort_keys=True))
+        print 'Wrote config: {}/{}'.format(output_path, etk_config['filename'])
         o.close()
