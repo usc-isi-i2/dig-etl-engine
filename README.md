@@ -55,6 +55,15 @@ DIG_AUTH_PASSWORD=123
 - `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
+If you are working on Linux, do this additional steps:
+
+    chmod 666 logstash/sandbox/settings/logstash.yml
+    sudo sysctl -w vm.max_map_count=262144
+    
+    # replace <DIG_PROJECTS_DIR_PATH> to you own project path
+    mkdir -p <DIG_PROJECTS_DIR_PATH>/.es/data
+    chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>/.es
+
 To run myDIG do:
 
     ./engine.sh up
@@ -62,7 +71,6 @@ To run myDIG do:
 > Docker commands acquire high privilege in some of the OS, add `sudo` before them.
 > You can also run `./engine.sh up -d` to run myDIG as a daemon process in the background.
 > Wait a couple of minutes to ensure all the services are up.
-> On Linux, there are several more additional step, please refer to `Advanced operations and solutions to known issues`.
 
 To stop myDIG do:
 
@@ -151,15 +159,11 @@ To stop, do `./engine.sh stop`.
 
 - If you want to clean up all Landmark Tool's database data, remove `.landmark` directory in your `DIG_PROJECTS_DIR_PATH`. But this will make published rules untraceable.
 
-- On Linux, if logstash is not up, do `chmod 666 logstash/sandbox/settings/logstash.yml`.
-
-- On Linux, if Elastic Search 5.x exits for `[1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`, set `max_map_count` by `sudo sysctl -w vm.max_map_count=262144`.
-
-- On Linux, if Elastic Search 5.x fails to start for obtaining node locks, change the ownership of myDIG project directory (e.g.,`chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>`).
-
 - On Linux, if you can not access docker network from host machine: 1. stop docker containers 2. do `docker network ls` to find out id of `dig_net` and find this id in `ifconfig`, do `ifconfig <interface id> down` to delete this network interface and restart docker service.
 
 - On Linux, if DNS does not work correctly in `dig_net`, please refer to [this post](https://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host).
+
+- On Linux, potential Elastic Search problem can be found [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
 
 - If there's a docker network conflict, use `docker network rm <network id>` to remove conflicting network.
 
