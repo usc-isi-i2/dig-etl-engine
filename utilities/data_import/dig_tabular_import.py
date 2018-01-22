@@ -31,7 +31,7 @@ class TabularImport(object):
             mapping_spec(dict): parsed mapping spec object
 
         """
-        #test
+        
         self.heading_row = _heading_row 
         self.heading_colums = _heading_colums
         self.content_start_row = _content_start_row
@@ -64,7 +64,7 @@ class TabularImport(object):
         data = get_data(filename, auto_detect_datetime=False)
         data = data.values().pop(0)
         
-        #find heading part
+        #find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
 
@@ -73,18 +73,12 @@ class TabularImport(object):
             start = self.heading_colums[0]
             end = self.heading_colums[1]
             keys = [str(name) for name in range(start, end + 1)]
-        '''
-        if self.content_start_row is None:
-            # defalt seting of row number of colum name is 0
-            self.content_start_row = 1
-        '''
         
+        #if both content_end_row and blank_row_ends_content are provided, take former 
         if self.content_end_row is not None:
             data = data[self.content_start_row:self.content_end_row + 1]
         
         #if self.blank_row_ends_content is not None, it will read the data untill blank row
-        
-        #if both content_end_row and blank_row_ends_content are provided, take former 
         if (self.content_end_row is None) and (self.blank_row_ends_content is not None):
             data = data[self.content_start_row:self.blank_row_ends_content]
             
@@ -98,14 +92,13 @@ class TabularImport(object):
             for value in data:
                 self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
         
+        #specify the colums to take by slicing data
         elif self.heading_colums is not None:
             start = self.heading_colums[0]
             end = self.heading_colums[1]
             for value in data:
                 print dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))) 
                 self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
-        #test
-        print self.object_list
         
         title_template = self.config.get("title")
 
