@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.1.4-dev1
+    image: uscisii2/dig-etl-engine:1.1.4-dev4
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -126,7 +126,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r060
+    image: digsandpaper/digsandpaper:0.1.4-r062
 #    ports:
 #      - "9876"
     volumes:
@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.1.5-dev6
+    image: uscisii2/mydig_ws:1.1.5-dev10
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -170,7 +170,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:3.0.4
+    image: digmemex/digui:3.0.5
 #    ports:
 #      - "8080"
     volumes:

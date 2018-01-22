@@ -1,6 +1,8 @@
 import json
 import re
 import os
+from optparse import OptionParser
+import codecs
 
 
 class Rule(object):
@@ -20,6 +22,7 @@ class Rule(object):
         """
         self.path = rule_spec["path"]
         self.field = rule_spec["field"]
+        self.extractions = rule_spec.get("extractions")
         self.prefix = prefix
         self.field_properties = field_properties
         self.path_to_nested_object = path_to_nested_object
@@ -72,7 +75,7 @@ class Rule(object):
         Returns: a json path relative to the top level object.
         """
         if self.field_of_nested_object:
-            return "content_extraction." + self.field_of_nested_object + "." + self.prefix + ".\"" + self.path + "\""
+            return "content_extraction." + self.field_of_nested_object + "." + self.prefix + self.path
         else:
             return self.prefix + "." + self.path
 
@@ -185,6 +188,15 @@ class Rule(object):
         """
         return self.default_extractors.get(self.field)
 
+    def datasetid_for_nested_object(self):
+        """
+        Construct a dataset identifier for a nested object
+
+        Returns: a string made form the prefix and path
+
+        """
+        return self.prefix + "/" + self.path
+
     def data_extraction(self):
         """
         Build the data extraction section for this rule.
@@ -202,7 +214,8 @@ class Rule(object):
             extractor = {
                 "create_kg_node_extractor": {
                     "config": {
-                        "segment_name": self.field
+                        "segment_name": self.field,
+                        "dataset_identifier": self.datasetid_for_nested_object()
                     }
                 }
             }
@@ -228,6 +241,13 @@ class Rule(object):
                 "extractors": extractor
             }
         }
+
+        # if there is an extractions section in the rule, include those extractors
+        additional_extractions = self.extractions
+        if additional_extractions:
+            for key, value in additional_extractions.items():
+                fields[key] = value
+
         return {
             "input_path": input_path,
             "fields": fields
@@ -279,6 +299,42 @@ class ConfigGenerator(object):
                      path_to_nested_object=self.path_to_nested_object,
                      field_of_nested_object=self.field_of_nested_object))
 
+        # Automatically add a rule to populate the field that hold nested objects
+        # For example:
+        #  {
+        #     "path": "answers",
+        #     "field": "answer_option"
+        #  }
+        if self.nested_configs:
+            for nested_config in self.nested_configs:
+                rule_dict = {
+                    "path": nested_config["path"],
+                    "field": nested_config["field"]
+                }
+                rule = Rule(rule_dict,
+                            self.prefix,
+                            self.field_properties,
+                            path_to_nested_object=self.path_to_nested_object,
+                            field_of_nested_object=self.field_of_nested_object)
+                self.rules.append(rule)
+
+    def is_nested_config(self):
+        """
+        Is this a nested config?
+
+        Returns: True if this is a nested config
+
+        """
+        return self.path_to_nested_object is not None
+
+    def datasetid(self):
+        """
+        Construct the dataset identifier used inside nested config
+        Returns: a string
+
+        """
+        return self.prefix + "/" + self.path_to_nested_object if self.is_nested_config() else self.prefix
+
     def content_extraction(self):
         """
         Generate the content extraction section for a configuration.
@@ -287,7 +343,7 @@ class ConfigGenerator(object):
         Returns: the dict to insert in the etk supplemental config
         """
         entries = list()
-        signatures = set() # to prevent duplicates
+        signatures = set()  # to prevent duplicates
         for rule in self.rules:
             ce = rule.content_extraction()
             if ce:
@@ -317,6 +373,40 @@ class ConfigGenerator(object):
                 entries.append(de)
         return entries
 
+    def kg_enhancement(self):
+        priority = 0
+        kge = None
+        constants = self.config.get("constants")
+        if constants:
+            kge = {
+                "fields": {},
+                "input_path": "knowledge_graph.`parent`"
+            }
+            for constant in constants:
+                if 'priority' in constant:
+                    user_priority = constant["priority"]
+                else:
+                    user_priority = None
+                kge["fields"][constant["field"]] = {
+                    "priority": user_priority if user_priority else priority,
+                    "extractors": {
+                        "add_constant_kg": {
+                            "config": {
+                                "constants": constant["value"]
+                            }
+                        }
+                    }
+
+                }
+                guard = dict()
+                guard['field'] = "dataset_identifier"
+                guard['value'] = self.datasetid()
+                kge["fields"][constant["field"]]['guard'] = guard
+                if not user_priority:
+                    priority += 1
+
+        return kge
+
     def segment_name_for_joins(self, config, rule):
         """
         Join fields are fields that store at the top level values in nested objects.
@@ -335,10 +425,10 @@ class ConfigGenerator(object):
         content_extraction_for_joins = list()
         if self.nested_configs:
             for config in self.nested_configs:
-                input_path_prefix = self.prefix + ".\"" + config["path"] + "\"." + self.prefix + ".\""
+                input_path_prefix = self.prefix + config["path"] + self.prefix
                 for rule in config["config"].get("rules") or []:
                     if rule.get("join_indexing"):
-                        input_path = input_path_prefix + rule["path"] + "\"[*]"
+                        input_path = input_path_prefix + rule["path"] + "[*]"
                         segment_name = self.segment_name_for_joins(config, rule)
                         ce = {
                             "input_path": input_path,
@@ -367,7 +457,7 @@ class ConfigGenerator(object):
                         data_extraction_for_joins.append(de)
         return data_extraction_for_joins
 
-    def generate_config_files(self, filename):
+    def generate_config_files(self, filename, etk_configs):
         """
         Generates all the supplemental config files for a mapping file.
 
@@ -376,19 +466,38 @@ class ConfigGenerator(object):
 
         Returns: nothing
         """
-        with open(filename, 'w') as outfile:
-            ce = self.content_extraction()
-            ce["json_content"].extend(self.content_extraction_for_join_fields())
-            de = self.data_extraction()
-            de.extend(self.data_extraction_for_joins())
-            supl_config = {
-                "content_extraction": ce,
-                "data_extraction": de
-            }
-            outfile.write(json.dumps(supl_config, indent=2, sort_keys=True))
-            outfile.write("\n")
-            outfile.close()
-            print "Wrote ", filename
+        ce = self.content_extraction()
+        ce["json_content"].extend(self.content_extraction_for_join_fields())
+        de = self.data_extraction()
+        de.extend(self.data_extraction_for_joins())
+        kge = self.kg_enhancement()
+        supl_config = {
+            "content_extraction": ce,
+            "data_extraction": de
+        }
+
+        if kge:
+            supl_config['kg_enhancement'] = kge
+
+        etk_configs.append({'etk_config': supl_config, 'filename': filename})
+
+        # with open(filename, 'w') as outfile:
+        #     ce = self.content_extraction()
+        #     ce["json_content"].extend(self.content_extraction_for_join_fields())
+        #     de = self.data_extraction()
+        #     de.extend(self.data_extraction_for_joins())
+        #     kge = self.kg_enhancement()
+        #     supl_config = {
+        #         "content_extraction": ce,
+        #         "data_extraction": de
+        #     }
+        #
+        #     if kge['fields'].keys() > 0:
+        #         supl_config['kg_enhancement'] = kge
+        #     outfile.write(json.dumps(supl_config, indent=2, sort_keys=True))
+        #     outfile.write("\n")
+        #     outfile.close()
+        #     print "Wrote ", filename
 
         if self.nested_configs:
             for config in self.nested_configs:
@@ -399,7 +508,9 @@ class ConfigGenerator(object):
                                       field_of_nested_object=config["field"])
                 nested_filename = os.path.splitext(filename)[0] \
                                   + "_" + Rule.make_alphanumeric_underscore(config["path"]) + ".json"
-                gen.generate_config_files(nested_filename)
+                gen.generate_config_files(nested_filename, etk_configs)
+
+        return etk_configs
 
 
 class FieldProperties(object):
@@ -415,15 +526,15 @@ class FieldProperties(object):
         for x in config["nested_configs"]:
             self.kg_properties.add(x["field"])
 
-    def stores_kg_nodes(self, path):
+    def stores_kg_nodes(self, field):
         """
         Determine whether a path leads to KG nodes (as opposed to literals)
         Args:
-            path (string): the name of a field
+            field (string): the name of a field
 
         Returns: True if path is expected to store KN nodes
         """
-        return path in self.kg_properties
+        return field in self.kg_properties
 
     def is_date_field(self, fieldname):
         """
@@ -440,7 +551,6 @@ class FieldProperties(object):
                or fieldname.find("_date_") != -1
 
 
-
 # test1 = Rule(spec["config"]["rules"][0], spec["prefix"])
 # print "content_extraction: ", test1.content_extraction()
 # print "data_extraction: ", test1.data_extraction()
@@ -454,26 +564,48 @@ class FieldProperties(object):
 #     ]
 
 # sage-research-tool/other-additional-etk-configs/measurement
-home_dir = "/Users/pszekely/github/sage/"
-prefix_dir = "sage-research-tool/other-additional-etk-configs/"
-output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
-mapping_files = [
-    "measurement/measurement",
-    "measure/measure"
-    ]
+# home_dir = "/Users/pszekely/github/sage/"
+# prefix_dir = "sage-research-tool/other-additional-etk-configs/"
+# output_dir = "/Users/pszekely/Documents/mydig-projects/sage_kg/working_dir/additional_etk_config/"
+# mapping_files = [
+#     "measurement/measurement",
+#     "measure/measure"
+# ]
+#
+# for item in mapping_files:
+#     mapping_file = home_dir + prefix_dir + item + "_mapping.json"
+#     with open(mapping_file, 'r') as open_file:
+#         spec_nested = json.loads(open_file.read())
+#         # print spec_nested
+#         gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
+#         # print "content_extraction: ", test2.content_extraction()
+#         # print "data_extraction: ", test2.data_extraction()
+#         etk_configs = gen.generate_config_files(output_dir + item.split("/")[0] + "_config.json", list())
+#
+#         # supl_config = {
+#         #     "content_extraction": test2.content_extraction(),
+#         #     "data_extraction": test2.data_extraction()
+#         # }
+#         # print json.dumps(supl_config, indent=2, sort_keys=True)
 
-for item in mapping_files:
-    mapping_file = home_dir + prefix_dir + item + "_mapping.json"
-    with open(mapping_file, 'r') as open_file:
-        spec_nested = json.loads(open_file.read())
-        # print spec_nested
-        gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
-        # print "content_extraction: ", test2.content_extraction()
-        # print "data_extraction: ", test2.data_extraction()
-        gen.generate_config_files(output_dir + item.split("/")[0] + "_config.json")
 
-# supl_config = {
-#     "content_extraction": test2.content_extraction(),
-#     "data_extraction": test2.data_extraction()
-# }
-# print json.dumps(supl_config, indent=2, sort_keys=True)
+if __name__ == '__main__':
+    compression = "org.apache.hadoop.io.compress.GzipCodec"
+
+    parser = OptionParser()
+
+    (c_options, args) = parser.parse_args()
+    mapping_file = args[0]
+    output_path = args[1]
+    spec_nested = json.load(codecs.open(mapping_file, mode='r'))
+    gen = ConfigGenerator(spec_nested, spec_nested["prefix"], FieldProperties(spec_nested))
+
+    ori_filename = os.path.basename(mapping_file)
+    filename, ext = os.path.splitext(ori_filename)
+    filename = filename.replace('_mapping', '')
+    etk_configs = gen.generate_config_files(filename + "_config.json", list())
+
+    for etk_config in etk_configs:
+        o = codecs.open('{}/{}'.format(output_path, etk_config['filename']), 'w')
+        o.write(json.dumps(etk_config['etk_config'], indent=2, sort_keys=True))
+        o.close()

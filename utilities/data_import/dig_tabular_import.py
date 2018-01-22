@@ -51,7 +51,7 @@ class TabularImport(object):
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
-        
+
         fn, extention = os.path.splitext(filename)
         if extention == ".csv":
             get_data = pyexcel_io.get_data
@@ -61,7 +61,7 @@ class TabularImport(object):
             get_data = pyexcel_xlsx.get_data
         else:
             print "file extension can not read"
-        data = get_data(filename)
+        data = get_data(filename, auto_detect_datetime=False)
         data = data.values().pop(0)
         
         #find heading part
@@ -131,6 +131,7 @@ class TabularImport(object):
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
 
         for ob in self.object_list:
+            ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
 
             # go through the csv and delete all values marked to be deleted
@@ -170,7 +171,6 @@ class TabularImport(object):
                             ob.pop(k)
                     else:
                         ob.pop(k)
-
 
     def listify(self, value):
         """
@@ -248,7 +248,9 @@ class TabularImport(object):
                 new_ob["url"] = self.website + "#" + ob_id
 
             new_ob["raw_content"] = ob["raw_content"]
+            new_ob["dataset_identifier"] = ob["dataset_identifier"]
             ob.pop("raw_content")
+            ob.pop("dataset_identifier")
             result.append(new_ob)
 
             counter += 1
@@ -415,6 +417,7 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         outfile.write("\n")
         outfile.close()
         print "Wrote default mapping file:", new_file
+
 
 # home_dir = "/Users/pszekely/github/sage/"
 # prefix_dir = "sage-research-tool/datasets/"
