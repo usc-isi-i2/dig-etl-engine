@@ -29,7 +29,12 @@ class TabularImport(object):
         Args:
             filename (string): the name of the CSV file
             mapping_spec(dict): parsed mapping spec object
-
+            
+            _heading_row(int): the row index that has the heading (default=0)
+            _heading_colums(tuple or list): the range of colum indices to be taken (default=None)
+            _content_start_row (int): the index of content start row (default=1)
+            _content_end_row(int): the index of content end row (default=None)
+            _blank_row_ends_content(int): the index of blank row ends content (default=None)
         """
         
         self.heading_row = _heading_row 
