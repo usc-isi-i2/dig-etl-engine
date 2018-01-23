@@ -103,3 +103,6 @@ ENV/
 
 .idea/*
 utilities/data-import/.idea/*
+
+# .DS_Store
+**/.DS_Store
