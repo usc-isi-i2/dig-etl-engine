@@ -1,0 +1,57 @@
+{
+  "content_start_row" : 5,
+  "heading_colums_disabled": [2,5],
+  "heading_row" : 4,
+  "nested_configs": [
+    {
+      "path": "actors",
+      "field": "actor",
+      "config": {
+        "type": [
+          "Actor"
+        ],
+        "rules": [
+          {
+            "path": "Value",
+            "field": "size",
+            "join_indexing": true
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "constants": [
+      {
+        "field": "type",
+        "value": [
+          "Event",
+          "Asylum Application"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "field": "country",
+        "path": "Origin"
+      },
+      {
+        "field": "title",
+        "path": "title"
+      },
+      {
+        "field": "event_date",
+        "path": "event_date",
+        "template": "{Year}/{Month}/01"
+      },
+      {
+        "field": "raw_content",
+        "path": "raw_content"
+      }
+    ],
+    "title": "{Value} asylum seeker(s) from {Origin}"
+  },
+  "file_url": "http://popstats.unhcr.org/en/asylum_seekers_monthly",
+  "prefix": "unhcr_asylum_seekers",
+  "website": "unhcr.org"
+}

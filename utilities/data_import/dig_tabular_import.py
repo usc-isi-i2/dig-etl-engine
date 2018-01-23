@@ -3,13 +3,10 @@ import json
 import os
 import re
 from collections import defaultdict
-import pytablereader as ptr
-import pytablewriter as ptw
 from optparse import OptionParser
 import pyexcel_io
 import pyexcel_xlsx
 import pyexcel_xls
-
 
 class TabularImport(object):
     """
@@ -29,8 +26,37 @@ class TabularImport(object):
         Args:
             filename (string): the name of the CSV file
             mapping_spec(dict): parsed mapping spec object
-
+            
+        
+        Specification
+            heading_row (int): the row index that has the heading (default=0)
+            content_start_row (int): the index of content start row (default=1)
+            heading_colums (tuple or list): the range of colum indices to be taken
+            content_end_row (int): the index of content end row
+            blank_row_ends_content (int): the index of blank row ends content
         """
+        
+        if mapping_spec.get("heading_row")   is not None:
+            self.heading_row = mapping_spec.get("heading_row") - 1
+        if mapping_spec.get("heading_row")  is None:
+            self.heading_row = 0
+       
+        if mapping_spec.get("content_start_row") is not None:
+            self.content_start_row = mapping_spec.get("content_start_row") - 1
+        if mapping_spec.get("content_start_row") is None:
+            self.content_start_row = 1
+
+        self.heading_colums = mapping_spec.get("heading_colums")
+        if  self.heading_colums is not None:
+            self.heading_colums[0] = self.heading_colums[0] - 1
+            self.heading_colums[1] = self.heading_colums[1] + 1
+        self.content_end_row = mapping_spec.get("content_end_row")
+        if self.content_end_row is not None:
+            self.content_end_row = self.content_end_row +1
+        self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content")
+        if self.blank_row_ends_content is not None:
+            self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content") + 1
+        
         self.website = mapping_spec.get("website")
         self.file_url = mapping_spec.get("file_url")
         self.id_path = mapping_spec.get("id_path")
@@ -56,12 +82,43 @@ class TabularImport(object):
             print "file extension can not read"
         data = get_data(filename, auto_detect_datetime=False)
         data = data.values().pop(0)
-        keys = data.pop(0)
-        for value in data:
-            self.object_list.append(dict(zip(keys, value + [u''] * (len(keys) - len(value)))))
-
+        
+        #find a heading part
+        if self.heading_colums is None:
+            keys = data[self.heading_row]
+        
+        elif self.heading_colums is not None:
+            #deal with the erro case
+            start = self.heading_colums[0]
+            end = self.heading_colums[1]
+            keys = [str(name) for name in range(start + 1, end)]
+        
+        #if both content_end_row and blank_row_ends_content are provided, take former 
+        if self.content_end_row is not None:
+            data = data[self.content_start_row:self.content_end_row + 1]
+        
+        #if self.blank_row_ends_content is not None, it will read the data untill blank row
+        if (self.content_end_row is None) and (self.blank_row_ends_content is not None):
+            data = data[self.content_start_row:self.blank_row_ends_content]
+            
+        elif (self.content_end_row is None) and (self.blank_row_ends_content is None):
+            data = data[self.content_start_row:]
+        
+        self.content_row_identification = {} 
+        self.content_row_identification["non_empty_colums"] = keys
+        
+        if self.heading_colums is None:
+            for value in data:
+                self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
+        
+        #specify the colums to take by slicing data
+        elif self.heading_colums is not None:
+            start = self.heading_colums[0]
+            end = self.heading_colums[1]
+            for value in data:
+                self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
+        
         title_template = self.config.get("title")
-
         # preprocess all rules in the config and create a dict for faster processing
         rules = self.config['rules']
 
@@ -306,10 +363,9 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
             mapping_spec = json.loads(open_file.read())
             open_file.close()
 
-    ti = TabularImport(csv_file, mapping_spec)
+    ti = TabularImport(csv_file, mapping_spec, )
     ti.apply_nested_configs_to_all_objects()
     ti.nest_generated_json()
-
     new_file = output_filename
     if not output_filename or output_filename == "":
         new_file = os.path.splitext(filename)[0] + ".jl"
@@ -324,7 +380,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
         outfile.close()
     print "Wrote jsonlines file:", new_file
 
-
+    
 def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_url="", output_filename=""):
     """
     Create a default mapping file for a CSV file to build a KG using every column of the file.
@@ -409,6 +465,7 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 #         mapping_file=home_dir + prefix_dir + item["mapping"],
 #         output_filename=home_dir + prefix_dir + item["jl"])
 
+#create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
