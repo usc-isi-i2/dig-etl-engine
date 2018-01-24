@@ -4,6 +4,64 @@ import os
 from optparse import OptionParser
 import codecs
 
+# to-do: move default extractors to an external file
+default_extractors = {
+    "country": {
+        "extract_using_dictionary": {
+            "config": {
+                "ngrams": 3,
+                "dictionary": "countries",
+                "case_sensitive": False
+            }
+        }
+    },
+    "state": {
+        "extract_using_dictionary": {
+            "config": {
+                "ngrams": 3,
+                "dictionary": "states_usa_canada",
+                "case_sensitive": False
+            }
+        }
+    },
+    "states_usa_codes": {
+        "extract_using_dictionary": {
+            "config": {
+                "ngrams": 1,
+                "dictionary": "states_usa_codes",
+                "case_sensitive": False
+            }
+        }
+    },
+    "city_name": {
+        "extract_using_dictionary": {
+            "config": {
+                "ngrams": 3,
+                "dictionary": "cities",
+                "case_sensitive": False
+            }
+        }
+    },
+    "phone": {
+        "extract_using_custom_spacy": {
+            "config": {
+                "spacy_field_rules": "phone"
+            }
+        }
+    },
+    "email": {
+        "extract_email": {
+            "config": {}
+        }
+    },
+    "stock_ticker": {
+        "extract_using_custom_spacy": {
+            "config": {
+                "spacy_field_rules": "stock_ticker"
+            }
+        }
+    }
+}
 
 class Rule(object):
     """
@@ -116,65 +174,6 @@ class Rule(object):
         else:
             return None
 
-    # to-do: move default extractors to an external file
-    default_extractors = {
-        "country": {
-            "extract_using_dictionary": {
-                "config": {
-                    "ngrams": 3,
-                    "dictionary": "countries",
-                    "case_sensitive": False
-                }
-            }
-        },
-        "state": {
-            "extract_using_dictionary": {
-                "config": {
-                    "ngrams": 3,
-                    "dictionary": "states_usa_canada",
-                    "case_sensitive": False
-                }
-            }
-        },
-        "states_usa_codes": {
-            "extract_using_dictionary": {
-                "config": {
-                    "ngrams": 1,
-                    "dictionary": "states_usa_codes",
-                    "case_sensitive": False
-                }
-            }
-        },
-        "city_name": {
-            "extract_using_dictionary": {
-                "config": {
-                    "ngrams": 3,
-                    "dictionary": "cities",
-                    "case_sensitive": False
-                }
-            }
-        },
-        "phone": {
-            "extract_using_custom_spacy": {
-                "config": {
-                    "spacy_field_rules": "phone"
-                }
-            }
-        },
-        "email": {
-            "extract_email": {
-                "config": {}
-            }
-        },
-        "stock_ticker": {
-            "extract_using_custom_spacy": {
-                "config": {
-                    "spacy_field_rules": "stock_ticker"
-                }
-            }
-        }
-    }
-
     def field_specific_extractor(self):
         """
         The config generator understands the names of common fields such as city_name,
@@ -186,7 +185,7 @@ class Rule(object):
 
         Returns: a default extractor, or None
         """
-        return self.default_extractors.get(self.field)
+        return default_extractors.get(self.field)
 
     def datasetid_for_nested_object(self):
         """
@@ -288,16 +287,20 @@ class ConfigGenerator(object):
         self.field_properties = field_properties
         self.path_to_nested_object = path_to_nested_object
         self.field_of_nested_object = field_of_nested_object
+        self.location_rule = None
 
         # To-do: add an "ignore": True, option to rule objects so that users can test
         # specific rules without having to remove them from their JSON file.
         for rule in self.config["rules"]:
-            self.rules.append(
-                Rule(rule,
-                     self.prefix,
-                     self.field_properties,
-                     path_to_nested_object=self.path_to_nested_object,
-                     field_of_nested_object=self.field_of_nested_object))
+            if not rule.get("ignore"):
+                rule_object = Rule(rule,
+                                   self.prefix,
+                                   self.field_properties,
+                                   path_to_nested_object=self.path_to_nested_object,
+                                   field_of_nested_object=self.field_of_nested_object)
+                self.rules.append(rule_object)
+                if rule["field"] == "location":
+                    self.location_rule = rule_object
 
         # Automatically add a rule to populate the field that hold nested objects
         # For example:
@@ -317,6 +320,19 @@ class ConfigGenerator(object):
                             path_to_nested_object=self.path_to_nested_object,
                             field_of_nested_object=self.field_of_nested_object)
                 self.rules.append(rule)
+
+        # Automatically add a rule to populate title if "title" option is present
+        if self.title:
+            title_rule_dict = {
+                "path": "title",
+                "field": "title"
+            }
+            title_rule = Rule(title_rule_dict,
+                              self.prefix,
+                              self.field_properties,
+                              path_to_nested_object=self.path_to_nested_object,
+                              field_of_nested_object=self.field_of_nested_object)
+            self.rules.append(title_rule)
 
     def is_nested_config(self):
         """
@@ -457,6 +473,20 @@ class ConfigGenerator(object):
                         data_extraction_for_joins.append(de)
         return data_extraction_for_joins
 
+    def data_extraction_for_location(self):
+        result = list()
+        if self.location_rule:
+            le = {
+                "fields": {
+                    "country": {"extractors": default_extractors["country"]},
+                    "city_name": {"extractors": default_extractors["city_name"]},
+                    "state": {"extractors": default_extractors["state"]}
+                },
+                "input_path": self.location_rule.path_to_content_extraction()
+            }
+            result.append(le)
+        return result
+
     def generate_config_files(self, filename, etk_configs):
         """
         Generates all the supplemental config files for a mapping file.
@@ -470,6 +500,7 @@ class ConfigGenerator(object):
         ce["json_content"].extend(self.content_extraction_for_join_fields())
         de = self.data_extraction()
         de.extend(self.data_extraction_for_joins())
+        de.extend(self.data_extraction_for_location())
         kge = self.kg_enhancement()
         supl_config = {
             "content_extraction": ce,

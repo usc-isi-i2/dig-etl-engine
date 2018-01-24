@@ -1,12 +1,40 @@
-import StringIO
 import json
 import os
 import re
 from collections import defaultdict
-from optparse import OptionParser
+
 import pyexcel_io
 import pyexcel_xlsx
-import pyexcel_xls
+from jsonpath_rw import parse
+from optparse import OptionParser
+
+class Guard(object):
+    """
+    Guards are used to test values in an object
+    """
+
+    def __init__(self, guard_spec):
+        self.path = guard_spec["path"]
+        self.regex = re.compile(guard_spec["regex"])
+
+    def test_guard(self, ob, tabular_import):
+        """
+
+        Args:
+            ob (): an parsed JSON object
+
+        Returns: True if the guard condition is met
+
+        """
+        match = tabular_import.dereference_json_path(ob, self.path)
+        # value = ob.get(self.path)
+        if match:
+            value = match.value
+            if not isinstance(value, basestring):
+                value = str(value)
+            return self.regex.match(value.strip())
+        return False
+
 
 class TabularImport(object):
     """
@@ -35,28 +63,28 @@ class TabularImport(object):
             content_end_row (int): the index of content end row
             blank_row_ends_content (int): the index of blank row ends content
         """
-        
-        if mapping_spec.get("heading_row")   is not None:
+
+        if mapping_spec.get("heading_row") is not None:
             self.heading_row = mapping_spec.get("heading_row") - 1
-        if mapping_spec.get("heading_row")  is None:
+        if mapping_spec.get("heading_row") is None:
             self.heading_row = 0
-       
+
         if mapping_spec.get("content_start_row") is not None:
             self.content_start_row = mapping_spec.get("content_start_row") - 1
         if mapping_spec.get("content_start_row") is None:
             self.content_start_row = 1
 
         self.heading_colums = mapping_spec.get("heading_colums")
-        if  self.heading_colums is not None:
+        if self.heading_colums is not None:
             self.heading_colums[0] = self.heading_colums[0] - 1
             self.heading_colums[1] = self.heading_colums[1] + 1
         self.content_end_row = mapping_spec.get("content_end_row")
         if self.content_end_row is not None:
-            self.content_end_row = self.content_end_row +1
+            self.content_end_row = self.content_end_row + 1
         self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content")
         if self.blank_row_ends_content is not None:
             self.blank_row_ends_content = mapping_spec.get("blank_row_ends_content") + 1
-        
+
         self.website = mapping_spec.get("website")
         self.file_url = mapping_spec.get("file_url")
         self.id_path = mapping_spec.get("id_path")
@@ -71,6 +99,13 @@ class TabularImport(object):
         self.object_list = list()
         self.config = mapping_spec.get("config")
 
+        self.guards = list()
+
+        guards = self.config.get("guards")
+        if guards is not None:
+            for guard in guards:
+                self.guards.append(Guard(guard))
+
         fn, extention = os.path.splitext(filename)
         if extention == ".csv":
             get_data = pyexcel_io.get_data
@@ -80,44 +115,47 @@ class TabularImport(object):
             get_data = pyexcel_xlsx.get_data
         else:
             print "file extension can not read"
-        data = get_data(filename, auto_detect_datetime=False)
+        # data = get_data(filename, auto_detect_datetime=False)
+        data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
         data = data.values().pop(0)
-        
-        #find a heading part
+
+        # find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
-        
+
         elif self.heading_colums is not None:
-            #deal with the erro case
+            # deal with the erro case
             start = self.heading_colums[0]
             end = self.heading_colums[1]
             keys = [str(name) for name in range(start + 1, end)]
-        
-        #if both content_end_row and blank_row_ends_content are provided, take former 
+
+        # keys = [k.replace(u'\ufeff', '') for k in keys]
+
+        # if both content_end_row and blank_row_ends_content are provided, take former
         if self.content_end_row is not None:
             data = data[self.content_start_row:self.content_end_row + 1]
-        
-        #if self.blank_row_ends_content is not None, it will read the data untill blank row
+
+        # if self.blank_row_ends_content is not None, it will read the data untill blank row
         if (self.content_end_row is None) and (self.blank_row_ends_content is not None):
             data = data[self.content_start_row:self.blank_row_ends_content]
-            
+
         elif (self.content_end_row is None) and (self.blank_row_ends_content is None):
             data = data[self.content_start_row:]
-        
-        self.content_row_identification = {} 
+
+        self.content_row_identification = {}
         self.content_row_identification["non_empty_colums"] = keys
-        
+
         if self.heading_colums is None:
             for value in data:
-                self.object_list.append(dict(zip(keys,value +[u'']*(len(keys)-len(value)))) )
-        
-        #specify the colums to take by slicing data
+                self.object_list.append(dict(zip(keys, value + [u''] * (len(keys) - len(value)))))
+
+        # specify the colums to take by slicing data
         elif self.heading_colums is not None:
             start = self.heading_colums[0]
             end = self.heading_colums[1]
             for value in data:
-                self.object_list.append(dict(zip(keys,value[start:end + 1] +[u'']*(len(keys)-len(value)))))
-        
+                self.object_list.append(dict(zip(keys, value[start:end + 1] + [u''] * (len(keys) - len(value)))))
+
         title_template = self.config.get("title")
         # preprocess all rules in the config and create a dict for faster processing
         rules = self.config['rules']
@@ -181,6 +219,22 @@ class TabularImport(object):
                             ob.pop(k)
                     else:
                         ob.pop(k)
+
+    def apply_guards(self, item, guards):
+        """
+        Apply the guards to an an item, an object or sub-object in the output.
+
+        Args:
+            item (): a json object
+            guards (): list of guards
+
+        Returns: True if all guards are satisfied.
+
+        """
+        for guard in guards:
+            if not guard.test_guard(item, self):
+                return False
+        return True
 
     def listify(self, value):
         """
@@ -267,6 +321,26 @@ class TabularImport(object):
 
         self.object_list = result
 
+    parsed_json_paths = dict()
+
+    def dereference_json_path(self, item, json_path):
+        """
+
+        Args:
+            item ():
+            json_path ():
+
+        Returns:
+
+        """
+        parsed_json_path = self.parsed_json_paths.get(json_path)
+        if parsed_json_path is None:
+            parsed_json_path = parse(json_path)
+            self.parsed_json_paths[json_path] = parsed_json_path
+
+        match = parsed_json_path.find(item)
+        return match[0] if match else None
+
     def apply_nested_configs(self, one_object):
         """
         When a config specifies nested_configs, process them to create nested object.
@@ -279,6 +353,17 @@ class TabularImport(object):
         all_keys = set(one_object.keys())
         result = defaultdict()
         for item in self.nested_configs:
+
+            # Improve this code by saving the Guard object in the config at initialization
+            # so that we don't compile the regex every time we test, sigh
+            guards = item.get("guards")
+            guard_list = list()
+            if guards:
+                for guard in guards:
+                    guard_list.append(Guard(guard))
+            if not self.apply_guards(one_object, guard_list):
+                continue
+
             k = item["path"]
             d = defaultdict()
 
@@ -286,15 +371,14 @@ class TabularImport(object):
             rules = item["config"].get("rules")
             if rules:
                 for rule in rules:
-                    # this is a simplification as we are assuming that "path" is an attribute
-                    # generalize to allow json paths
-                    entry = rule["path"]
-                    value = one_object.get(entry)
+                    path = rule["path"]
+                    match = self.dereference_json_path(one_object, path)
+                    value = match.value if match else None
                     if self.remove_leading_trailing_whitespace and value and isinstance(value, basestring):
                         value = value.strip()
                     if value or not self.remove_blank_fields:
-                        d[entry] = value
-                    all_keys.discard(entry)
+                        d[str(match.path)] = value
+                    all_keys.discard(path)
 
                 # Add raw_content
                 d["raw_content"] = "<html><pre>" + json.dumps(d, sort_keys=True, indent=2) + "</pre></html>"
@@ -368,7 +452,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
     ti.nest_generated_json()
     new_file = output_filename
     if not output_filename or output_filename == "":
-        new_file = os.path.splitext(filename)[0] + ".jl"
+        new_file = os.path.splitext(csv_file)[0] + ".jl"
 
     with open(new_file, 'w') as outfile:
         write_newline = False
@@ -380,7 +464,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
         outfile.close()
     print "Wrote jsonlines file:", new_file
 
-    
+
 def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_url="", output_filename=""):
     """
     Create a default mapping file for a CSV file to build a KG using every column of the file.
@@ -420,7 +504,7 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
 
     new_file = output_filename
     if not output_filename or output_filename == "":
-        new_file = os.path.dirname(filename) + "/" + dataset_key + "-mapping.json"
+        new_file = os.path.dirname(csv_file) + "/" + dataset_key + "-mapping.json"
 
     with open(new_file, 'w') as outfile:
         outfile.write(json.dumps(mapping, indent=2, sort_keys=True))
@@ -429,43 +513,13 @@ def create_default_mapping_for_csv_file(csv_file, dataset_key, website="", file_
         print "Wrote default mapping file:", new_file
 
 
-# home_dir = "/Users/pszekely/github/sage/"
-# prefix_dir = "sage-research-tool/datasets/"
-# files = [
-#     {
-#         "csv": "reigncoups/example/couplist_raw.csv",
-#         "mapping": "reigncoups/reigncoups_mapping.json",
-#         "jl": "reigncoups/example/couplist_diginput.jl"
-#     }
-#     # ,
-#     # {
-#     #     "csv": "privacyrights/example/Privacy_Rights_Clearinghouse-Data-Breaches-Export_raw.csv",
-#     #     "mapping": "privacyrights/privacyrights_mapping.json",
-#     #     "jl": "privacyrights/example/Privacy_Rights_Clearinghouse-Data-Breaches-Export_diginput.jl"
-#     # }
-# ]
-#
-# # filename = "./examples/Privacy_Rights_Clearinghouse-Data-Breaches-Export_100.csv"
-# # filename = "/Users/pszekely/Downloads/couplist.csv"
-# # mapping_file = "./examples/privacyrights-mapping.json"
-# # mapping_file = "/Users/pszekely/Downloads/reigncoups-mapping.json"
-#
-# # 1. generate default mappings
-# # create_default_mapping_for_csv_file(filename, "output/default-mapping")
-#
-# # 2. create jl file
-# # create_jl_file_from_csv(filename, mapping_file=mapping_file,
-# #                         output_filename="/Users/pszekely/Downloads/couplist.jl")
-# # create_jl_file_from_csv(filename, mapping_file=mapping_file,
-# #                         output_filename="./examples/privacyrights_diginput.jl")
-#
-# for item in files:
-#     create_jl_file_from_csv(
-#         home_dir + prefix_dir + item["csv"],
-#         mapping_file=home_dir + prefix_dir + item["mapping"],
-#         output_filename=home_dir + prefix_dir + item["jl"])
-
-#create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
+# # Test code:
+# path = "/Users/pszekely/github/sage/sage-research-tool/datasets/bokoharam/"
+# input_path = path + "example/NST-BokoHaram_2.csv"
+# mapping_file = path + "bokoharam_mapping.json"
+# output_filemail
+#  = path + "example/bokoharam_diginput_1.jl"
+# create_jl_file_from_csv(input_path, mapping_file=mapping_file, output_filename=output_file)
 
 if __name__ == '__main__':
     compression = "org.apache.hadoop.io.compress.GzipCodec"
