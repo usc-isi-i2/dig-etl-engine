@@ -118,15 +118,16 @@ There are also incompatible changes in myDIG webservice (1.0.11). Instead of cra
 
     # run with ache
     ./engine.sh +ache up
-    # stop
-    ./engine.sh +ache stop
     
-    # run with ache and rss crawler
-    ./engine.sh +ache +rss up
-    # stop
-    ./engine.sh +ache +rss stop
+    # run with ache and rss crawler in background
+    ./engine.sh +ache +rss up -d
     
-> `./engine.sh stop` only stops core containers.
+    # stop containers
+    ./engine.sh stop
+    
+    # drop containers
+    ./engine.sh down
+    
     
 ### From env file
 
@@ -134,9 +135,7 @@ In `.env` file, add comma separated add-on names:
 
     DIG_ADD_ONS=ache,rss
     
-Then, simply do `./engine.sh up`. 
-
-To stop, do `./engine.sh stop`.
+Then, simply do `./engine.sh up`. You can also invoke additional add-ons at run time: `./engine.sh +dev up`.
 
 
 ### Add-on list
