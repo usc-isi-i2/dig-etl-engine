@@ -103,7 +103,8 @@ ENV/
 .mypy_cache/
 
 .idea/*
-utilities/data-import/.idea/*
+utilities/data_import/.idea
 
 # .DS_Store
 **/.DS_Store
+

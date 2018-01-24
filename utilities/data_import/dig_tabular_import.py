@@ -369,7 +369,7 @@ class TabularImport(object):
 
             # Create the nested objects and add the grouping attributes
             rules = item["config"].get("rules")
-            if rules:
+            if rules is not None:
                 for rule in rules:
                     path = rule["path"]
                     match = self.dereference_json_path(one_object, path)
