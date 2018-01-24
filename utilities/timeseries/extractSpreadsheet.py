@@ -79,7 +79,7 @@ class LocationRange(object):
             return self.generator.next()
         except StopIteration:
             self.generator = None
-            self.iteridx+=1
+            self.iteridx += 1
             return self.next()
 
 
@@ -181,6 +181,8 @@ class TimeSeriesRegion(object):
                 metadata[mdname] = data.name
             elif mdspec['source'] == 'cell':
                 metadata[mdname] = data[(mdspec['row'], mdspec['col'])]
+            elif mdspec['source'] == 'const':
+                metadata[mdname] = mdspec['val']
             else:
                 logging.warn("Unknown metadata source %s", mdspec['source'])
         return metadata
@@ -192,6 +194,8 @@ class TimeSeriesRegion(object):
             if mds[md_name]['mode'] == 'normal':
                 if mds[md_name]['source'] == 'cell':
                     metadata[md_name] = data[(mds[md_name]['loc'][0], mds[md_name]['loc'][1])]
+                elif mds[md_name]['source'] == 'const':
+                    metadata[md_name] = mds[md_name]['val']
                 else:
                     md_vals = []
                     for idx in mds[md_name]['loc']:
@@ -290,13 +294,10 @@ class TimeSeriesRegion(object):
                 coords = self.orient_coords(ts_idx, d_idx)
                 timeseries.append((time_label,data[coords[0],coords[1]]))
 
-            self.time_series.append( {
-                'metadata': ts_metadata,
-                'ts': timeseries
-            })
+            self.time_series.append(dict(metadata=ts_metadata, ts=timeseries))
 
     def is_blank(self, data):
-        return len(data.strip())==0
+        return len(data.strip()) == 0
 
 class SpreadsheetAnnotation(object):
     def __init__(self, annotation):
@@ -319,6 +320,8 @@ class SpreadsheetAnnotation(object):
             md_dict[mdname]['source'] = mdspec['source']
             if mdspec['source'] == 'cell':
                 (md_dict[mdname]['row'], md_dict[mdname]['col']) = self.locparser.parse_coords(mdspec['loc'])
+            if mdspec['source'] == 'const':
+                md_dict[mdname]['val'] = mdspec['val']
         return md_dict
 
     def parse_tsr(self, tsr_json):
@@ -354,7 +357,10 @@ class SpreadsheetAnnotation(object):
             else:
                 md_dict[name]['source'] = reverse_orientation[orientation]
 
-            loc = md_sec['loc']
+            loc = None
+            if 'loc' in md_sec:
+                loc = md_sec['loc']
+
             if md_dict[name]['source'] == 'cell':
                 md_dict[name]['loc'] = self.locparser.parse_coords(loc)
 
@@ -363,6 +369,9 @@ class SpreadsheetAnnotation(object):
 
             elif md_dict[name]['source'] == 'col':
                 md_dict[name]['loc'] = self.locparser.parse_range(loc)
+
+            elif md_dict[name]['source'] == 'const':
+                md_dict[name]['val'] = md_sec['val']
 
             if 'mode' in md_sec:
                 md_dict[name]['mode'] = md_sec['mode']
