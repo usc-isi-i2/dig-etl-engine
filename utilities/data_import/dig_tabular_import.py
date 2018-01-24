@@ -172,6 +172,10 @@ class TabularImport(object):
                 delete_dict[rule['path']] = rule['delete'] if isinstance(rule['delete'], list) else [rule['delete']]
 
             if 'decoding_dict' in rule:
+                #
+                # This is wrong as the path is a JSON path and needs to be translated
+                # into an attribute name, decoding won't work for quoted paths.
+                #
                 decoding_dict[rule['path']] = dict()
                 decoding_dict[rule['path']]['decoding_dict'] = rule['decoding_dict']['keys']
                 # default action can be `preserve` or `delete`, default = `preserve`
@@ -192,8 +196,11 @@ class TabularImport(object):
             for k in decoding_dict.keys():
                 # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
                 if k in ob:
-                    if ob[k] in decoding_dict[k]['decoding_dict']:
-                        ob[k] = decoding_dict[k]['decoding_dict'][ob[k]]
+                    value = ob[k]
+                    if not isinstance(value, basestring):
+                        value = str(value)
+                    if value in decoding_dict[k]['decoding_dict']:
+                        ob[k] = decoding_dict[k]['decoding_dict'][value]
                     else:
                         # no decoding dict defined for this value, do the default_action
                         if decoding_dict[k]['default_action'] == 'delete':
