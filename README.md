@@ -265,11 +265,13 @@ build Nginx image:
 
 build ETK base image:
 
-    docker build -t uscisii2/etk:1.0.0 -f Dockerfile-etk .
+    # update ETK_VERSION in file VERSION
+    ./build_docker etk
     
 build ETL image:
 
-    docker build -t uscisii2/dig-etl-engine:1.0.0 .
+    # update DIG_ETL_ENGINE_VERSION in file VERSION
+    ./build_docker engine
     
 Invoke development mode:
     
