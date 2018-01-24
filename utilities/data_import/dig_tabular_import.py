@@ -8,6 +8,7 @@ import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
 
+
 class Guard(object):
     """
     Guards are used to test values in an object
@@ -195,16 +196,21 @@ class TabularImport(object):
             # decode the values if there is anything to decode
             for k in decoding_dict.keys():
                 # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
-                if k in ob:
-                    value = ob[k]
+                parsed_k = parse(k)
+                matches = parsed_k.find(ob)
+                if matches:
+                    # should only have one "match"
+                    match = matches[0]
+                    value = match.value
+                    str_path = str(match.path)
                     if not isinstance(value, basestring):
                         value = str(value)
                     if value in decoding_dict[k]['decoding_dict']:
-                        ob[k] = decoding_dict[k]['decoding_dict'][value]
+                        ob[str_path] = decoding_dict[k]['decoding_dict'][value]
                     else:
                         # no decoding dict defined for this value, do the default_action
                         if decoding_dict[k]['default_action'] == 'delete':
-                            ob.pop(k)
+                            ob.pop(str_path)
 
             # apply templates to combine fields
             for rule in rules:
