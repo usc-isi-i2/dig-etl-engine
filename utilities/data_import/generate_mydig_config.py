@@ -283,14 +283,13 @@ class ConfigGenerator(object):
         self.config = full_config["config"]
         self.nested_configs = full_config.get("nested_configs")
         self.title = self.config.get("title")
+        self.type = self.config.get("type")
         self.rules = list()
         self.field_properties = field_properties
         self.path_to_nested_object = path_to_nested_object
         self.field_of_nested_object = field_of_nested_object
         self.location_rule = None
 
-        # To-do: add an "ignore": True, option to rule objects so that users can test
-        # specific rules without having to remove them from their JSON file.
         for rule in self.config["rules"]:
             if not rule.get("ignore"):
                 rule_object = Rule(rule,
@@ -333,6 +332,34 @@ class ConfigGenerator(object):
                               path_to_nested_object=self.path_to_nested_object,
                               field_of_nested_object=self.field_of_nested_object)
             self.rules.append(title_rule)
+
+        # Automatically add a rule to populate type if "type" option is present
+        if self.type and not self.find_rule("type", "type"):
+            type_rule_dict = {
+                "path": "type",
+                "field": "type"
+            }
+            type_rule = Rule(type_rule_dict,
+                              self.prefix,
+                              self.field_properties,
+                              path_to_nested_object=self.path_to_nested_object,
+                              field_of_nested_object=self.field_of_nested_object)
+            self.rules.append(type_rule)
+
+    def find_rule(self, path, field):
+        """
+        Return a rule if it matches path and field.
+        Args:
+            path ():
+            field ():
+
+        Returns: the Rule or None
+
+        """
+        for r in self.rules:
+            if r.path == path and r.field == field:
+                return r
+        return None
 
     def is_nested_config(self):
         """
