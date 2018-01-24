@@ -10,7 +10,7 @@ from data_import.dig_tabular_import import TabularImport
 
 class TestDeleteCellValues(unittest.TestCase):
     def setUp(self):
-        self.csv_file = os.path.join(os.path.dirname(__file__), "./test_data/delete_cell_input")
+        self.csv_file = os.path.join(os.path.dirname(__file__), "./test_data/delete_cell_input.csv")
 
     def test_decode_cell(self):
         mapping_spec = {
