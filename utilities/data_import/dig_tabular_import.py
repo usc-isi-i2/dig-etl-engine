@@ -193,6 +193,7 @@ class TabularImport(object):
         for ob in self.object_list:
             ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
+            ob["disable_default_extractors"] = "yes"
 
             # go through the csv and delete all values marked to be deleted
             for k in delete_dict.keys():
