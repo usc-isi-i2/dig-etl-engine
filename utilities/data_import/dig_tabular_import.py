@@ -117,7 +117,14 @@ class TabularImport(object):
         else:
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
-        data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
+        print filename
+        try:
+            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
+        except:
+            try:
+                data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
+            except:
+                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
         data = data.values().pop(0)
 
         # find a heading part
