@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-name=${1}
-
 source ./VERSION
 
 if [ "${1}" == "etk" ]; then
