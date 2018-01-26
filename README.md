@@ -63,6 +63,9 @@ If you are working on Linux, do these additional steps:
     # replace <DIG_PROJECTS_DIR_PATH> to you own project path
     mkdir -p <DIG_PROJECTS_DIR_PATH>/.es/data
     chown -R 1000:1000 <DIG_PROJECTS_DIR_PATH>/.es
+    
+> To set `vm.max_map_count` permanently, please update it in `/etc/sysctl.conf` and reload sysctl settings by `sysctl
+ -p /etc/sysctl.conf`.
 
 To run myDIG do:
 
