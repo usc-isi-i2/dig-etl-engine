@@ -265,12 +265,18 @@ build Nginx image:
 build ETK base image:
 
     # update ETK_VERSION in file VERSION
-    ./build_docker etk
+    ./release_docker.sh etk build
+    ./release_docker.sh etk push
     
 build ETL image:
-
+    
+    
+    # git commit all changes first, then
+    ./release_docker.sh engine tag
+    git push --tags
     # update DIG_ETL_ENGINE_VERSION in file VERSION
-    ./build_docker engine
+    ./release_docker.sh engine build
+    ./release_docker.sh push
     
 Invoke development mode:
     
