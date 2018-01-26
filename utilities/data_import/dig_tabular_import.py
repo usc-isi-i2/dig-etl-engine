@@ -8,6 +8,7 @@ import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
 
+
 class Guard(object):
     """
     Guards are used to test values in an object
@@ -116,8 +117,14 @@ class TabularImport(object):
         else:
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
-        data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
-
+        print filename
+        try:
+            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
+        except:
+            try:
+                data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
+            except:
+                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
         data = data.values().pop(0)
 
         # find a heading part
@@ -186,6 +193,7 @@ class TabularImport(object):
         for ob in self.object_list:
             ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
+            ob["disable_default_extractors"] = "yes"
 
             # go through the csv and delete all values marked to be deleted
             for k in delete_dict.keys():
@@ -193,19 +201,7 @@ class TabularImport(object):
                     if ob[k] in delete_dict[k]:
                         ob.pop(k)
 
-            # decode the values if there is anything to decode
-            for k in decoding_dict.keys():
-                # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
-                if k in ob:
-                    value = ob[k]
-                    if not isinstance(value, basestring):
-                        value = str(value)
-                    if value in decoding_dict[k]['decoding_dict']:
-                        ob[k] = decoding_dict[k]['decoding_dict'][value]
-                    else:
-                        # no decoding dict defined for this value, do the default_action
-                        if decoding_dict[k]['default_action'] == 'delete':
-                            ob.pop(k)
+            self.decode_cell_values(decoding_dict, ob)
 
             # apply templates to combine fields
             for rule in rules:
@@ -227,6 +223,26 @@ class TabularImport(object):
                             ob.pop(k)
                     else:
                         ob.pop(k)
+
+    def decode_cell_values(self, decoding_dict, ob):
+        # decode the values if there is anything to decode
+        for k in decoding_dict.keys():
+            # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
+            parsed_k = parse(k)
+            matches = parsed_k.find(ob)
+            if matches:
+                # should only have one "match"
+                match = matches[0]
+                value = match.value
+                str_path = str(match.path)
+                if not isinstance(value, basestring):
+                    value = str(value)
+                if value in decoding_dict[k]['decoding_dict']:
+                    ob[str_path] = decoding_dict[k]['decoding_dict'][value]
+                else:
+                    # no decoding dict defined for this value, do the default_action
+                    if decoding_dict[k]['default_action'] == 'delete':
+                        ob.pop(str_path)
 
     def apply_guards(self, item, guards):
         """

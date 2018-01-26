@@ -83,6 +83,7 @@ class ProcessTimeSeries():
         total = 0
         index = 0
         missing_value_index = []
+        total_str = 0
         for element in ts:
             if len(element) <= 2:
                 value = element[1]
@@ -95,10 +96,12 @@ class ProcessTimeSeries():
                         ts[index] = [element[0], n_value]
                     else:
                         missing_value_index.append(index)
+                        total_str += 1
                 else:
                     missing_value_index.append(index)
 
                 index += 1
+        print total_str
 
         if total*1.0/len(ts) >= threshold:
             n_missing = len(missing_value_index)
@@ -115,8 +118,16 @@ class ProcessTimeSeries():
 
             return ts
 
+        elif total_str == len(ts):
+            return ts
+
         else:
-            return None
+            for i in range(0, len(ts)):
+                value =  ts[i][1]
+                if value is not None:
+                    ts[i] = [ts[i][0], str(value)]
+            return ts
+            
 
     def processs(self, tables):
         result = []
