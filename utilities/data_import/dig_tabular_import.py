@@ -108,7 +108,8 @@ class TabularImport(object):
                 self.guards.append(Guard(guard))
 
         fn, extention = os.path.splitext(filename)
-        if extention == ".csv":
+        print "extension", extention, fn
+        if extention in (".csv", ".tsv"):
             get_data = pyexcel_io.get_data
         elif extention == ".xls":
             get_data = pyexcel_xlsx.get_data
@@ -118,6 +119,8 @@ class TabularImport(object):
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
         print filename
+
+
         try:
             data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
         except:
