@@ -100,6 +100,8 @@ class TabularImport(object):
 
         if mapping_spec.get("remove_fields") is not None:
             self.remove_fields = mapping_spec.get("remove_fields")
+        else:
+            self.remove_fields = None
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
@@ -123,7 +125,6 @@ class TabularImport(object):
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
         print filename
-
 
         try:
             data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
@@ -481,7 +482,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
         with open(mapping_file, 'r') as open_file:
             mapping_spec = json.loads(open_file.read())
             open_file.close()
-            
+
     ti = TabularImport(csv_file, mapping_spec, )
     ti.apply_nested_configs_to_all_objects()
     ti.nest_generated_json()
