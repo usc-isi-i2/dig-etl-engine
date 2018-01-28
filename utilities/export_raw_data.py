@@ -5,10 +5,13 @@ import gzip
 from argparse import ArgumentParser
 
 if __name__ == '__main__':
+    # python export_raw_data.py -i ../../mydig-projects/rss_project/data -o /tmp/rss_export.jl.gz --gzip
     parser = ArgumentParser()
-    parser.add_argument("-i", "--src", action="store", type=str, dest="src_path", required=True)
-    parser.add_argument("-o", "--dst", action="store", type=str, dest="dst_path", required=True)
-    parser.add_argument("--gzip", action="store_true", dest="gzip")
+    parser.add_argument("-i", "--src", action="store", type=str, dest="src_path",
+                        required=True, help="input data directory path")
+    parser.add_argument("-o", "--dst", action="store", type=str, dest="dst_path",
+                        required=True, help="output data file path")
+    parser.add_argument("--gzip", action="store_true", dest="gzip", help="enable gzip")
     args, _ = parser.parse_known_args()
 
     src_path = os.path.abspath(args.src_path)
@@ -37,3 +40,4 @@ if __name__ == '__main__':
                 output.write(json.dumps(obj) + '\n')
     output.close()
     print 'done'
+
