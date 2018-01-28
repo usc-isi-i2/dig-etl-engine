@@ -288,18 +288,21 @@ class ConfigGenerator(object):
         self.field_properties = field_properties
         self.path_to_nested_object = path_to_nested_object
         self.field_of_nested_object = field_of_nested_object
-        self.location_rule = None
+        self.location_rules = list()
 
         for rule in self.config["rules"]:
-            if not rule.get("ignore"):
+            if not rule.get("ignore") == "yes":
                 rule_object = Rule(rule,
                                    self.prefix,
                                    self.field_properties,
                                    path_to_nested_object=self.path_to_nested_object,
                                    field_of_nested_object=self.field_of_nested_object)
-                self.rules.append(rule_object)
+
+                # Handle location rules differently.
                 if rule["field"] == "location":
-                    self.location_rule = rule_object
+                    self.location_rules.append(rule_object)
+                else:
+                    self.rules.append(rule_object)
 
         # Automatically add a rule to populate the field that hold nested objects
         # For example:
@@ -387,7 +390,11 @@ class ConfigGenerator(object):
         """
         entries = list()
         signatures = set()  # to prevent duplicates
-        for rule in self.rules:
+        rules_to_process = list()
+        if self.location_rules:
+            rules_to_process.extend(self.location_rules)
+        rules_to_process.extend(self.rules)
+        for rule in rules_to_process:
             ce = rule.content_extraction()
             if ce:
                 signature = ce["input_path"] + "//" + ce["segment_name"]
@@ -502,14 +509,15 @@ class ConfigGenerator(object):
 
     def data_extraction_for_location(self):
         result = list()
-        if self.location_rule:
+        for location_rule in self.location_rules:
             le = {
                 "fields": {
+                    "location": {"extractors": {"extract_as_is": {}}},
                     "country": {"extractors": default_extractors["country"]},
                     "city_name": {"extractors": default_extractors["city_name"]},
                     "state": {"extractors": default_extractors["state"]}
                 },
-                "input_path": self.location_rule.path_to_content_extraction()
+                "input_path": location_rule.path_to_content_extraction()
             }
             result.append(le)
         return result

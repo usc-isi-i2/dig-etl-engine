@@ -3,6 +3,7 @@ import os
 import re
 from collections import defaultdict
 
+import pyexcel
 import pyexcel_io
 import pyexcel_xlsx
 from jsonpath_rw import parse
@@ -96,6 +97,9 @@ class TabularImport(object):
         self.remove_blank_fields = mapping_spec.get("remove_blank_fields")
         if self.remove_blank_fields is None:
             self.remove_blank_fields = True
+
+        if mapping_spec.get("remove_fields") is not None:
+            self.remove_fields = mapping_spec.get("remove_fields")
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
@@ -194,6 +198,9 @@ class TabularImport(object):
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
 
         for ob in self.object_list:
+            if self.remove_fields is not None:
+                for remove_field in self.remove_fields:
+                    del ob[remove_field]
             ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
             ob["disable_default_extractors"] = "yes"
@@ -289,7 +296,8 @@ class TabularImport(object):
 
         """
         result = template
-        for m in re.finditer(r'\{([\w ]+)\}', template):
+
+        for m in re.finditer(r'\{([^\}]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
             if value:
@@ -473,7 +481,7 @@ def create_jl_file_from_csv(csv_file, mapping_spec=None, mapping_file=None, outp
         with open(mapping_file, 'r') as open_file:
             mapping_spec = json.loads(open_file.read())
             open_file.close()
-
+            
     ti = TabularImport(csv_file, mapping_spec, )
     ti.apply_nested_configs_to_all_objects()
     ti.nest_generated_json()
