@@ -47,14 +47,16 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                 # run core
                 cdr = etk_core.process(cdr, create_knowledge_graph=True)
                 if not cdr:
+                    prev_doc_sent_time = time.time()
                     raise Exception('run core error')
 
                 # indexing
                 if indexing:
                     cdr = index_knowledge_graph_fields(cdr)
-                cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
                 if not cdr:
+                    prev_doc_sent_time = time.time()
                     raise Exception('indexing in sandpaper failed')
+                cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
 
                 # nested docs
                 if 'nested_docs' in cdr:
@@ -76,17 +78,22 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                         nested_cdr = etk_core.process(nested_cdr, create_knowledge_graph=True)
                         if not nested_cdr:
                             print 'run core error in nested doc {}'.format(nested_cdr['doc_id'])
+                            continue
 
                         # indexing
                         if indexing:
                             nested_cdr = index_knowledge_graph_fields(nested_cdr)
+                        if not nested_cdr:
+                            print 'indexing error in nested doc {}'.format(nested_cdr['doc_id'])
+                            continue
+
                         nested_cdr['@execution_profile']['@run_core_time'] = \
                             float(time.time() - nested_start_run_core_time)
 
                         nested_doc_sent_time = time.time()
                         nested_cdr['@execution_profile']['@doc_sent_time'] = \
                             datetime.utcfromtimestamp(nested_doc_sent_time).isoformat()
-                        cdr['@execution_profile']['@doc_processed_time'] = \
+                        nested_cdr['@execution_profile']['@doc_processed_time'] = \
                             float(nested_doc_sent_time - doc_arrived_time) # use its parent's doc_arrived_time
                         if nested_cdr:
                             r = producer.send(producer_topic, nested_cdr)
