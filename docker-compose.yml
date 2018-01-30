@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.1.4-dev7
+    image: uscisii2/dig-etl-engine:1.1.4-dev8
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -126,7 +126,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.1.4-r063
+    image: digsandpaper/digsandpaper:0.1.4-r064
 #    ports:
 #      - "9876"
     volumes:
