@@ -45,17 +45,19 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
             try:
                 start_run_core_time = time.time()
                 # run core
-                cdr = etk_core.process(cdr, create_knowledge_graph=True)
-                if not cdr:
-                    prev_doc_sent_time = time.time()
-                    raise Exception('run core error')
+                result = etk_core.process(cdr, create_knowledge_graph=True)
+                if not result:
+                    print 'run core error'
+                else:
+                    cdr = result
 
                 # indexing
                 if indexing:
-                    cdr = index_knowledge_graph_fields(cdr)
-                if not cdr:
-                    prev_doc_sent_time = time.time()
-                    raise Exception('indexing in sandpaper failed')
+                    result = index_knowledge_graph_fields(cdr)
+                if not result:
+                    print 'indexing in sandpaper failed'
+                else:
+                    cdr = result
                 cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
 
                 # nested docs
@@ -75,17 +77,21 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                         nested_cdr['tld'] = cdr['tld']
 
                         # run core
-                        nested_cdr = etk_core.process(nested_cdr, create_knowledge_graph=True)
-                        if not nested_cdr:
+                        nested_result = etk_core.process(nested_cdr, create_knowledge_graph=True)
+                        if not nested_result:
                             print 'run core error in nested doc {}'.format(nested_cdr['doc_id'])
                             continue
+                        else:
+                            nested_cdr = nested_result
 
                         # indexing
                         if indexing:
-                            nested_cdr = index_knowledge_graph_fields(nested_cdr)
-                        if not nested_cdr:
+                            nested_result = index_knowledge_graph_fields(nested_cdr)
+                        if not nested_result:
                             print 'indexing error in nested doc {}'.format(nested_cdr['doc_id'])
                             continue
+                        else:
+                            nested_cdr = nested_result
 
                         nested_cdr['@execution_profile']['@run_core_time'] = \
                             float(time.time() - nested_start_run_core_time)
@@ -95,7 +101,7 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                             datetime.utcfromtimestamp(nested_doc_sent_time).isoformat()
                         nested_cdr['@execution_profile']['@doc_processed_time'] = \
                             float(nested_doc_sent_time - doc_arrived_time) # use its parent's doc_arrived_time
-                        if nested_cdr:
+                        if nested_result:
                             r = producer.send(producer_topic, nested_cdr)
                             r.get(timeout=60)  # wait till sent
                         else:
@@ -109,7 +115,7 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                 prev_doc_sent_time = doc_sent_time
                 cdr['@execution_profile']['@doc_processed_time'] = float(doc_sent_time - doc_arrived_time)
                 # dumping result
-                if cdr:
+                if result:
                     r = producer.send(producer_topic, cdr)
                     r.get(timeout=60)  # wait till sent
                 else:
