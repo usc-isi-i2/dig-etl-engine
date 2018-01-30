@@ -95,7 +95,7 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                             etk_core.log('fail to indexing nested doc {}'.format(nested_cdr['doc_id']), core._ERROR)
 
                     # remove nested_docs from original result
-                    # del cdr['nested_docs']
+                    del cdr['nested_docs']
 
                 doc_sent_time = time.time()
                 cdr['@execution_profile']['@doc_sent_time'] = datetime.utcfromtimestamp(doc_sent_time).isoformat()
