@@ -63,6 +63,7 @@ default_extractors = {
     }
 }
 
+
 class Rule(object):
     """
 
@@ -146,8 +147,7 @@ class Rule(object):
 
         Returns: the jsonpath to access the data corresponding to a <path>
         """
-
-        if self.field_properties.stores_kg_nodes(self.path):
+        if self.field_properties.stores_kg_nodes(self.field):
             return "content_extraction." + self.segment_name()
         else:
             return "content_extraction." + self.segment_name() + "[*]"
@@ -343,10 +343,10 @@ class ConfigGenerator(object):
                 "field": "type"
             }
             type_rule = Rule(type_rule_dict,
-                              self.prefix,
-                              self.field_properties,
-                              path_to_nested_object=self.path_to_nested_object,
-                              field_of_nested_object=self.field_of_nested_object)
+                             self.prefix,
+                             self.field_properties,
+                             path_to_nested_object=self.path_to_nested_object,
+                             field_of_nested_object=self.field_of_nested_object)
             self.rules.append(type_rule)
 
     def find_rule(self, path, field):
@@ -589,6 +589,7 @@ class FieldProperties(object):
 
     def __init__(self, config):
         self.kg_properties = set()
+
         for x in config["nested_configs"]:
             self.kg_properties.add(x["field"])
 
