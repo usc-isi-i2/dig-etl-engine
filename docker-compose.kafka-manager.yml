@@ -7,6 +7,11 @@ services:
     depends_on:
       - kafka_manager
 
+  kafka:
+    environment:
+      JMX_PORT: 9999
+#      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka -Dcom.sun.management.jmxremote.rmi.port=9999"
+
   kafka_manager:
     image: sheepkiller/kafka-manager
     environment:
