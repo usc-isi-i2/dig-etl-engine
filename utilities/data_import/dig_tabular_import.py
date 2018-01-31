@@ -65,7 +65,7 @@ class TabularImport(object):
             content_end_row (int): the index of content end row
             blank_row_ends_content (int): the index of blank row ends content
         """
-
+        self.decoding_dict_parsed_paths = dict()
         if mapping_spec.get("heading_row") is not None:
             self.heading_row = mapping_spec.get("heading_row") - 1
         if mapping_spec.get("heading_row") is None:
@@ -134,7 +134,7 @@ class TabularImport(object):
             except:
                 data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
         data = data.values().pop(0)
-
+        # print data
         # find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
@@ -163,6 +163,7 @@ class TabularImport(object):
 
         if self.heading_colums is None:
             for value in data:
+
                 self.object_list.append(dict(zip(keys, value + [u''] * (len(keys) - len(value)))))
 
         # specify the colums to take by slicing data
@@ -197,7 +198,7 @@ class TabularImport(object):
                 # default action can be `preserve` or `delete`, default = `preserve`
                 decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
-
+        print json.dumps(decoding_dict, indent=2)
         for ob in self.object_list:
             if self.remove_fields is not None:
                 for remove_field in self.remove_fields:
@@ -238,17 +239,22 @@ class TabularImport(object):
     def decode_cell_values(self, decoding_dict, ob):
         # decode the values if there is anything to decode
         for k in decoding_dict.keys():
-            # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
-            parsed_k = parse(k)
+            if k not in self.decoding_dict_parsed_paths:
+                self.decoding_dict_parsed_paths[k] = parse(k)
+            parsed_k = self.decoding_dict_parsed_paths[k]
             matches = parsed_k.find(ob)
             if matches:
                 # should only have one "match"
                 match = matches[0]
                 value = match.value
+
                 str_path = str(match.path)
                 if not isinstance(value, basestring):
                     value = str(value)
+                print json.dumps(decoding_dict[k]['decoding_dict'], indent=2)
                 if value in decoding_dict[k]['decoding_dict']:
+                    # print "decoding"
+                    # print value, decoding_dict[k]['decoding_dict'][value]
                     ob[str_path] = decoding_dict[k]['decoding_dict'][value]
                 else:
                     # no decoding dict defined for this value, do the default_action
