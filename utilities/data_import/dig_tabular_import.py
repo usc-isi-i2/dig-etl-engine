@@ -3,7 +3,6 @@ import os
 import re
 from collections import defaultdict
 
-import pyexcel
 import pyexcel_io
 import pyexcel_xlsx
 from jsonpath_rw import parse
@@ -114,7 +113,6 @@ class TabularImport(object):
                 self.guards.append(Guard(guard))
 
         fn, extention = os.path.splitext(filename)
-        print "extension", extention, fn
         if extention in (".csv", ".tsv"):
             get_data = pyexcel_io.get_data
         elif extention == ".xls":
@@ -124,15 +122,16 @@ class TabularImport(object):
         else:
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
-        print filename
+
 
         try:
-            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
+            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
+
         except:
             try:
                 data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
             except:
-                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
+                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
         data = data.values().pop(0)
         # print data
         # find a heading part
@@ -163,7 +162,6 @@ class TabularImport(object):
 
         if self.heading_colums is None:
             for value in data:
-
                 self.object_list.append(dict(zip(keys, value + [u''] * (len(keys) - len(value)))))
 
         # specify the colums to take by slicing data
@@ -198,7 +196,6 @@ class TabularImport(object):
                 # default action can be `preserve` or `delete`, default = `preserve`
                 decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
-        print json.dumps(decoding_dict, indent=2)
         for ob in self.object_list:
             if self.remove_fields is not None:
                 for remove_field in self.remove_fields:
@@ -243,6 +240,7 @@ class TabularImport(object):
                 self.decoding_dict_parsed_paths[k] = parse(k)
             parsed_k = self.decoding_dict_parsed_paths[k]
             matches = parsed_k.find(ob)
+
             if matches:
                 # should only have one "match"
                 match = matches[0]
@@ -251,7 +249,6 @@ class TabularImport(object):
                 str_path = str(match.path)
                 if not isinstance(value, basestring):
                     value = str(value)
-                print json.dumps(decoding_dict[k]['decoding_dict'], indent=2)
                 if value in decoding_dict[k]['decoding_dict']:
                     # print "decoding"
                     # print value, decoding_dict[k]['decoding_dict'][value]
