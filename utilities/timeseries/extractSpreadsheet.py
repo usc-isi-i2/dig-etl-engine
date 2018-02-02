@@ -1,15 +1,9 @@
-import sys
-import os
-import re
 import argparse
-import pyexcel
-import numpy
-from datetime import date, datetime
 import pyexcel
 import logging
 import re
 import demjson
-import json
+
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
 
@@ -55,7 +49,7 @@ class LocationRangeInfiniteIntervalComponent(LocationRangeComponent):
 class LocationRange(object):
     def __init__(self):
         self.vals = []
-        self.iteridx=0
+        self.iteridx = 0
         self.generator = None
 
     def add_component(self, component):
@@ -65,7 +59,7 @@ class LocationRange(object):
         return self.vals[self.iteridx]
 
     def __iter__(self):
-        self.iteridx=0
+        self.iteridx = 0
         self.generator = None
         return self
 
@@ -73,7 +67,7 @@ class LocationRange(object):
         if self.iteridx >= len(self.vals):
             raise StopIteration
         elif self.generator is None:
-            self.generator=self.vals[self.iteridx].generator()
+            self.generator = self.vals[self.iteridx].generator()
 
         try:
             return self.generator.next()
@@ -103,29 +97,29 @@ class LocationParser(object):
                     translate_fn = self.translate_col_label
 
                 if len(parts) == 1:
-                        rnge.add_component(LocationRangeSingletonComponent(translate_fn(parts[0])-1))
+                    rnge.add_component(LocationRangeSingletonComponent(translate_fn(parts[0]) - 1))
 
                 elif len(parts) == 2:
                     if self.is_sentinel(parts[1]):
-                        rnge.add_component(LocationRangeInfiniteIntervalComponent(start=translate_fn(parts[0])-1))
+                        rnge.add_component(LocationRangeInfiniteIntervalComponent(start=translate_fn(parts[0]) - 1))
                     else:
-                        rnge.add_component(LocationRangeIntervalComponent(start=translate_fn(parts[0])-1,
+                        rnge.add_component(LocationRangeIntervalComponent(start=translate_fn(parts[0]) - 1,
                                                                           end=translate_fn(parts[1])))
 
                 elif len(parts) == 3:
 
                     if self.is_sentinel(parts[1]):
-                        rnge.add_component(LocationRangeInfiniteIntervalComponent(start=translate_fn(parts[0])-1,
+                        rnge.add_component(LocationRangeInfiniteIntervalComponent(start=translate_fn(parts[0]) - 1,
                                                                                   increment=int(parts[1])))
                     else:
-                        rnge.add_component(LocationRangeIntervalComponent(start=translate_fn(parts[0])-1,
+                        rnge.add_component(LocationRangeIntervalComponent(start=translate_fn(parts[0]) - 1,
                                                                           end=translate_fn(parts[2]),
                                                                           increment=int(parts[1])))
 
                 else:
-                    raise Exception("Error parsing element of range: %s"%val)
+                    raise Exception("Error parsing element of range: %s" % val)
         else:
-            raise Exception('Error parsing range, data %s did not match pattern'%data)
+            raise Exception('Error parsing range, data %s did not match pattern' % data)
 
         return rnge
 
@@ -134,7 +128,7 @@ class LocationParser(object):
         if match:
             return (int(match.group(2)) - 1, self.translate_col_label(match.group(1)) - 1)
         else:
-            raise Exception('Error passing cell coordinates: %s'%data)
+            raise Exception('Error passing cell coordinates: %s' % data)
 
     def is_column(self, data):
         return self.patterns['col_label'].match(data)
@@ -149,15 +143,14 @@ class LocationParser(object):
         elif len(cl) == 1:
             return ord(cl[0]) - ord('A') + 1
         else:
-            raise Exception("Unexpected column label: %s"%cl)
+            raise Exception("Unexpected column label: %s" % cl)
 
     def translate_row_label(self, row_label):
         return int(row_label)
 
 
-
 class TimeSeriesRegion(object):
-    def __init__(self, orientation='row', series_range=None, data_range=None, metadata_spec = None,
+    def __init__(self, orientation='row', series_range=None, data_range=None, metadata_spec=None,
                  time_coordinates=None, global_metadata=None, granularity=None):
         self.orientation = orientation
         self.series_range = series_range
@@ -168,13 +161,12 @@ class TimeSeriesRegion(object):
         self.global_metadata = global_metadata
         self.time_series = []
 
-
-    def parse(self,data):
+    def parse(self, data):
         metadata = self.parse_global_metadata(data)
         self.parse_ts(data, metadata)
         return self.time_series
 
-    def parse_global_metadata(self,data):
+    def parse_global_metadata(self, data):
         metadata = {}
         for mdname, mdspec in self.global_metadata.iteritems():
             if mdspec['source'] == 'sheet_name':
@@ -187,7 +179,7 @@ class TimeSeriesRegion(object):
                 logging.warn("Unknown metadata source %s", mdspec['source'])
         return metadata
 
-    def parse_tsr_metadata(self,metadata,data,tsidx):
+    def parse_tsr_metadata(self, metadata, data, tsidx):
         mds = self.metadata_spec
         md_modes = {}
         for md_name in mds:
@@ -206,7 +198,7 @@ class TimeSeriesRegion(object):
                 md_modes[mds[md_name]['mode']] = True
         return md_modes
 
-    def parse_inline_tsr_metadata(self,metadata,data,dataidx):
+    def parse_inline_tsr_metadata(self, metadata, data, dataidx):
         mds = self.metadata_spec
         for md_name in mds:
             if mds[md_name]['mode'] == 'inline':
@@ -215,7 +207,6 @@ class TimeSeriesRegion(object):
                     coords = self.orient_coords(idx, dataidx)
                     md_vals.append(str(data[coords]))
                 metadata[md_name] = " ".join(md_vals)
-
 
     def orient_coords(self, tsidx, dataidx):
         if self.orientation == 'row':
@@ -258,11 +249,12 @@ class TimeSeriesRegion(object):
                     else:
                         raise ie
 
-                if type(self.data_range.curr_component()) is LocationRangeInfiniteIntervalComponent and self.is_blank(time_label):
+                if type(self.data_range.curr_component()) is LocationRangeInfiniteIntervalComponent and self.is_blank(
+                        time_label):
                     logging.error("blank cell in infinite interval")
                     break
 
-                # if inline metadata has changed (in auto-detect mode)
+                    # if inline metadata has changed (in auto-detect mode)
                     # merge previous metadata
                     # output old time series
                     # re-initialize time series array
@@ -292,12 +284,13 @@ class TimeSeriesRegion(object):
                         inline_md_curr = {}
 
                 coords = self.orient_coords(ts_idx, d_idx)
-                timeseries.append((time_label,data[coords[0],coords[1]]))
+                timeseries.append((time_label, data[coords[0], coords[1]]))
 
             self.time_series.append(dict(metadata=ts_metadata, ts=timeseries))
 
     def is_blank(self, data):
         return len(data.strip()) == 0
+
 
 class SpreadsheetAnnotation(object):
     def __init__(self, annotation):
@@ -380,8 +373,8 @@ class SpreadsheetAnnotation(object):
 
         return md_dict
 
-class ExtractSpreadsheet(object):
 
+class ExtractSpreadsheet(object):
     def __init__(self, spreadsheet_fn, annotations_fn):
         self.book = pyexcel.get_book(file_name=spreadsheet_fn, auto_detect_datetime=False)
         self.annotations = self.load_annotations(annotations_fn)
@@ -396,17 +389,18 @@ class ExtractSpreadsheet(object):
                 for tsr in ssa.timeseries_regions:
                     for parsed_tsr in tsr.parse(data):
                         parsed.append(parsed_tsr)
-                logging.debug("%s",parsed)
+                logging.debug("%s", parsed)
             timeseries.append(parsed)
         return timeseries
 
-    def load_annotations(self,annotations_fn):
+    def load_annotations(self, annotations_fn):
         anfile = open(annotations_fn)
         annotations_decoded = demjson.decode(anfile.read(), return_errors=True)
         for msg in annotations_decoded[1]:
             if msg.severity == "error":
                 logging.error(msg.pretty_description())
         return annotations_decoded[0]
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -416,7 +410,8 @@ def main():
     args = ap.parse_args()
     es = ExtractSpreadsheet(args.spreadsheet, args.annotation)
     timeseries = es.process()
-    demjson.encode_to_file(args.outfile,timeseries,overwrite=True)
+    demjson.encode_to_file(args.outfile, timeseries, overwrite=True)
+
 
 if __name__ == "__main__":
     main()
