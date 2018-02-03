@@ -7,8 +7,8 @@
 		[
 			{
 				"orientation": "row",
-				"rows": "[5:*]",
-				"locs": "[J:*]",
+				"rows": "[5:41]",
+				"locs": "[J:S]",
 				"metadata": [
 					{
 						"source": "col",
