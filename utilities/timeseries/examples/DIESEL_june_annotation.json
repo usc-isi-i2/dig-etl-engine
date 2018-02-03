@@ -1,34 +1,38 @@
 [
 	{
+		"Properties": {
+			"sheet_indices": "[1]"			
+		},
 		"TimeSeriesRegions":
 		[
 			{
 				"orientation": "row",
-				"rows": "[5:41]",
-				"locs": "[J:S]",
+				"rows": "[5:*]",
+				"locs": "[J:*]",
 				"metadata": [
 					{
-						"orientation": "col",
-						"loc": "A",
+						"source": "col",
+						"loc": "[A]",
 						"name": "location"
 					},
 					{
-						"orientation": "col",
-						"loc": "T",
+						"source": "col",
+						"loc": "[T]",
 						"name": "yearly_change"
 					},
 					{
-						"orientation": "col",
-						"loc": "U",
+						"source": "col",
+						"loc": "[U]",
 						"name": "monthly_change"
 					}										
 				],
 				"times": {
-					"locs": [4]
+					"locs": "[4]",
+					"granularity": "monthly"
 				}
 			}
 		],
-		"Metadata":
+		"GlobalMetadata":
 		[
 			{
 				"source": "cell",
