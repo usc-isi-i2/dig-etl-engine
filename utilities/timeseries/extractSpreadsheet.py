@@ -14,7 +14,7 @@ import copy
 import LocationRange as lr
 import LocationParser as lp
 
-logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.WARN)
 
 
 class TimeSeriesRegion(object):
@@ -34,6 +34,15 @@ class TimeSeriesRegion(object):
         metadata = self.parse_global_metadata(data)
         self.parse_ts(data, metadata)
         return self.time_series
+
+    def data_to_string(self, data):
+        if type(data) is unicode:
+            return data
+        if type(data) is str:
+            return unicode(data, errors='replace')
+        else:
+            return unicode(str(data), errors='replace')
+
 
     def parse_global_metadata(self,data):
         metadata = {}
@@ -65,7 +74,7 @@ class TimeSeriesRegion(object):
                     md_vals = []
                     for idx in mds[md_name]['loc']:
                         coords = self.orient_coords(tsidx, idx)
-                        val = unicode(data[coords], errors='replace')
+                        val = self.data_to_string(data[coords])
                         md_vals.append(val)
                         if not self.is_blank(val):
                             all_blank = False
@@ -83,7 +92,7 @@ class TimeSeriesRegion(object):
                 md_vals = []
                 for idx in mds[md_name]['loc']:
                     coords = self.orient_coords(idx, dataidx)
-                    md_vals.append(unicode(data[coords], errors='replace'))
+                    md_vals.append(self.data_to_string(data[coords]))
                 metadata[md_name] = " ".join(md_vals)
 
     def orient_coords(self, tsidx, dataidx):
@@ -96,12 +105,12 @@ class TimeSeriesRegion(object):
         time_labels = []
         for tc in self.time_coordinates['locs']:
             coords = self.orient_coords(tc, d_idx)
-            val = unicode(data[coords[0], coords[1]], errors='replace')
+            val = self.data_to_string(data[coords[0], coords[1]])
             if self.is_blank(val) and self.time_coordinates['mode'] == 'backfill':
                 t_idx = d_idx - 1
                 while t_idx > 0 and self.is_blank(val):
                     coords = self.orient_coords(tc, t_idx)
-                    val = unicode(data[coords[0], coords[1]], errors='replace')
+                    val = self.data_to_string(data[coords[0], coords[1]])
                     t_idx -= 1
             time_labels.append(val)
         time_label = " ".join(time_labels)
