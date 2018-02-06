@@ -62,7 +62,9 @@ class LocationParser(object):
 
     def translate_col_label(self, col_label):
         cl = col_label
-        if len(cl) == 2:
+        if len(cl) == 3:
+            return 26 * 26 * (ord(cl[0]) - ord('A') + 1) + 26 * (ord(cl[1]) - ord('A') + 1) + (ord(cl[2]) - ord('A') + 1)
+        elif len(cl) == 2:
             return 26 * (ord(cl[0]) - ord('A') + 1) + (ord(cl[1]) - ord('A') + 1)
         elif len(cl) == 1:
             return ord(cl[0]) - ord('A') + 1
