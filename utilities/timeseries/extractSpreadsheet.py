@@ -14,7 +14,7 @@ import copy
 import LocationRange as lr
 import LocationParser as lp
 
-logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.WARN)
 
 
 class TimeSeriesRegion(object):
