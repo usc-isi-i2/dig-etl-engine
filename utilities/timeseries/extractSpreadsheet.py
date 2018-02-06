@@ -65,8 +65,9 @@ class TimeSeriesRegion(object):
                     md_vals = []
                     for idx in mds[md_name]['loc']:
                         coords = self.orient_coords(tsidx, idx)
-                        md_vals.append(unicode(data[coords], errors='replace'))
-                        if not self.is_blank(unicode(data[coords], errors='replace')):
+                        val = unicode(data[coords], errors='replace')
+                        md_vals.append(val)
+                        if not self.is_blank(val):
                             all_blank = False
                     metadata[md_name] = " ".join(md_vals)
             else:
