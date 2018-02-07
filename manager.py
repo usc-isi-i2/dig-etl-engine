@@ -74,6 +74,32 @@ def run_etk():
         with open(config_path, 'r') as f:
             project_config = json.loads(f.read())
 
+    kill_and_clean_up_queue(args, project_config)
+
+    run_etk_processes(args['project_name'], args['number_of_workers'], project_config)
+    return jsonify({}), 202
+
+
+@app.route('/kill_etk', methods=['POST'])
+def kill_etk():
+
+    args = request.get_json(force=True)
+    if 'project_name' not in args:
+        return jsonify({'error_message': 'invalid project_name'}), 400
+
+    config_path = os.path.join(config['projects_path'], args['project_name'], 'working_dir/etl_config.json')
+    project_config = {}
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            project_config = json.loads(f.read())
+
+    kill_and_clean_up_queue(args, project_config)
+
+    return jsonify({}), 202
+
+
+def kill_and_clean_up_queue(args, project_config):
+
     kill_etk_process(args['project_name'], True)
 
     # reset input offset in `dig` group
@@ -86,18 +112,6 @@ def run_etk():
         output_partitions = project_config.get('output_partitions', config['output_partitions'])
         seek_to_topic_end(args['project_name'] + '_out', output_partitions,
                           config['output_server'])
-
-    run_etk_processes(args['project_name'], args['number_of_workers'], project_config)
-    return jsonify({}), 202
-
-
-@app.route('/kill_etk', methods=['POST'])
-def kill_etk():
-    args = request.get_json(force=True)
-    if 'project_name' not in args:
-        return jsonify({'error_message': 'invalid project_name'}), 400
-    kill_etk_process(args['project_name'], True)
-    return jsonify({}), 201
 
 # @app.route('/delete_topics', methods=['POST'])
 # def delete_topics():

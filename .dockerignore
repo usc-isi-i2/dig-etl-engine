@@ -2,9 +2,9 @@
 *.out
 *.err
 *.zip
-.git
 .idea
 .DS_Store
 *.test
 *.log
 .env
+utilities/*

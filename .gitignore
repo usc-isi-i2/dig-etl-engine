@@ -82,6 +82,7 @@ celerybeat-schedule
 # dotenv
 .env
 .env.dev
+.engine.status
 
 # virtualenv
 .venv
@@ -102,3 +103,8 @@ ENV/
 .mypy_cache/
 
 .idea/*
+utilities/data_import/.idea
+
+# .DS_Store
+**/.DS_Store
+

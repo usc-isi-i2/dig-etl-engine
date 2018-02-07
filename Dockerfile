@@ -1,5 +1,7 @@
-# mydig-webservice
-FROM uscisii2/etk:1.0.7-dev1
+ARG ETK_VERSION
+
+# dig-etl-engine
+FROM uscisii2/etk:${ETK_VERSION}
 
 # all packages and environments are in /app
 WORKDIR /app

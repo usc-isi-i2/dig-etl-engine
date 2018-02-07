@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  nginx:
+    volumes:
+      - ./nginx/sandbox/conf.d/kafka_manager.addon:/etc/nginx/conf.d/kafka_manager.addon
+    depends_on:
+      - kafka_manager
+
+  kafka_manager:
+    image: sheepkiller/kafka-manager
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      KM_CONFIGFILE: "/opt/application.conf"
+    volumes:
+      - ./kafka_manager/sandbox/conf/application.conf:/opt/application.conf
+  #    ports:
+  #      - "9000:9000"
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - dig_net
+
+  mydig_ws:
+    environment:
+      ADDON_KAFKA_MANAGER: "true"

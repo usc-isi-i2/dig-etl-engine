@@ -27,6 +27,9 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
     # will exit once timeout
     try:
         for msg in consumer:
+            # force to commit, block till getting response
+            consumer.commit()
+
             cdr = msg.value
             cdr['@execution_profile'] = {'@worker_id': worker_id}
             doc_arrived_time = time.time()

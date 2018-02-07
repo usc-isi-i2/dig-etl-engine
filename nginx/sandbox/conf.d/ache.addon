@@ -1,0 +1,7 @@
+# ACHE
+location /ache/ {
+    proxy_set_header X-NginX-Proxy true;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $http_host;
+    proxy_pass http://ache:8080/;
+}

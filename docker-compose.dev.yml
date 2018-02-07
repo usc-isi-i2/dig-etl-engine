@@ -12,3 +12,7 @@ services:
       - ${MYDIG_DIR_PATH}:/app/mydig-webservice
       - ${ETK_DIR_PATH}:/app/etk
 #      - ${SPACY_DIR_PATH}:/app/spacy-ui
+
+  rss_feed_crawler:
+    volumes:
+      - ${RSS_DIR_PATH}:/app

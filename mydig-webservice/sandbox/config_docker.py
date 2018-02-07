@@ -60,7 +60,7 @@ config = {
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'landmark_url': 'http://{}:{}/landmark/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),  # add slash at the end
-        'digui_url': 'http://{}:{}/search.html'.format(
+        'digui_url': 'http://{}:{}/dig-ui/search.html'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'kibana_url': 'http://{}:{}/kibana/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
@@ -72,9 +72,12 @@ config = {
             os.getenv('DIG_AUTH_USER', 'admin'), os.getenv('DIG_AUTH_PASSWORD', '123')))
     },
     'landmark': {
-        'url': 'http://landmark-rest:5000/project/create_from_dig/{project_name}'
+        'create': 'http://landmark-rest:5000/project/create_from_dig/{project_name}',
+        'export': 'http://landmark-rest:5000/project/export/{project_name}',
+        'import': 'http://landmark-rest:5000/project/import/{project_name}'
     },
     'ache': {
+        'enable': len(os.getenv('ADDON_ACHE', '')) != 0,
         'kafka_topic': 'ache',
         'group_id': 'mydig',
         'upload': {
@@ -83,6 +86,15 @@ config = {
             # send to endpoint when get more than max_size or max_wait_time
             # 'max_size': 10, # 10 docs
             # 'max_wait_time': 10 * 1000, # 10s, float('inf')
+        }
+    },
+    'rss_feed_crawler': {
+        'enable': len(os.getenv('ADDON_RSS_FEED_CRAWLER', '')) != 0,
+        'kafka_topic': 'rss',
+        'group_id': 'mydig',
+        'upload': {
+            'endpoint': 'http://mydig_ws:9879/projects/{project_name}/data?sync=true&log=false',
+            'file_name': 'rss'
         }
     },
     'data_pushing_worker_backoff_time': 5,
