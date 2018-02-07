@@ -127,9 +127,10 @@ class TimeSeriesRegion(object):
                 md_modes = self.parse_tsr_metadata(ts_metadata, data, ts_idx)
             except IndexError as ie:
                 if type(self.series_range.curr_component()) is lr.LocationRangeInfiniteIntervalComponent:
-                    logging.error("all blank metadata cells in infinite interval")
+                    logging.info("all blank metadata cells in infinite interval")
                     break
                 else:
+                    logging.error("metadata specifcation indexing error for time series index {}".format(ts_idx))
                     raise ie
 
             inline_md_curr = {}
@@ -143,10 +144,11 @@ class TimeSeriesRegion(object):
                     if type(self.data_range.curr_component()) is lr.LocationRangeInfiniteIntervalComponent:
                         break
                     else:
+                        logging.error("metadata specifcation indexing error for data point index {}".format(d_idx))
                         raise ie
 
                 if type(self.data_range.curr_component()) is lr.LocationRangeInfiniteIntervalComponent and self.is_blank(time_label):
-                    logging.error("blank cell in infinite interval")
+                    logging.info("blank cell in infinite interval")
                     break
 
                 # if inline metadata has changed (in auto-detect mode)
