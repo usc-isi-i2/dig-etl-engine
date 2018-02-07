@@ -227,7 +227,7 @@ class TabularImport(object):
             if self.remove_blank_fields:
                 for k in ob.keys():
                     val = ob[k]
-                    if val:
+                    if val is not None:
                         if isinstance(val, basestring) and val.strip() == '':
                             ob.pop(k)
                     else:
@@ -304,7 +304,7 @@ class TabularImport(object):
         for m in re.finditer(r'\{([^\}]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
-            if value:
+            if value is not None:
                 if not isinstance(value, basestring):
                     value = str(value)
             else:
