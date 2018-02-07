@@ -47,19 +47,24 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                 # run core
                 result = etk_core.process(cdr, create_knowledge_graph=True)
                 if not result:
-                    raise Exception('run core error')
+                    print 'run core error'
+                else:
+                    cdr = result
 
                 # indexing
                 if indexing:
-                    result = index_knowledge_graph_fields(result)
-                cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
+                    result = index_knowledge_graph_fields(cdr)
                 if not result:
-                    raise Exception('indexing in sandpaper failed')
+                    print 'indexing in sandpaper failed'
+                else:
+                    cdr = result
+                cdr['@execution_profile']['@run_core_time'] = float(time.time() - start_run_core_time)
 
                 # nested docs
-                if 'nested_docs' in result:
+                if 'nested_docs' in cdr:
                     print 'detected nested_docs'
-                    for nested_cdr in result['nested_docs']:
+                    for nested_cdr in cdr['nested_docs']:
+                        print 'processing nested_docs', nested_cdr['doc_id']
                         nested_cdr['@execution_profile'] = {
                             '@worker_id': cdr['@execution_profile']['@worker_id'],
                             '@doc_arrived_time': cdr['@execution_profile']['@doc_arrived_time'],
@@ -68,30 +73,42 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                         }
 
                         nested_start_run_core_time = time.time()
+                        # fill tld by parent tld
+                        nested_cdr['tld'] = cdr['tld']
+
                         # run core
                         nested_result = etk_core.process(nested_cdr, create_knowledge_graph=True)
                         if not nested_result:
-                            print 'run core error in nested doc {}'.format(nested_result['doc_id'])
+                            print 'run core error in nested doc {}'.format(nested_cdr['doc_id'])
+                            continue
+                        else:
+                            nested_cdr = nested_result
 
                         # indexing
                         if indexing:
-                            nested_result = index_knowledge_graph_fields(nested_result)
+                            nested_result = index_knowledge_graph_fields(nested_cdr)
+                        if not nested_result:
+                            print 'indexing error in nested doc {}'.format(nested_cdr['doc_id'])
+                            continue
+                        else:
+                            nested_cdr = nested_result
+
                         nested_cdr['@execution_profile']['@run_core_time'] = \
                             float(time.time() - nested_start_run_core_time)
 
                         nested_doc_sent_time = time.time()
                         nested_cdr['@execution_profile']['@doc_sent_time'] = \
                             datetime.utcfromtimestamp(nested_doc_sent_time).isoformat()
-                        cdr['@execution_profile']['@doc_processed_time'] = \
+                        nested_cdr['@execution_profile']['@doc_processed_time'] = \
                             float(nested_doc_sent_time - doc_arrived_time) # use its parent's doc_arrived_time
                         if nested_result:
-                            r = producer.send(producer_topic, nested_result)
+                            r = producer.send(producer_topic, nested_cdr)
                             r.get(timeout=60)  # wait till sent
                         else:
-                            etk_core.log('fail to indexing nested doc {}'.format(nested_result['doc_id']), core._ERROR)
+                            etk_core.log('fail to indexing nested doc {}'.format(nested_cdr['doc_id']), core._ERROR)
 
                     # remove nested_docs from original result
-                    del result['nested_docs']
+                    del cdr['nested_docs']
 
                 doc_sent_time = time.time()
                 cdr['@execution_profile']['@doc_sent_time'] = datetime.utcfromtimestamp(doc_sent_time).isoformat()
@@ -99,7 +116,7 @@ def run_serial_cdrs(etk_core, consumer, producer, producer_topic, indexing=False
                 cdr['@execution_profile']['@doc_processed_time'] = float(doc_sent_time - doc_arrived_time)
                 # dumping result
                 if result:
-                    r = producer.send(producer_topic, result)
+                    r = producer.send(producer_topic, cdr)
                     r.get(timeout=60)  # wait till sent
                 else:
                     etk_core.log('fail to indexing doc {}'.format(cdr['doc_id']), core._ERROR)
