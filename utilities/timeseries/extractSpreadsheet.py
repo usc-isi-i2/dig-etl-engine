@@ -81,7 +81,7 @@ class TimeSeriesRegion(object):
                     metadata[md_name] = " ".join(md_vals)
             else:
                 md_modes[mds[md_name]['mode']] = True
-        if all_blank:
+        if all_blank and not md_modes["inline"]:
             raise IndexError("All metadata values blank")
         return md_modes
 
@@ -167,6 +167,7 @@ class TimeSeriesRegion(object):
                             new_metadata = dict(ts_metadata)
                             for md_name in inline_md_prev:
                                 new_metadata[md_name] = inline_md_prev[md_name]
+
                             self.time_series.append({
                                 'metadata': new_metadata,
                                 'ts': timeseries
