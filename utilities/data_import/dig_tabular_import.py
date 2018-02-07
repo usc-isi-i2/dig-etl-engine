@@ -109,7 +109,13 @@ class TabularImport(object):
 
         fn, extention = os.path.splitext(filename)
         print "extension", extention, fn
-        if extention in (".csv", ".tsv"):
+        #converting .tab file extention to .tsv file extension
+        if extention in (".tab"):
+            new_filename = filename.replace('.tab', '.tsv')
+            os.rename(filename, new_filename)
+            filename=new_filename
+            extention= '.tsv'
+        if extention in (".csv", ".tsv",".tab"):
             get_data = pyexcel_io.get_data
         elif extention == ".xls":
             get_data = pyexcel_xlsx.get_data
