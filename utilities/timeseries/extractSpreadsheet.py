@@ -66,7 +66,7 @@ class TimeSeriesRegion(object):
             if mds[md_name]['mode'] == 'normal':
                 if mds[md_name]['source'] == 'cell':
                     metadata[md_name] = data[(mds[md_name]['loc'][0], mds[md_name]['loc'][1])]
-                    if not self.is_blank(metadata[md_modes]):
+                    if not self.is_blank(metadata[md_name]):
                         all_blank = False
                 elif mds[md_name]['source'] == 'const':
                     metadata[md_name] = mds[md_name]['val']
