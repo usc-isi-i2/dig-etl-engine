@@ -7,7 +7,8 @@ import pyexcel_io
 import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
-
+import datetime
+import dateutil.parser as parser
 
 class Guard(object):
     """
@@ -197,6 +198,10 @@ class TabularImport(object):
                 decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
         for ob in self.object_list:
+            for k in ob:
+                if isinstance(ob[k], datetime.date):
+                    ob[k] = ob[k].isoformat()
+
             if self.remove_fields is not None:
                 for remove_field in self.remove_fields:
                     del ob[remove_field]
@@ -227,7 +232,7 @@ class TabularImport(object):
             if self.remove_blank_fields:
                 for k in ob.keys():
                     val = ob[k]
-                    if val:
+                    if val is not None:
                         if isinstance(val, basestring) and val.strip() == '':
                             ob.pop(k)
                     else:
@@ -304,7 +309,7 @@ class TabularImport(object):
         for m in re.finditer(r'\{([^\}]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
-            if value:
+            if value is not None:
                 if not isinstance(value, basestring):
                     value = str(value)
             else:
