@@ -102,6 +102,11 @@ class TabularImport(object):
             self.remove_fields = mapping_spec.get("remove_fields")
         else:
             self.remove_fields = None
+        if mapping_spec.get("sheet_number") is not None:
+            self.sheet_number = mapping_spec.get("sheet_number") - 1
+        else:
+            self.sheet_number = 0
+        
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
@@ -133,7 +138,8 @@ class TabularImport(object):
                 data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
             except:
                 data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
-        data = data.values().pop(0)
+        
+        data = data.values().pop(self.sheet_number)
         # print data
         # find a heading part
         if self.heading_colums is None:
