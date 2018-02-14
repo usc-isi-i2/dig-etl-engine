@@ -2,7 +2,7 @@ version: '3'
 
 services:
   rss_feed_crawler:
-    image: uscisii2/rss-feed-crawler:0.1.4
+    image: uscisii2/rss-feed-crawler:0.1.5
     volumes:
       - ./rss_feed_crawler/sandbox/config.py:/app/config.py
       - ./rss_feed_crawler/sandbox/latest_feed_state.json:/app/latest_feed_state.json
