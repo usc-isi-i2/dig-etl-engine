@@ -8,7 +8,8 @@ import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
 from pyfastcopy import shutil
-
+import datetime
+import dateutil.parser as parser
 
 class Guard(object):
     """
@@ -65,7 +66,7 @@ class TabularImport(object):
             content_end_row (int): the index of content end row
             blank_row_ends_content (int): the index of blank row ends content
         """
-
+        self.decoding_dict_parsed_paths = dict()
         if mapping_spec.get("heading_row") is not None:
             self.heading_row = mapping_spec.get("heading_row") - 1
         if mapping_spec.get("heading_row") is None:
@@ -97,6 +98,16 @@ class TabularImport(object):
         self.remove_blank_fields = mapping_spec.get("remove_blank_fields")
         if self.remove_blank_fields is None:
             self.remove_blank_fields = True
+
+        if mapping_spec.get("remove_fields") is not None:
+            self.remove_fields = mapping_spec.get("remove_fields")
+        else:
+            self.remove_fields = None
+        if mapping_spec.get("sheet_number") is not None:
+            self.sheet_number = mapping_spec.get("sheet_number") - 1
+        else:
+            self.sheet_number = 0
+
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
@@ -126,22 +137,21 @@ class TabularImport(object):
         else:
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
-        print filename
 
 
         try:
-            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8")
+            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig")
+
         except:
             try:
                 data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1")
             except:
-                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig")
-        data = data.values().pop(0)
-
-        # delete the tmp file create for .tab
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8")
+                # delete the tmp file create for .tab
         if os.path.splitext(filename)[1] == '.tab':
             os.remove(fileToProcess)
-            
+        data = data.values().pop(self.sheet_number)
+        # print data
         # find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
@@ -204,8 +214,14 @@ class TabularImport(object):
                 # default action can be `preserve` or `delete`, default = `preserve`
                 decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
-
         for ob in self.object_list:
+            for k in ob:
+                if isinstance(ob[k], datetime.date):
+                    ob[k] = ob[k].isoformat()
+
+            if self.remove_fields is not None:
+                for remove_field in self.remove_fields:
+                    del ob[remove_field]
             ob['dataset_identifier'] = self.prefix
             ob["raw_content"] = "<html><pre>" + json.dumps(ob, sort_keys=True, indent=2) + "</pre></html>"
             ob["disable_default_extractors"] = "yes"
@@ -233,7 +249,7 @@ class TabularImport(object):
             if self.remove_blank_fields:
                 for k in ob.keys():
                     val = ob[k]
-                    if val:
+                    if val is not None:
                         if isinstance(val, basestring) and val.strip() == '':
                             ob.pop(k)
                     else:
@@ -242,17 +258,22 @@ class TabularImport(object):
     def decode_cell_values(self, decoding_dict, ob):
         # decode the values if there is anything to decode
         for k in decoding_dict.keys():
-            # {'B 1': {'default_action': 'preserve', 'decoding_dict': {'is': 'are'}}}
-            parsed_k = parse(k)
+            if k not in self.decoding_dict_parsed_paths:
+                self.decoding_dict_parsed_paths[k] = parse(k)
+            parsed_k = self.decoding_dict_parsed_paths[k]
             matches = parsed_k.find(ob)
+
             if matches:
                 # should only have one "match"
                 match = matches[0]
                 value = match.value
+
                 str_path = str(match.path)
                 if not isinstance(value, basestring):
                     value = str(value)
                 if value in decoding_dict[k]['decoding_dict']:
+                    # print "decoding"
+                    # print value, decoding_dict[k]['decoding_dict'][value]
                     ob[str_path] = decoding_dict[k]['decoding_dict'][value]
                 else:
                     # no decoding dict defined for this value, do the default_action
@@ -301,10 +322,11 @@ class TabularImport(object):
 
         """
         result = template
-        for m in re.finditer(r'\{([\w ]+)\}', template):
+
+        for m in re.finditer(r'\{([^\}]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
-            if value:
+            if value is not None:
                 if not isinstance(value, basestring):
                     value = str(value)
             else:
