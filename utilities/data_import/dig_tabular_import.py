@@ -7,6 +7,7 @@ import pyexcel_io
 import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
+from pyfastcopy import shutil
 
 
 class Guard(object):
@@ -107,8 +108,15 @@ class TabularImport(object):
             for guard in guards:
                 self.guards.append(Guard(guard))
 
+        # preprocessing for .tab file
         fn, extention = os.path.splitext(filename)
-        print "extension", extention, fn
+        fileToProcess = filename
+        if extention in (".tab"):
+            # create a copy of file and rename it to .tsv to fetch data
+            shutil.copyfile(filename, fn + '.tsv')
+            fileToProcess = fn + '.tsv'
+            extention = '.tsv'
+
         if extention in (".csv", ".tsv"):
             get_data = pyexcel_io.get_data
         elif extention == ".xls":
@@ -122,14 +130,18 @@ class TabularImport(object):
 
 
         try:
-            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
+            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8")
         except:
             try:
-                data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1")
             except:
-                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig")
         data = data.values().pop(0)
 
+        # delete the tmp file create for .tab
+        if os.path.splitext(filename)[1] == '.tab':
+            os.remove(fileToProcess)
+            
         # find a heading part
         if self.heading_colums is None:
             keys = data[self.heading_row]
