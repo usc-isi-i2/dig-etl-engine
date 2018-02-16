@@ -157,7 +157,7 @@ class ProcessTimeSeries():
                 if ts_measure_transfer and isinstance(ts_measure_transfer, dict) and 'measure' in obj:
                     meta = obj['measure']['metadata']
                     for k, v in ts_measure_transfer.items():
-                        obj[k] = v.format(**meta)
+                        obj['measure']['metadata'][k] = v.format(**meta)
                 fp.write(json.dumps(obj, cls=DecimalJSONEncoder))
                 fp.write('\n')
 
