@@ -150,10 +150,14 @@ class ProcessTimeSeries():
                 logging.error(msg.pretty_description())
         return json_decoded[0]
 
-    def write_result_to_file(self, output_fn, output):
+    def write_result_to_file(self, output_fn, output, ts_measure_transfer=None):
 
         with open(output_fn, 'w') as fp:
             for obj in output:
+                if ts_measure_transfer and isinstance(ts_measure_transfer, dict) and 'measure' in obj:
+                    meta = obj['measure']['metadata']
+                    for k, v in ts_measure_transfer.items():
+                        obj['measure']['metadata'][k] = v.format(**meta)
                 fp.write(json.dumps(obj, cls=DecimalJSONEncoder))
                 fp.write('\n')
 

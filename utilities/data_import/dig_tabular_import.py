@@ -7,7 +7,9 @@ import pyexcel_io
 import pyexcel_xlsx
 from jsonpath_rw import parse
 from optparse import OptionParser
-
+from pyfastcopy import shutil
+import datetime
+import dateutil.parser as parser
 
 class Guard(object):
     """
@@ -101,6 +103,11 @@ class TabularImport(object):
             self.remove_fields = mapping_spec.get("remove_fields")
         else:
             self.remove_fields = None
+        if mapping_spec.get("sheet_number") is not None:
+            self.sheet_number = mapping_spec.get("sheet_number") - 1
+        else:
+            self.sheet_number = 0
+
         self.nested_configs = mapping_spec.get("nested_configs")
         self.object_list = list()
         self.config = mapping_spec.get("config")
@@ -112,7 +119,15 @@ class TabularImport(object):
             for guard in guards:
                 self.guards.append(Guard(guard))
 
+        # preprocessing for .tab file
         fn, extention = os.path.splitext(filename)
+        fileToProcess = filename
+        if extention in (".tab"):
+            # create a copy of file and rename it to .tsv to fetch data
+            shutil.copyfile(filename, fn + '.tsv')
+            fileToProcess = fn + '.tsv'
+            extention = '.tsv'
+
         if extention in (".csv", ".tsv"):
             get_data = pyexcel_io.get_data
         elif extention == ".xls":
@@ -125,14 +140,17 @@ class TabularImport(object):
 
 
         try:
-            data = get_data(filename, auto_detect_datetime=False, encoding="utf-8-sig")
+            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig")
 
         except:
             try:
-                data = get_data(filename, auto_detect_datetime=False, encoding="latin_1")
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1")
             except:
-                data = get_data(filename, auto_detect_datetime=False, encoding="utf-8")
-        data = data.values().pop(0)
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8")
+                # delete the tmp file create for .tab
+        if os.path.splitext(filename)[1] == '.tab':
+            os.remove(fileToProcess)
+        data = data.values().pop(self.sheet_number)
         # print data
         # find a heading part
         if self.heading_colums is None:
@@ -197,6 +215,10 @@ class TabularImport(object):
                 decoding_dict[rule['path']]['default_action'] = rule['decoding_dict'][
                     'default_action'] if 'default_action' in rule['decoding_dict'] else 'preserve'
         for ob in self.object_list:
+            for k in ob:
+                if isinstance(ob[k], datetime.date):
+                    ob[k] = ob[k].isoformat()
+
             if self.remove_fields is not None:
                 for remove_field in self.remove_fields:
                     del ob[remove_field]
@@ -227,7 +249,7 @@ class TabularImport(object):
             if self.remove_blank_fields:
                 for k in ob.keys():
                     val = ob[k]
-                    if val:
+                    if val is not None:
                         if isinstance(val, basestring) and val.strip() == '':
                             ob.pop(k)
                     else:
@@ -304,7 +326,7 @@ class TabularImport(object):
         for m in re.finditer(r'\{([^\}]+)\}', template):
             key = m.group(1)
             value = one_object.get(key)
-            if value:
+            if value is not None:
                 if not isinstance(value, basestring):
                     value = str(value)
             else:
