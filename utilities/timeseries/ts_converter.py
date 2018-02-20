@@ -42,7 +42,7 @@ class Measurement(object):
         dct["measurement"]['timeseries'] = self.timeseries_id
         dct["measurement"]['type'] = "Measurement"
         dct['doc_id'] = self.doc_id
-        dct['provenance_filename'] = self.filename
+        dct['measurement']['provenance_filename'] = self.filename
         return dct
 
 
@@ -62,7 +62,7 @@ class TimeSeries(object):
         dct["measure"]["metadata"] = self.meta_data
         dct["measure"]['type'] = "Measure"
         dct['doc_id'] = self.doc_id
-        dct['provenance_filename'] = dct['measure']['metadata']['provenance']['filename']
+        dct["measure"]['provenance_filename'] = dct['measure']['metadata']['provenance']['filename']
         return dct
 
 
@@ -141,7 +141,7 @@ class ProcessTimeSeries():
                 if processed_ts is not None:
                     ts_dict = ts.to_dict()
                     result.append(ts_dict)
-                    filename = ts_dict['provenance_filename']
+                    filename = ts_dict["measure"]['provenance_filename']
                     for ts_element in processed_ts:
                         measurement = Measurement(ts.doc_id, ts_element, filename)
                         result.append(measurement.to_dict())
