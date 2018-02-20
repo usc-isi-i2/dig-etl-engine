@@ -15,7 +15,7 @@ class DecimalJSONEncoder(json.JSONEncoder):
 
 
 class Measurement(object):
-    def __init__(self, timeseries_id, timeseries_element):
+    def __init__(self, timeseries_id, timeseries_element, filename):
         self.date = timeseries_element[0]
         if len(timeseries_element) <= 2:
             self.value = timeseries_element[1]
@@ -23,6 +23,7 @@ class Measurement(object):
             self.value = timeseries_element[1:]
         self.doc_id = self.get_doc_id(timeseries_element)
         self.timeseries_id = timeseries_id
+        self.filename = filename
 
     def get_doc_id(self, array):
         array_str = json.dumps(array, cls=DecimalJSONEncoder)
@@ -41,6 +42,7 @@ class Measurement(object):
         dct["measurement"]['timeseries'] = self.timeseries_id
         dct["measurement"]['type'] = "Measurement"
         dct['doc_id'] = self.doc_id
+        dct['provenance_filename'] = self.filename
         return dct
 
 
@@ -60,6 +62,7 @@ class TimeSeries(object):
         dct["measure"]["metadata"] = self.meta_data
         dct["measure"]['type'] = "Measure"
         dct['doc_id'] = self.doc_id
+        dct['provenance_filename'] = dct['measure']['metadata']['provenance']['filename']
         return dct
 
 
@@ -136,9 +139,11 @@ class ProcessTimeSeries():
                 ts = TimeSeries(timeseries['metadata'])
                 processed_ts = self.impute_values(timeseries['ts'], 0.8)
                 if processed_ts is not None:
-                    result.append(ts.to_dict())
+                    ts_dict = ts.to_dict()
+                    result.append(ts_dict)
+                    filename = ts_dict['provenance_filename']
                     for ts_element in processed_ts:
-                        measurement = Measurement(ts.doc_id, ts_element)
+                        measurement = Measurement(ts.doc_id, ts_element, filename)
                         result.append(measurement.to_dict())
         return result
 
