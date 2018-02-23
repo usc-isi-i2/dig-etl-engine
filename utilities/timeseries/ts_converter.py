@@ -176,9 +176,11 @@ class ProcessTimeSeries():
                         result.append(measurement.to_dict())
                     # trend
                     if 'ts_description' in timeseries:
-                        for trend_element in timeseries['ts_description']['linear fits']:
-                            trend = Trend(ts.doc_id, trend_element, filename)
-                            result.append(trend.to_dict())
+                        if 'linear fits' in timeseries['ts_description'] and \
+                            isinstance(['ts_description']['linear fits'], list):
+                            for trend_element in timeseries['ts_description']['linear fits']:
+                                trend = Trend(ts.doc_id, trend_element, filename)
+                                result.append(trend.to_dict())
 
         return result
 
