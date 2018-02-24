@@ -11,6 +11,7 @@ from pyfastcopy import shutil
 import datetime
 import dateutil.parser as parser
 
+
 class Guard(object):
     """
     Guards are used to test values in an object
@@ -138,15 +139,17 @@ class TabularImport(object):
             print "file extension can not read"
         # data = get_data(filename, auto_detect_datetime=False)
 
-
         try:
-            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig")
+            data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8-sig", auto_detect_int=False,
+                            auto_detect_float=False)
 
         except:
             try:
-                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1")
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1", auto_detect_int=False,
+                                auto_detect_float=False)
             except:
-                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8")
+                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8", auto_detect_int=False,
+                                auto_detect_float=False)
                 # delete the tmp file create for .tab
         if os.path.splitext(filename)[1] == '.tab':
             os.remove(fileToProcess)
