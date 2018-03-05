@@ -114,6 +114,9 @@ class TimeSeriesRegion(object):
                     t_idx -= 1
             time_labels.append(val)
         time_label = " ".join(time_labels)
+        if self.time_coordinates['post_process']:
+            func = eval('lambda v: ' + self.time_coordinates['post_process'])
+            time_label = func(time_label)
         return time_label
 
     def parse_ts(self, data, metadata):
@@ -225,12 +228,15 @@ class SpreadsheetAnnotation(object):
             series_range = self.locparser.parse_range(tsr_json['cols'])
 
         data_range = self.locparser.parse_range(tsr_json['locs'])
+
         time_coords = {}
         time_coords['locs'] = self.locparser.parse_range(tsr_json['times']['locs'])
         if 'mode' in tsr_json['times']:
             time_coords['mode'] = tsr_json['times']['mode']
         else:
             time_coords['mode'] = None
+
+        time_coords['post_process'] = tsr_json['times'].get('post_process')
 
         mdspec = self.parse_tsr_metadata(tsr_json['metadata'], orientation)
 
