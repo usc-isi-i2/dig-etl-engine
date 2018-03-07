@@ -148,8 +148,12 @@ class TabularImport(object):
                 data = get_data(fileToProcess, auto_detect_datetime=False, encoding="latin_1", auto_detect_int=False,
                                 auto_detect_float=False)
             except:
-                data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8", auto_detect_int=False,
-                                auto_detect_float=False)
+                try:
+                    data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-8", auto_detect_int=False,
+                                    auto_detect_float=False)
+                except:
+                    data = get_data(fileToProcess, auto_detect_datetime=False, encoding="utf-16", auto_detect_int=False,
+                                    auto_detect_float=False)
                 # delete the tmp file create for .tab
         if os.path.splitext(filename)[1] == '.tab':
             os.remove(fileToProcess)
