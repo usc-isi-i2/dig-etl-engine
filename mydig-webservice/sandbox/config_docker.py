@@ -97,8 +97,17 @@ config = {
             'file_name': 'rss'
         }
     },
+    'external_crawler': {
+        'kafka_topic': 'crawler',
+        'group_id': 'mydig',
+        'upload': {
+            'endpoint': 'http://mydig_ws:9879/projects/{project_name}/data?sync=true&log=false',
+            'file_name': 'crawler'
+        },
+        'default_project': os.getenv('DEFAULT_EXTERNAL_CRAWLER_PROJECT', 'crawler')
+    },
     'data_pushing_worker_backoff_time': 5,
-    'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
+    'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana', 'crawler'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'

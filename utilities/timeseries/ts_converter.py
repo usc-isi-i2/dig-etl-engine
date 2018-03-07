@@ -5,6 +5,7 @@ import logging
 import hashlib
 import numbers
 import sys
+from dateutil import parser
 
 
 class DecimalJSONEncoder(json.JSONEncoder):
@@ -15,7 +16,7 @@ class DecimalJSONEncoder(json.JSONEncoder):
 
 
 class Measurement(object):
-    def __init__(self, timeseries_id, timeseries_element):
+    def __init__(self, timeseries_id, timeseries_element, filename):
         self.date = timeseries_element[0]
         if len(timeseries_element) <= 2:
             self.value = timeseries_element[1]
@@ -23,6 +24,7 @@ class Measurement(object):
             self.value = timeseries_element[1:]
         self.doc_id = self.get_doc_id(timeseries_element)
         self.timeseries_id = timeseries_id
+        self.filename = filename
 
     def get_doc_id(self, array):
         array_str = json.dumps(array, cls=DecimalJSONEncoder)
@@ -41,6 +43,29 @@ class Measurement(object):
         dct["measurement"]['timeseries'] = self.timeseries_id
         dct["measurement"]['type'] = "Measurement"
         dct['doc_id'] = self.doc_id
+        dct['measurement']['provenance_filename'] = self.filename
+        return dct
+
+
+class Trend(object):
+    def __init__(self, timeseries_id, trend_element, filename):
+        self.value = trend_element
+        self.doc_id = self.get_doc_id(trend_element)
+        self.timeseries_id = timeseries_id
+        self.filename = filename
+
+    def get_doc_id(self, array):
+        array_str = json.dumps(array, cls=DecimalJSONEncoder)
+        hash_object = hashlib.sha1(array_str)
+        return hash_object.hexdigest()
+
+    def to_dict(self):
+        dct = {}
+        dct['doc_id'] = self.doc_id
+        dct["trend"] = self.value
+        dct['trend']['provenance_filename'] = self.filename
+        dct["trend"]['timeseries'] = self.timeseries_id
+        dct["trend"]['type'] = "Trend"
         return dct
 
 
@@ -60,6 +85,7 @@ class TimeSeries(object):
         dct["measure"]["metadata"] = self.meta_data
         dct["measure"]['type'] = "Measure"
         dct['doc_id'] = self.doc_id
+        dct["measure"]['provenance_filename'] = dct['measure']['metadata']['provenance']['filename']
         return dct
 
 
@@ -136,11 +162,41 @@ class ProcessTimeSeries():
                 ts = TimeSeries(timeseries['metadata'])
                 processed_ts = self.impute_values(timeseries['ts'], 0.8)
                 if processed_ts is not None:
-                    result.append(ts.to_dict())
+                    ts_dict = ts.to_dict()
+                    start, end = self.get_temporal_region(processed_ts)
+                    ts_dict["measure"]["temporal_region"] = {
+                        'start_date_time': start,
+                        'end_date_time': end
+                    }
+                    result.append(ts_dict)
+                    filename = ts_dict["measure"]['provenance_filename']
+                    # measurement
                     for ts_element in processed_ts:
-                        measurement = Measurement(ts.doc_id, ts_element)
+                        measurement = Measurement(ts.doc_id, ts_element, filename)
                         result.append(measurement.to_dict())
+                    # trend
+                    if 'ts_description' in timeseries:
+                        try:
+                            for trend_element in timeseries['ts_description']['linear fits']:
+                                trend = Trend(ts.doc_id, trend_element, filename)
+                                result.append(trend.to_dict())
+                        except:
+                            pass
+
         return result
+
+    def get_temporal_region(self, ts_array):
+        max_dt, min_dt = None, None
+        for ts in ts_array:
+            dt = parser.parse(ts[0])
+            if not max_dt:
+                max_dt = dt
+            if not min_dt:
+                min_dt = dt
+            max_dt = max(max_dt, dt)
+            min_dt = min(min_dt, dt)
+        return min_dt.isoformat(), max_dt.isoformat()
+
 
     def load_json(self, json_fn):
         anfile = open(json_fn)
@@ -150,10 +206,14 @@ class ProcessTimeSeries():
                 logging.error(msg.pretty_description())
         return json_decoded[0]
 
-    def write_result_to_file(self, output_fn, output):
+    def write_result_to_file(self, output_fn, output, ts_measure_transfer=None):
 
         with open(output_fn, 'w') as fp:
             for obj in output:
+                if ts_measure_transfer and isinstance(ts_measure_transfer, dict) and 'measure' in obj:
+                    meta = obj['measure']['metadata']
+                    for k, v in ts_measure_transfer.items():
+                        obj['measure']['metadata'][k] = v.format(**meta)
                 fp.write(json.dumps(obj, cls=DecimalJSONEncoder))
                 fp.write('\n')
 

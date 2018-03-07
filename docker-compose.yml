@@ -55,7 +55,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "ache:1:1,rss:1:1"
+      KAFKA_CREATE_TOPICS: "ache:1:1,rss:1:1,crawler:1:1"
       KAFKA_HEAP_OPTS: "-Xmx${KAFKA_HEAP_SIZE:-256m} -Xms${KAFKA_HEAP_SIZE:-256m}"
       KAFKA_LOG_CLEANER_ENABLE: "true"
       KAFKA_LOG_CLEANUP_POLICY: delete
@@ -148,13 +148,14 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.1.5-dev21
+    image: uscisii2/mydig_ws:1.1.5-dev23
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
       NUM_ETK_PROCESSES: ${NUM_ETK_PROCESSES}
       DIG_AUTH_USER: ${DIG_AUTH_USER}
       DIG_AUTH_PASSWORD: ${DIG_AUTH_PASSWORD}
+      DEFAULT_EXTERNAL_CRAWLER_PROJECT: ${DEFAULT_EXTERNAL_CRAWLER_PROJECT:-crawler}
 #    ports:
 #      - "9879:9879"
 #      - "9880:9880"
@@ -170,7 +171,7 @@ services:
       - elasticsearch
 
   digui:
-    image: digmemex/digui:3.1.0
+    image: digmemex/digui:3.2.0
 #    ports:
 #      - "8080"
     volumes:
