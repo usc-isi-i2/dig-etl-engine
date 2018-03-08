@@ -129,7 +129,7 @@ class ProcessTimeSeries():
                 index += 1
         print total_str
 
-        if total*1.0/len(ts) >= threshold:
+        if total * 1.0 / len(ts) >= threshold:
             n_missing = len(missing_value_index)
             for i in range(n_missing):
                 index = missing_value_index[i]
@@ -140,7 +140,7 @@ class ProcessTimeSeries():
                         next += 1
                     ts[index] = [ts[index][0], ts[next][1]]
                 else:
-                    ts[index] = [ts[index][0], ts[index-1][1]]
+                    ts[index] = [ts[index][0], ts[index - 1][1]]
 
             return ts
 
@@ -149,11 +149,10 @@ class ProcessTimeSeries():
 
         else:
             for i in range(0, len(ts)):
-                value =  ts[i][1]
+                value = ts[i][1]
                 if value is not None:
                     ts[i] = [ts[i][0], str(value)]
             return ts
-            
 
     def processs(self, tables):
         result = []
@@ -163,11 +162,14 @@ class ProcessTimeSeries():
                 processed_ts = self.impute_values(timeseries['ts'], 0.8)
                 if processed_ts is not None:
                     ts_dict = ts.to_dict()
-                    start, end = self.get_temporal_region(processed_ts)
-                    ts_dict["measure"]["temporal_region"] = {
-                        'start_date_time': start,
-                        'end_date_time': end
-                    }
+                    try:
+                        start, end = self.get_temporal_region(processed_ts)
+                        ts_dict["measure"]["temporal_region"] = {
+                            'start_date_time': start,
+                            'end_date_time': end
+                        }
+                    except:
+                        pass
                     result.append(ts_dict)
                     filename = ts_dict["measure"]['provenance_filename']
                     # measurement
@@ -197,7 +199,6 @@ class ProcessTimeSeries():
             min_dt = min(min_dt, dt)
         return min_dt.isoformat(), max_dt.isoformat()
 
-
     def load_json(self, json_fn):
         anfile = open(json_fn)
         json_decoded = demjson.decode(anfile.read(), return_errors=True)
@@ -216,7 +217,6 @@ class ProcessTimeSeries():
                         obj['measure']['metadata'][k] = v.format(**meta)
                 fp.write(json.dumps(obj, cls=DecimalJSONEncoder))
                 fp.write('\n')
-
 
 
 def main():
