@@ -19,9 +19,10 @@ config = {
         }
     },
     'logging': {
-        'file_path': 'log.log',
-        'format': '%(asctime)s %(levelname)s %(message)s',
-        'level': logging.INFO
+        'file_path': '',
+        'format': '%(asctime)s [%(levelname)s] %(message)s',
+        'level': logging.INFO,
+        'werkzeug': logging.WARNING
     },
     'es': {
         # do not add / at the end
