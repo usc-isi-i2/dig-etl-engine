@@ -23,17 +23,17 @@ class Measurement(object):
             self.value = timeseries_element[1]
         else:
             self.value = timeseries_element[1:]
-        self.doc_id = self.get_doc_id(timeseries_element)
+        self.doc_id = self.get_doc_id(timeseries_element, timeseries_id)
         self.timeseries_id = timeseries_id
         self.filename = filename
 
-    def get_doc_id(self, array):
-        array_str = json.dumps(array, cls=DecimalJSONEncoder)
-        hash_object = hashlib.sha1(array_str)
+    def get_doc_id(self, array, timeseries_id):
+        array_str = '{} {}'.format(json.dumps(array, cls=DecimalJSONEncoder), timeseries_id)
+        hash_object = hashlib.sha256(array_str)
         return hash_object.hexdigest()
 
     def to_dict(self):
-        dct = {}
+        dct = dict()
         dct["measurement"] = {}
         dct["measurement"]['date'] = self.date
         if isinstance(self.value, numbers.Number):
@@ -89,7 +89,7 @@ class TimeSeries(object):
         return hash_object.hexdigest().upper()
 
     def to_dict(self):
-        dct = {}
+        dct = dict()
         dct["measure"] = {}
         dct["measure"]["metadata"] = self.meta_data
         dct["measure"]['type'] = "Measure"
@@ -136,13 +136,12 @@ class ProcessTimeSeries():
                     missing_value_index.append(index)
 
                 index += 1
-        print total_str
 
         if total * 1.0 / len(ts) >= threshold:
             n_missing = len(missing_value_index)
             for i in range(n_missing):
                 index = missing_value_index[i]
-                print index
+
                 if index == 0:
                     next = 1
                     while next < n_missing and next == missing_value_index[next]:
