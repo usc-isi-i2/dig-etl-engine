@@ -30,8 +30,8 @@ class TimeSeriesRegion(object):
         self.provenance = provenance
         self.time_series = []
 
-    def parse(self,data):
-        metadata = self.parse_global_metadata(data)
+    def parse(self,data, sheet_name):
+        metadata = self.parse_global_metadata(data, sheet_name)
         self.parse_ts(data, metadata)
         return self.time_series
 
@@ -44,13 +44,13 @@ class TimeSeriesRegion(object):
             return unicode(str(data), errors='replace')
 
 
-    def parse_global_metadata(self,data):
+    def parse_global_metadata(self,data, sheet_name):
         metadata = {}
         for mdname, mdspec in self.global_metadata.iteritems():
             if mdspec['source'] == 'sheet_name':
-                metadata[mdname] = data.name
+                metadata[mdname] = sheet_name
             elif mdspec['source'] == 'cell':
-                metadata[mdname] = data[(mdspec['row'], mdspec['col'])]
+                metadata[mdname] = data[mdspec['row']][mdspec['col']]
             elif mdspec['source'] == 'const':
                 metadata[mdname] = mdspec['val']
             else:
@@ -65,7 +65,7 @@ class TimeSeriesRegion(object):
         for md_name in mds:
             if mds[md_name]['mode'] == 'normal':
                 if mds[md_name]['source'] == 'cell':
-                    metadata[md_name] = data[(mds[md_name]['loc'][0], mds[md_name]['loc'][1])]
+                    metadata[md_name] = data[mds[md_name]['loc'][0]][mds[md_name]['loc'][1]]
                     if not self.is_blank(metadata[md_name]):
                         all_blank = False
                 elif mds[md_name]['source'] == 'const':
@@ -74,7 +74,7 @@ class TimeSeriesRegion(object):
                     md_vals = []
                     for idx in mds[md_name]['loc']:
                         coords = self.orient_coords(tsidx, idx)
-                        val = self.data_to_string(data[coords])
+                        val = self.data_to_string(data[coords[0]][coords[1]])
                         md_vals.append(val)
                         if not self.is_blank(val):
                             all_blank = False
@@ -92,7 +92,7 @@ class TimeSeriesRegion(object):
                 md_vals = []
                 for idx in mds[md_name]['loc']:
                     coords = self.orient_coords(idx, dataidx)
-                    md_vals.append(self.data_to_string(data[coords]))
+                    md_vals.append(self.data_to_string(data[coords[0]][coords[1]]))
                 metadata[md_name] = " ".join(md_vals)
 
     def orient_coords(self, tsidx, dataidx):
@@ -105,12 +105,12 @@ class TimeSeriesRegion(object):
         time_labels = []
         for tc in self.time_coordinates['locs']:
             coords = self.orient_coords(tc, d_idx)
-            val = self.data_to_string(data[coords[0], coords[1]])
+            val = self.data_to_string(data[coords[0]][coords[1]])
             if self.is_blank(val) and self.time_coordinates['mode'] == 'backfill':
                 t_idx = d_idx - 1
                 while t_idx > 0 and self.is_blank(val):
                     coords = self.orient_coords(tc, t_idx)
-                    val = self.data_to_string(data[coords[0], coords[1]])
+                    val = self.data_to_string(data[coords[0]][coords[1]])
                     t_idx -= 1
             time_labels.append(val)
         time_label = " ".join(time_labels)
@@ -185,7 +185,7 @@ class TimeSeriesRegion(object):
                         inline_md_curr = {}
 
                 coords = self.orient_coords(ts_idx, d_idx)
-                timeseries.append((time_label,data[coords[0],coords[1]]))
+                timeseries.append((time_label,data[coords[0]][coords[1]]))
 
             self.time_series.append(dict(metadata=ts_metadata, ts=timeseries))
 
@@ -293,15 +293,15 @@ class ExtractSpreadsheet(object):
             ssa = SpreadsheetAnnotation(annotation, self.normalized_source_file)
             parsed = []
             for anidx in ssa.sheet_indices:
-                data = self.book.sheet_by_index(anidx)
+                sheet = self.book.sheet_by_index(anidx)
+                data = sheet.to_array()
                 for tsr in ssa.timeseries_regions:
                     tsr.provenance['sheet']=anidx
-                    for parsed_tsr in tsr.parse(data):
+                    for parsed_tsr in tsr.parse(data, sheet.name):
                         parsed.append(parsed_tsr)
                 logging.debug("%s",parsed)
             timeseries.append(parsed)
         return timeseries
-
     def load_annotations(self,annotations_fn):
         anfile = open(annotations_fn)
         annotations_decoded = demjson.decode(anfile.read(), return_errors=True)
@@ -318,7 +318,9 @@ def main():
     args = ap.parse_args()
     es = ExtractSpreadsheet(args.spreadsheet, args.annotation)
     timeseries = es.process()
-    demjson.encode_to_file(args.outfile,timeseries,overwrite=True)
+    
+    with open(args.outfile, 'w') as outfile:
+        json.dump(timeseries, outfile)
 
 if __name__ == "__main__":
     main()
