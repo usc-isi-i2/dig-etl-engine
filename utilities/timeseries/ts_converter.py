@@ -6,6 +6,7 @@ import hashlib
 import numbers
 import sys
 from dateutil import parser
+from optparse import OptionParser
 
 
 class DecimalJSONEncoder(json.JSONEncoder):
@@ -22,17 +23,17 @@ class Measurement(object):
             self.value = timeseries_element[1]
         else:
             self.value = timeseries_element[1:]
-        self.doc_id = self.get_doc_id(timeseries_element)
+        self.doc_id = self.get_doc_id(timeseries_element, timeseries_id)
         self.timeseries_id = timeseries_id
         self.filename = filename
 
-    def get_doc_id(self, array):
-        array_str = json.dumps(array, cls=DecimalJSONEncoder)
-        hash_object = hashlib.sha1(array_str)
+    def get_doc_id(self, array, timeseries_id):
+        array_str = '{} {}'.format(json.dumps(array, cls=DecimalJSONEncoder), timeseries_id)
+        hash_object = hashlib.sha256(array_str)
         return hash_object.hexdigest()
 
     def to_dict(self):
-        dct = {}
+        dct = dict()
         dct["measurement"] = {}
         dct["measurement"]['date'] = self.date
         if isinstance(self.value, numbers.Number):
@@ -70,17 +71,25 @@ class Trend(object):
 
 
 class TimeSeries(object):
-    def __init__(self, meta_data):
+    def __init__(self, meta_data, dataset):
         self.meta_data = meta_data
+        self.dataset = dataset
         self.doc_id = self.get_doc_id(meta_data)
 
     def get_doc_id(self, meta_data):
-        md_str = json.dumps(meta_data, sort_keys=True, cls=DecimalJSONEncoder)
-        hash_object = hashlib.sha1(md_str)
-        return hash_object.hexdigest()
+        if self.dataset.strip() != "" and 'name' in meta_data:
+            hash_object = hashlib.sha256('{} {}'.format(self.dataset, meta_data['name']))
+        else:
+            print('WARNING: Creating doc id for time series using metadata and not a combination of \"dataset\" '
+                  'and \"metadata[\'name\']. This can result in inconsistencies in future datasets of the same '
+                  'timeseries. You have been warned!')
+
+            md_str = json.dumps(meta_data, sort_keys=True, cls=DecimalJSONEncoder)
+            hash_object = hashlib.sha1(md_str)
+        return hash_object.hexdigest().upper()
 
     def to_dict(self):
-        dct = {}
+        dct = dict()
         dct["measure"] = {}
         dct["measure"]["metadata"] = self.meta_data
         dct["measure"]['type'] = "Measure"
@@ -127,20 +136,19 @@ class ProcessTimeSeries():
                     missing_value_index.append(index)
 
                 index += 1
-        print total_str
 
-        if total*1.0/len(ts) >= threshold:
+        if total * 1.0 / len(ts) >= threshold:
             n_missing = len(missing_value_index)
             for i in range(n_missing):
                 index = missing_value_index[i]
-                print index
+
                 if index == 0:
                     next = 1
                     while next < n_missing and next == missing_value_index[next]:
                         next += 1
                     ts[index] = [ts[index][0], ts[next][1]]
                 else:
-                    ts[index] = [ts[index][0], ts[index-1][1]]
+                    ts[index] = [ts[index][0], ts[index - 1][1]]
 
             return ts
 
@@ -149,25 +157,27 @@ class ProcessTimeSeries():
 
         else:
             for i in range(0, len(ts)):
-                value =  ts[i][1]
+                value = ts[i][1]
                 if value is not None:
                     ts[i] = [ts[i][0], str(value)]
             return ts
-            
 
-    def processs(self, tables):
+    def processs(self, tables, dataset_name):
         result = []
         for sheet in tables:
             for timeseries in sheet:
-                ts = TimeSeries(timeseries['metadata'])
+                ts = TimeSeries(timeseries['metadata'], dataset_name)
                 processed_ts = self.impute_values(timeseries['ts'], 0.8)
                 if processed_ts is not None:
                     ts_dict = ts.to_dict()
-                    start, end = self.get_temporal_region(processed_ts)
-                    ts_dict["measure"]["temporal_region"] = {
-                        'start_date_time': start,
-                        'end_date_time': end
-                    }
+                    try:
+                        start, end = self.get_temporal_region(processed_ts)
+                        ts_dict["measure"]["temporal_region"] = {
+                            'start_date_time': start,
+                            'end_date_time': end
+                        }
+                    except:
+                        pass
                     result.append(ts_dict)
                     filename = ts_dict["measure"]['provenance_filename']
                     # measurement
@@ -197,7 +207,6 @@ class ProcessTimeSeries():
             min_dt = min(min_dt, dt)
         return min_dt.isoformat(), max_dt.isoformat()
 
-
     def load_json(self, json_fn):
         anfile = open(json_fn)
         json_decoded = demjson.decode(anfile.read(), return_errors=True)
@@ -218,12 +227,19 @@ class ProcessTimeSeries():
                 fp.write('\n')
 
 
-
 def main():
+    parser = OptionParser()
+    parser.add_option("-d", "--dataset", dest="dataset", type="string",
+                      help="dataset name", default="")
+    (c_options, args) = parser.parse_args()
+    input_path = args[0]
+    output_file = args[1]
+    dataset_name = c_options.dataset
+
     test = ProcessTimeSeries()
-    tables = test.load_json(sys.argv[1])
+    tables = test.load_json(input_path)
     # print test.processs(tables)
-    test.write_result_to_file(sys.argv[2], test.processs(tables))
+    test.write_result_to_file(output_file, test.processs(tables, dataset_name))
 
 
 if __name__ == "__main__":
