@@ -6,6 +6,7 @@ import hashlib
 import numbers
 import sys
 from dateutil import parser
+from optparse import OptionParser
 
 
 class DecimalJSONEncoder(json.JSONEncoder):
@@ -70,14 +71,22 @@ class Trend(object):
 
 
 class TimeSeries(object):
-    def __init__(self, meta_data):
+    def __init__(self, meta_data, dataset):
         self.meta_data = meta_data
+        self.dataset = dataset
         self.doc_id = self.get_doc_id(meta_data)
 
     def get_doc_id(self, meta_data):
-        md_str = json.dumps(meta_data, sort_keys=True, cls=DecimalJSONEncoder)
-        hash_object = hashlib.sha1(md_str)
-        return hash_object.hexdigest()
+        if self.dataset.strip() != "" and 'name' in meta_data:
+            hash_object = hashlib.sha256('{} {}'.format(self.dataset, meta_data['name']))
+        else:
+            print('WARNING: Creating doc id for time series using metadata and not a combination of \"dataset\" '
+                  'and \"metadata[\'name\']. This can result in inconsistencies in future datasets of the same '
+                  'timeseries. You have been warned!')
+
+            md_str = json.dumps(meta_data, sort_keys=True, cls=DecimalJSONEncoder)
+            hash_object = hashlib.sha1(md_str)
+        return hash_object.hexdigest().upper()
 
     def to_dict(self):
         dct = {}
@@ -154,11 +163,11 @@ class ProcessTimeSeries():
                     ts[i] = [ts[i][0], str(value)]
             return ts
 
-    def processs(self, tables):
+    def processs(self, tables, dataset_name):
         result = []
         for sheet in tables:
             for timeseries in sheet:
-                ts = TimeSeries(timeseries['metadata'])
+                ts = TimeSeries(timeseries['metadata'], dataset_name)
                 processed_ts = self.impute_values(timeseries['ts'], 0.8)
                 if processed_ts is not None:
                     ts_dict = ts.to_dict()
@@ -220,10 +229,18 @@ class ProcessTimeSeries():
 
 
 def main():
+    parser = OptionParser()
+    parser.add_option("-d", "--dataset", dest="dataset", type="string",
+                      help="dataset name", default="")
+    (c_options, args) = parser.parse_args()
+    input_path = args[0]
+    output_file = args[1]
+    dataset_name = c_options.dataset
+
     test = ProcessTimeSeries()
-    tables = test.load_json(sys.argv[1])
+    tables = test.load_json(input_path)
     # print test.processs(tables)
-    test.write_result_to_file(sys.argv[2], test.processs(tables))
+    test.write_result_to_file(output_file, test.processs(tables, dataset_name))
 
 
 if __name__ == "__main__":
