@@ -57,7 +57,7 @@ class Trend(object):
 
     def get_doc_id(self, array, timeseries_id):
         array_str = '{} {}'.format(json.dumps(array, cls=DecimalJSONEncoder), timeseries_id)
-        hash_object = hashlib.sha1(array_str)
+        hash_object = hashlib.sha256(array_str)
         return hash_object.hexdigest()
 
     def to_dict(self):
