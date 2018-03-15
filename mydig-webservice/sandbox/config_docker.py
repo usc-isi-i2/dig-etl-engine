@@ -19,9 +19,10 @@ config = {
         }
     },
     'logging': {
-        'file_path': 'log.log',
-        'format': '%(asctime)s %(levelname)s %(message)s',
-        'level': logging.INFO
+        'file_path': '',
+        'format': '%(asctime)s [%(levelname)s] %(message)s',
+        'level': logging.INFO,
+        'werkzeug': logging.WARNING
     },
     'es': {
         # do not add / at the end
@@ -107,6 +108,8 @@ config = {
         'default_project': os.getenv('DEFAULT_EXTERNAL_CRAWLER_PROJECT', 'crawler')
     },
     'data_pushing_worker_backoff_time': 5,
+    'status_memory_dump_backoff_time': 5,
+    'catalog_memory_dump_backoff_time': 5,
     'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana', 'crawler'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
