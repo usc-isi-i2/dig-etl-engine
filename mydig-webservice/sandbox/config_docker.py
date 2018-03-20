@@ -19,7 +19,8 @@ config = {
         }
     },
     'logging': {
-        'file_path': '',
+        'name': 'mydig-webservice.log', # name of logger
+        'file_path': None,
         'format': '%(asctime)s [%(levelname)s] %(message)s',
         'level': logging.INFO,
         'werkzeug': logging.WARNING
