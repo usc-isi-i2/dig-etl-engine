@@ -406,7 +406,14 @@ class ConfigGenerator(object):
             self.content_extraction_for_join_fields()
 
         return {
-            "json_content": entries
+            "json_content": entries,
+            "guards": [
+                {
+                    "regex": "no",
+                    "path": "$.{}.disable_default_extractors".format(self.prefix),
+                    "type": "doc"
+                }
+            ],
         }
 
     def data_extraction(self):
