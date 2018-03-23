@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:1.2.1
+    image: uscisii2/mydig_ws:1.2.2
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
