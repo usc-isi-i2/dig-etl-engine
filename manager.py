@@ -135,10 +135,15 @@ def kill_and_clean_up_queue(args, project_config):
 
 @app.route('/etk_status/<project_name>', methods=['GET'])
 def etk_status(project_name):
-    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{project_name}"'.format(project_name=project_name)
+    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{project_name}" | wc -l'.format(project_name=project_name)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read()
-    return jsonify({'etk_processes':len(output)})
+    try:
+        process_num = int(output) / 2
+        return jsonify({'etk_processes':process_num})
+    except:
+        logger.exception('etk_status error: {}'.format(project_name))
+        return 'error', 500
 
 @app.route('/debug/ps', methods=['GET'])
 def debug_ps():
