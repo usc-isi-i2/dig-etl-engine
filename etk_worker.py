@@ -61,6 +61,7 @@ class ETKWorker(object):
         )
 
         self.timeout_count = self.kafka_input_session_timeout / self.check_interval
+        self.current_timeout_count = 0
 
     def process(self):
         prev_doc_sent_time = None
@@ -72,6 +73,7 @@ class ETKWorker(object):
                 for msg in self.kafka_consumer:
                     # force to commit, block till getting response
                     self.kafka_consumer.commit()
+                    self.current_timeout_count = 0
 
                     cdr = msg.value
                     cdr['@execution_profile'] = {'@worker_id': self.worker_id}
@@ -129,8 +131,8 @@ class ETKWorker(object):
 
             except StopIteration as e:
                 # timeout
-                self.timeout_count -= 1
-                if self.timeout_count <= 0:
+                self.current_timeout_count += 1
+                if self.current_timeout_count >= self.timeout_count:
                     self.exit_sign = True
 
     def __del__(self):
@@ -181,10 +183,12 @@ if __name__ == "__main__":
         os.path.join(config['projects_path'], args.project_name, 'working_dir/additional_ems'),
         os.path.join(config['projects_path'], args.project_name, 'working_dir/generated_em')
     ]
+    worker_id = int(args.worker_id)
 
     try:
+        logger.info('ETK Worker {} is staring...'.format(worker_id))
         etk_worker = ETKWorker(master_config=master_config, em_paths=em_paths, logger=logger,
-                           worker_id=int(args.worker_id), project_name=args.project_name,
+                           worker_id=worker_id, project_name=args.project_name,
                            kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
         g_etk_worker = etk_worker
         etk_worker.process()
