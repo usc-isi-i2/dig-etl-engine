@@ -256,29 +256,18 @@ files. `DIG_PROJECTS_DIR_PATH/<project_name>` will be mapped to `/shared_data/pr
 > `dig_net` is the LAN in Docker compose.
 
 ### Docker commands for development
-
-build Kibana 4 image:
-
-    docker build -t uscisii2/kibana:4.6-sense kibana/.
     
 build Nginx image:
 
     docker build -t uscisii2/nginx:auth-1.0 nginx/.
-
-build ETK base image:
-
-    # update ETK_VERSION in file VERSION
-    ./release_docker.sh etk build
-    ./release_docker.sh etk push
     
 build ETL image:
     
-    
     # git commit all changes first, then
-    ./release_docker.sh engine tag
+    ./release_docker.sh tag
     git push --tags
     # update DIG_ETL_ENGINE_VERSION in file VERSION
-    ./release_docker.sh engine build
+    ./release_docker.sh build
     ./release_docker.sh push
     
 Invoke development mode:

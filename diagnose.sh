@@ -218,15 +218,15 @@ fi
 echo "--------------------------------------------------"
 
 
-echo "[Add-on Containers]"
-echo "--------------------------------------------------"
-
-echo "Diagnose kafka_manager:"
-echo -n "Checking container ... "
-container_id=$(docker ps -q --filter "name=${CONTAINER_KAFKA_MANAGER}")
-if [ -z ${container_id} ]; then
-    echo "[ERROR]"
-else
-    echo "[done]"
-fi
-echo "--------------------------------------------------"
+#echo "[Add-on Containers]"
+#echo "--------------------------------------------------"
+#
+#echo "Diagnose kafka_manager:"
+#echo -n "Checking container ... "
+#container_id=$(docker ps -q --filter "name=${CONTAINER_KAFKA_MANAGER}")
+#if [ -z ${container_id} ]; then
+#    echo "[ERROR]"
+#else
+#    echo "[done]"
+#fi
+#echo "--------------------------------------------------"
