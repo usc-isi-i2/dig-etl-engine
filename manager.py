@@ -171,7 +171,8 @@ def run_etk_processes(project_name, processes, project_config):
 
 
 def kill_etk_process(project_name, ignore_error=False):
-    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{}" | awk \'{{print $2}}\' | xargs kill '.format(project_name)
+    cmd = ('ps -ef | grep -v grep | grep "tag-mydig-etk-{}"'
+            '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name)
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and not ignore_error:
         logger.error('error in kill_etk_process')
