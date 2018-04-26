@@ -8,7 +8,7 @@ import signal
 import logging
 
 from kafka import KafkaProducer, KafkaConsumer
-# from digsandpaper.elasticsearch_indexing.index_knowledge_graph import index_knowledge_graph_fields
+from digsandpaper.elasticsearch_indexing.index_knowledge_graph import index_knowledge_graph_fields
 
 from config import config
 sys.path.append(os.path.join(config['etk_path']))
@@ -89,22 +89,22 @@ class ETKWorker(object):
                         self.logger.error('invalid cdr: unknown doc_id')
                         continue
 
-                    self.logger.info('processing', cdr['doc_id'])
+                    self.logger.info('processing %s' % cdr['doc_id'])
                     try:
                         start_run_core_time = time.time()
                         # run etk module
 
-                        doc = self.etk_ins.create_document(cdr)
+                        doc = self.etk_ins.create_document(cdr, url=cdr['url'], doc_id=cdr['doc_id'])
                         doc, kg = self.etk_ins.process_ems(doc)
-                        cdr = kg
+                        cdr = doc.cdr_document
 
                         # indexing
                         # TODO
-                        # indexed_kg = index_knowledge_graph_fields(kg)
-                        # if not indexed_kg:
-                        #     logger.error('indexing in sandpaper failed')
-                        #     continue
-                        # cdr = indexed_kg
+                        indexed_cdr = index_knowledge_graph_fields(cdr)
+                        if not indexed_cdr:
+                            logger.error('indexing in sandpaper failed')
+                            continue
+                        cdr = indexed_cdr
 
                         cdr['@execution_profile']['@run_core_time'] = \
                             float(time.time() - start_run_core_time)
@@ -122,7 +122,7 @@ class ETKWorker(object):
                         self.logger.info('{} done'.format(cdr['doc_id']))
 
                     except Exception as e:
-                        self.logger.exception('failed at', cdr['doc_id'])
+                        self.logger.exception('failed at %s' % cdr['doc_id'])
 
             except ValueError as e:
                 # I/O operation on closed epoll fd
@@ -169,9 +169,14 @@ if __name__ == "__main__":
     parser.add_argument("--kafka-output-args", action="store", type=str, dest="kafka_output_args")
     args, _ = parser.parse_known_args()
 
+    worker_id = int(args.worker_id)
     logger = logging.getLogger(args.logger_name)
-    log_stdout = logging.StreamHandler(sys.stdout)
-    logger.addHandler(log_stdout)
+    # log_stdout = logging.StreamHandler(sys.stdout)
+    # logger.addHandler(log_stdout)
+    log_path = os.path.join(config['projects_path'], args.project_name, 'working_dir/etk_worker_{}.log'
+                            .format(worker_id))
+    log_file = logging.FileHandler(log_path)
+    logger.addHandler(log_file)
     logger.setLevel(logging.INFO)
     g_logger = logger
 
@@ -183,14 +188,10 @@ if __name__ == "__main__":
         os.path.join(config['projects_path'], args.project_name, 'working_dir/additional_ems'),
         os.path.join(config['projects_path'], args.project_name, 'working_dir/generated_em')
     ]
-    worker_id = int(args.worker_id)
 
-    try:
-        logger.info('ETK Worker {} is staring...'.format(worker_id))
-        etk_worker = ETKWorker(master_config=master_config, em_paths=em_paths, logger=logger,
-                           worker_id=worker_id, project_name=args.project_name,
-                           kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
-        g_etk_worker = etk_worker
-        etk_worker.process()
-    except:
-        logger.exception('etk_worker main')
+    logger.info('ETK Worker {} is staring...'.format(worker_id))
+    etk_worker = ETKWorker(master_config=master_config, em_paths=em_paths, logger=logger,
+                       worker_id=worker_id, project_name=args.project_name,
+                       kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
+    g_etk_worker = etk_worker
+    etk_worker.process()
