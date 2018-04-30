@@ -90,7 +90,8 @@ def kill_etk():
 
 @app.route('/etk_status/<project_name>', methods=['GET'])
 def etk_status(project_name):
-    cmd = 'ps -ef | grep -v grep | grep "tag-mydig-etk-{project_name}" | wc -l'.format(project_name=project_name)
+    cmd = 'ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}" | wc -l' \
+           .format(project_name=project_name)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read()
     try:
@@ -171,8 +172,8 @@ def run_etk_processes(project_name, processes, project_config):
 
 
 def kill_etk_process(project_name, ignore_error=False):
-    cmd = ('ps -ef | grep -v grep | grep "tag-mydig-etk-{}"'
-            '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name)
+    cmd = ('ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}"'
+            '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name=project_name)
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and not ignore_error:
         logger.error('error in kill_etk_process')
