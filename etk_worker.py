@@ -11,6 +11,7 @@ from kafka import KafkaProducer, KafkaConsumer
 from digsandpaper.elasticsearch_indexing.index_knowledge_graph import index_knowledge_graph_fields
 
 from config import config
+
 sys.path.append(os.path.join(config['etk_path']))
 sys.path.append(os.path.join(config['etk_path'], 'etk'))
 from etk.etk import ETK
@@ -19,8 +20,8 @@ from etk.knowledge_graph import KGSchema
 g_etk_worker = None
 g_logger = None
 
-class ETKWorker(object):
 
+class ETKWorker(object):
     def __init__(self, master_config, em_paths, logger, worker_id,
                  project_name, kafka_input_args=None, kafka_output_args=None):
         self.logger = logger
@@ -73,6 +74,7 @@ class ETKWorker(object):
                 for msg in self.kafka_consumer:
                     # force to commit, block till getting response
                     self.kafka_consumer.commit()
+                    # get message, clear timeout count
                     self.current_timeout_count = 0
 
                     cdr = msg.value
@@ -82,7 +84,7 @@ class ETKWorker(object):
                         datetime.utcfromtimestamp(doc_arrived_time).isoformat()
                     cdr['@execution_profile']['@doc_wait_time'] = \
                         0.0 if not prev_doc_sent_time \
-                        else float(doc_arrived_time - prev_doc_sent_time)
+                            else float(doc_arrived_time - prev_doc_sent_time)
                     cdr['@execution_profile']['@doc_length'] = len(json.dumps(cdr))
 
                     if 'doc_id' not in cdr or len(cdr['doc_id']) == 0:
@@ -112,7 +114,7 @@ class ETKWorker(object):
                         cdr['@execution_profile']['@doc_sent_time'] = \
                             datetime.utcfromtimestamp(doc_sent_time).isoformat()
                         prev_doc_sent_time = doc_sent_time
-                        cdr['@execution_profile']['@doc_processed_time'] =\
+                        cdr['@execution_profile']['@doc_processed_time'] = \
                             float(doc_sent_time - doc_arrived_time)
 
                         # output result
@@ -148,6 +150,7 @@ class ETKWorker(object):
         except:
             pass
 
+
 def termination_handler(signum, frame):
     global g_logger, g_etk_worker
     g_logger.info('SIGNAL #{} received, trying to exit...'.format(signum))
@@ -156,6 +159,7 @@ def termination_handler(signum, frame):
         g_etk_worker.exit_sign = True
     except Exception as e:
         pass
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, termination_handler)
@@ -189,9 +193,9 @@ if __name__ == "__main__":
         os.path.join(config['projects_path'], args.project_name, 'working_dir/generated_em')
     ]
 
-    logger.info('ETK Worker {} is staring...'.format(worker_id))
+    logger.info('ETK Worker {} is starting...'.format(worker_id))
     etk_worker = ETKWorker(master_config=master_config, em_paths=em_paths, logger=logger,
-                       worker_id=worker_id, project_name=args.project_name,
-                       kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
+                           worker_id=worker_id, project_name=args.project_name,
+                           kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
     g_etk_worker = etk_worker
     etk_worker.process()
