@@ -78,14 +78,15 @@ class ETKWorker(object):
                     self.current_timeout_count = 0
 
                     cdr = msg.value
-                    cdr['@execution_profile'] = {'@worker_id': self.worker_id}
-                    doc_arrived_time = time.time()
-                    cdr['@execution_profile']['@doc_arrived_time'] = \
-                        datetime.utcfromtimestamp(doc_arrived_time).isoformat()
-                    cdr['@execution_profile']['@doc_wait_time'] = \
-                        0.0 if not prev_doc_sent_time \
-                            else float(doc_arrived_time - prev_doc_sent_time)
-                    cdr['@execution_profile']['@doc_length'] = len(json.dumps(cdr))
+                    # TODO better way to add execution profile
+                    # cdr['@execution_profile'] = {'@worker_id': self.worker_id}
+                    # doc_arrived_time = time.time()
+                    # cdr['@execution_profile']['@doc_arrived_time'] = \
+                    #     datetime.utcfromtimestamp(doc_arrived_time).isoformat()
+                    # cdr['@execution_profile']['@doc_wait_time'] = \
+                    #     0.0 if not prev_doc_sent_time \
+                    #         else float(doc_arrived_time - prev_doc_sent_time)
+                    # cdr['@execution_profile']['@doc_length'] = len(json.dumps(cdr))
 
                     if 'doc_id' not in cdr or len(cdr['doc_id']) == 0:
                         self.logger.error('invalid cdr: unknown doc_id')
@@ -97,31 +98,33 @@ class ETKWorker(object):
                         # run etk module
 
                         doc = self.etk_ins.create_document(cdr, url=cdr['url'], doc_id=cdr['doc_id'])
-                        doc, kg = self.etk_ins.process_ems(doc)
-                        cdr = doc.cdr_document
+                        # process_ems returns a list of Documents
+                        results = self.etk_ins.process_ems(doc)
+                        for result in results:
+                            cdr_result = result.cdr_document
 
-                        # indexing
-                        # TODO
-                        indexed_cdr = index_knowledge_graph_fields(cdr)
-                        if not indexed_cdr:
-                            logger.error('indexing in sandpaper failed')
-                            continue
-                        cdr = indexed_cdr
+                            # indexing
+                            # TODO
+                            indexed_cdr = index_knowledge_graph_fields(cdr_result)
+                            if not indexed_cdr:
+                                logger.error('indexing in sandpaper failed')
+                                continue
+                            # cdr = indexed_cdr
 
-                        cdr['@execution_profile']['@run_core_time'] = \
-                            float(time.time() - start_run_core_time)
-                        doc_sent_time = time.time()
-                        cdr['@execution_profile']['@doc_sent_time'] = \
-                            datetime.utcfromtimestamp(doc_sent_time).isoformat()
-                        prev_doc_sent_time = doc_sent_time
-                        cdr['@execution_profile']['@doc_processed_time'] = \
-                            float(doc_sent_time - doc_arrived_time)
+                        # cdr['@execution_profile']['@run_core_time'] = \
+                        #     float(time.time() - start_run_core_time)
+                        # doc_sent_time = time.time()
+                        # cdr['@execution_profile']['@doc_sent_time'] = \
+                        #     datetime.utcfromtimestamp(doc_sent_time).isoformat()
+                        # prev_doc_sent_time = doc_sent_time
+                        # cdr['@execution_profile']['@doc_processed_time'] = \
+                        #     float(doc_sent_time - doc_arrived_time)
 
-                        # output result
-                        r = self.kafka_producer.send(self.kafka_output_topic, cdr)
-                        r.get(timeout=60)  # wait till sent
+                            # output result
+                            r = self.kafka_producer.send(self.kafka_output_topic, indexed_cdr)
+                            r.get(timeout=60)  # wait till sent
 
-                        self.logger.info('{} done'.format(cdr['doc_id']))
+                            self.logger.info('{} done'.format(indexed_cdr['doc_id']))
 
                     except Exception as e:
                         self.logger.exception('failed at %s' % cdr['doc_id'])
