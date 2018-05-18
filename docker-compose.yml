@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:1.1.4-dev9
+    image: uscisii2/dig-etl-engine:2.0.0-a001
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
