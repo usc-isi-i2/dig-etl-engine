@@ -12,8 +12,8 @@ services:
 #      DIG_AUTH_ENABLE: ${DIG_AUTH_ENABLE}
     volumes:
       - ./nginx/sandbox/conf.d/dig.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/sandbox/logs:/var/log/nginx
-      - ./digapp/sandbox/logs/digapp:/var/log/diglogs
+      - ${DIG_PROJECTS_DIR_PATH}/.nginx/logs:/var/log/nginx
+      - ${DIG_PROJECTS_DIR_PATH}/.nginx/logs/digui:/var/log/diglogs
       - ./nginx/sandbox/index.html:/usr/share/nginx/html/index.html
     networks:
       - dig_net
@@ -85,7 +85,6 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.6.4
-#    image: docker.elastic.co/logstash/logstash:5.5.1
     environment:
       PATH_CONFIG: /usr/share/logstash/pipeline
       LS_JAVA_OPTS: "-Xmx${LS_HEAP_SIZE:-256m} -Xms${LS_HEAP_SIZE:-256m}"
@@ -93,7 +92,7 @@ services:
     volumes:
       - ${DIG_PROJECTS_DIR_PATH}/.ls/pipeline/:/usr/share/logstash/pipeline
       - ./logstash/sandbox/settings/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./logstash/sandbox/log/:/var/log/logstash
+      - ${DIG_PROJECTS_DIR_PATH}/.ls/log/:/var/log/logstash
     networks:
       - dig_net
     depends_on:
@@ -103,7 +102,6 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
-#    image: elasticsearch:2.4.6
     volumes:
 #      - ./elasticsearch/sandbox/config/logging.yml:/usr/share/elasticsearch/config/logging.yml
       - ./elasticsearch/sandbox/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -118,7 +116,6 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:5.6.4
-#    image: uscisii2/kibana:4.6-sense # compatible with es 2.4
     volumes:
       - ./kibana/sandbox/config:/opt/kibana/config
 #    ports:
@@ -178,7 +175,7 @@ services:
 #    ports:
 #      - "8080"
     volumes:
-      - ./digapp/sandbox/logs/digapp:/var/log
+      - ${DIG_PROJECTS_DIR_PATH}/.digui/log:/var/log
     environment:
       NODE_ENV: 'production'
       ES_HOST: '{"host": "http://${DOMAIN}:${PORT}/es", "apiVersion":"5.0"}'
