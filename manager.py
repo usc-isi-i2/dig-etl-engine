@@ -9,6 +9,7 @@ import logstash
 import codecs
 import requests
 import time
+import shutil
 from flask import Flask, request, jsonify
 
 from config import config
@@ -46,6 +47,15 @@ def create_project():
     etl_config = get_project_etl_config(args['project_name'])
     output_topic = etl_config.get('output_topic', args['project_name'] + '_out')
     output_partition = etl_config.get('output_partitions', config['output_partitions'])
+
+    # create default logstash pipeline
+    for ls_conf in os.listdir(config['logstash']['default_pipeline']):
+        if not ls_conf.endswith('.conf'):
+            continue
+        ls_conf_default_path = os.path.join(config['logstash']['default_pipeline'], ls_conf)
+        ls_conf_path = os.path.join(config['logstash']['pipeline'], ls_conf)
+        if not os.path.exists(ls_conf_path):
+            shutil.copyfile(ls_conf_default_path, ls_conf_path)
 
     # update logstash pipeline
     output_server = etl_config.get('output_server', config['output_server'])

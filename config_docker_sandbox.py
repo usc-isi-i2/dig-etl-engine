@@ -16,7 +16,8 @@ config = {
         'level': logging.INFO,
         'version': 1,
         'name': 'dig_etl_engine',
-        'pipeline': '/app/logstash_pipeline'
+        'pipeline': '/app/logstash/pipeline',
+        'default_pipeline': '/app/logstash/default_pipeline'
     },
 
     'input_zookeeper_server': ['zookeeper:2181'],
