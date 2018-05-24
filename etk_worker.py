@@ -65,7 +65,7 @@ class ETKWorker(object):
         self.current_timeout_count = 0
 
     def process(self):
-        prev_doc_sent_time = None
+        # prev_doc_sent_time = None
 
         while not self.exit_sign:
             # high level api handles batching
@@ -94,7 +94,7 @@ class ETKWorker(object):
 
                     self.logger.info('processing %s' % cdr['doc_id'])
                     try:
-                        start_run_core_time = time.time()
+                        # start_run_core_time = time.time()
                         # run etk module
 
                         doc = self.etk_ins.create_document(cdr, url=cdr['url'], doc_id=cdr['doc_id'])
