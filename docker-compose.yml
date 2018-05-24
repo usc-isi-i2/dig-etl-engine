@@ -73,6 +73,7 @@ services:
       KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 300000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${DIG_PROJECTS_DIR_PATH}/.kafka/data:/kafka
     depends_on:
       - zookeeper
     networks:
