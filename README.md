@@ -87,6 +87,17 @@ Once myDIG is running, go to your browser and visit `http://localhost:12497/mydi
 
 To use myDIG, look at the [user guide](docs/index.md)
 
+#### Upgrade Issues (12 June 2018)
+
+myDIG v2 is now in alpha, there are couple of big and incompatible changes.
+
+- data, configs and logs of components are not in `DIG_PROJECTS_DIR_PATH/.*`.
+- Kafka queue data will NOT be clean up even after doing `./engine.sh down`, you need to delete `DIG_PROJECTS_DIR_PATH/.kafka` then restart engine (if you change `NUM_ETK_PROCESSES`).
+- There's no default resource any more, if a resource file (glossary) is not compatible, please delete it.
+- There's no `custom_etk_config.json` or `additional_etk_config/*` any more, instead, generated ETK modules are in `working_dir/em_base.py` and additional modules are in `working_dir/additional_ems`.
+- ETK log is not fully implemented and tested. Runtime logs will APPEND to `working_dir/etk_worker_*.log`.
+- Spacy rule editor is not working.
+
 #### Upgrade Issues (16 Nov 2017)
 
 ELK (Elastic Search, LogStash & Kibana) components had been upgraded to 5.6.4 and other services in myDIG also got 
