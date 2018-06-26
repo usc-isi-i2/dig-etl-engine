@@ -8,6 +8,7 @@ import signal
 import logging
 
 from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import CommitFailedError
 from digsandpaper.elasticsearch_indexing.index_knowledge_graph import index_knowledge_graph_fields
 
 from config import config
@@ -19,6 +20,7 @@ from etk.knowledge_graph import KGSchema
 
 g_etk_worker = None
 g_logger = None
+g_restart_worker = True
 
 
 class ETKWorker(object):
@@ -132,13 +134,20 @@ class ETKWorker(object):
             except ValueError as e:
                 # I/O operation on closed epoll fd
                 self.logger.info('consumer closed')
-                sys.exit()
+                self.exit_sign = True
 
             except StopIteration as e:
                 # timeout
                 self.current_timeout_count += 1
                 if self.current_timeout_count >= self.timeout_count:
                     self.exit_sign = True
+
+            except CommitFailedError as e:
+                self.exit_sign = True
+
+                # https://github.com/dpkp/kafka-python/blob/535d8f6a85969c4e07de0bc81e14513c677995be/kafka/errors.py#L65
+                # if this worker is dead, restart and reattach to the group
+                g_restart_worker = True
 
     def __del__(self):
 
@@ -200,5 +209,8 @@ if __name__ == "__main__":
     etk_worker = ETKWorker(master_config=master_config, em_paths=em_paths, logger=logger,
                            worker_id=worker_id, project_name=args.project_name,
                            kafka_input_args=kafka_input_args, kafka_output_args=kafka_output_args)
-    g_etk_worker = etk_worker
-    etk_worker.process()
+
+    while g_restart_worker:
+        g_restart_worker = False
+        g_etk_worker = etk_worker
+        etk_worker.process()
