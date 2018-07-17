@@ -201,7 +201,7 @@ if __name__ == "__main__":
     kafka_input_args = json.loads(args.kafka_input_args) if args.kafka_input_args else dict()
     kafka_output_args = json.loads(args.kafka_output_args) if args.kafka_output_args else dict()
     em_paths = [
-        os.path.join(config['projects_path'], args.project_name, 'working_dir/additional_ems'),
+        os.path.join(config['projects_path'], args.project_name, 'working_dir/generated_additional_ems'),
         os.path.join(config['projects_path'], args.project_name, 'working_dir/generated_em')
     ]
 
