@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:2.0.0-a001
+    image: uscisii2/dig-etl-engine:2.0.0-a002
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -126,7 +126,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.2.0-r002
+    image: digsandpaper/digsandpaper:0.2.0-r003
 #    ports:
 #      - "9876"
     volumes:
@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:2.0.0-a001
+    image: uscisii2/mydig_ws:2.0.0-a002
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -188,6 +188,7 @@ services:
         "http://sandpaper:9876": "http://${DOMAIN}:${PORT}/search/coarse"
       }'
       PATH_PREFIX: '/dig-ui/'
+      SHOW_ES_DATA: 'true'
     depends_on:
       - elasticsearch
     networks:
