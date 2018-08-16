@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:2.0.0-a004
+    image: uscisii2/dig-etl-engine:2.0.1
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:2.0.0-a004
+    image: uscisii2/mydig_ws:2.0.1
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
