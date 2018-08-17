@@ -101,7 +101,7 @@ def kill_etk():
 @app.route('/etk_status/<project_name>', methods=['GET'])
 def etk_status(project_name):
     cmd = 'ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}" | wc -l' \
-           .format(project_name=project_name)
+        .format(project_name=project_name)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read()
     try:
@@ -183,7 +183,7 @@ def run_etk_processes(project_name, processes, project_config):
 
 def kill_etk_process(project_name, ignore_error=False):
     cmd = ('ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}"'
-            '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name=project_name)
+           '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name=project_name)
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and not ignore_error:
         logger.error('error in kill_etk_process')
@@ -192,40 +192,40 @@ def kill_etk_process(project_name, ignore_error=False):
 
 def update_logstash_pipeline(project_name, output_server, output_topic, output_partition):
     content = \
-'''input {{
-  kafka {{
-    bootstrap_servers => ["{server}"]
-    topics => ["{output_topic}"]
-    consumer_threads => "{output_partition}"
-    codec => json {{}}
-    type => "{project_name}"
-    max_partition_fetch_bytes => "10485760"
-    max_poll_records => "10"
-    fetch_max_wait_ms => "1000"
-    poll_timeout_ms => "1000"
-   }}
-}}
-filter {{
-  if [type] == "{project_name}" {{
-    mutate {{ remove_field => ["_id"] }}
-  }}
-}}
-output {{
-  if [type] == "{project_name}" {{
-    elasticsearch {{
-      document_id  => "%{{doc_id}}"
-      document_type => "ads"
-      hosts => ["{es_server}"]
-      index => "{project_name}"
-    }}
-  }}
-}}'''.format(
-    server='","'.join(output_server),
-    output_topic=output_topic,
-    output_partition=output_partition,
-    project_name=project_name,
-    es_server=config['es_server']
-)
+        '''input {{
+          kafka {{
+            bootstrap_servers => ["{server}"]
+            topics => ["{output_topic}"]
+            consumer_threads => "{output_partition}"
+            codec => json {{}}
+            type => "{project_name}"
+            max_partition_fetch_bytes => "10485760"
+            max_poll_records => "10"
+            fetch_max_wait_ms => "1000"
+            poll_timeout_ms => "1000"
+           }}
+        }}
+        filter {{
+          if [type] == "{project_name}" {{
+            mutate {{ remove_field => ["_id"] }}
+          }}
+        }}
+        output {{
+          if [type] == "{project_name}" {{
+            elasticsearch {{
+              document_id  => "%{{doc_id}}"
+              document_type => "ads"
+              hosts => ["{es_server}"]
+              index => "{project_name}"
+            }}
+          }}
+        }}'''.format(
+            server='","'.join(output_server),
+            output_topic=output_topic,
+            output_partition=output_partition,
+            project_name=project_name,
+            es_server=config['es_server']
+        )
 
     path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
     if not os.path.exists(path):
