@@ -1,11 +1,9 @@
 import os
 import sys
-import traceback
 import subprocess
 import json
-from kafka import KafkaProducer, KafkaConsumer, TopicPartition
+from kafka import KafkaConsumer, TopicPartition
 import logging
-import logstash
 import codecs
 import requests
 import time
