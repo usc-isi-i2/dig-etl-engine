@@ -148,7 +148,7 @@ services:
       - elasticsearch
 
   mydig_ws:
-    image: uscisii2/mydig_ws:2.0.1
+    image: uscisii2/mydig_ws:2.0.2
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
@@ -169,6 +169,7 @@ services:
     depends_on:
       - sandpaper
       - elasticsearch
+      - hbase
 
   digui:
     image: digmemex/digui:3.4.1
@@ -223,6 +224,16 @@ services:
       - ./landmark/sandbox/landmark-portal.docker.env
 #    ports:
 #     - "3333:3333"
+    networks:
+      - dig_net
+
+  hbase:
+    image: dajobe/hbase:latest
+#    ports:
+#      - "9090"
+#      - "9001"
+    volumes:
+      - ${DIG_PROJECTS_DIR_PATH}/.hbase:/data
     networks:
       - dig_net
 
