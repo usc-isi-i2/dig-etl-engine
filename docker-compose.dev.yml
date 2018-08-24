@@ -5,18 +5,18 @@ services:
   dig_etl_engine:
     volumes:
       - .:/app/dig-etl-engine
-      - ${ETK_DIR_PATH}:/app/etk
-      - ${SANDPAPER_DIR_PATH}:/app/miniconda/envs/etk2_env/lib/python3.6/site-packages/digsandpaper
+#      - ${ETK_DIR_PATH}:/app/etk
+#      - ${SANDPAPER_DIR_PATH}:/app/miniconda/envs/etk2_env/lib/python3.6/site-packages/digsandpaper
 
   mydig_ws:
     volumes:
       - ${MYDIG_DIR_PATH}:/app/mydig-webservice
-      - ${ETK_DIR_PATH}:/app/etk
+#      - ${ETK_DIR_PATH}:/app/etk
 #      - ${SPACY_DIR_PATH}:/app/spacy-ui
 
-  rss_feed_crawler:
-    volumes:
-      - ${RSS_DIR_PATH}:/app
+#  rss_feed_crawler:
+#    volumes:
+#      - ${RSS_DIR_PATH}:/app
 
-  sandpaper:
-    image: sandpaperlocal:latest
+#  sandpaper:
+#    image: sandpaperlocal:latest
