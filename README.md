@@ -55,6 +55,10 @@ DIG_AUTH_PASSWORD=123
 - `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
+```
+Copy logstash/sandbox/pipeline/logstash.conf to DIG_PROJECTS_DIR_PATH/.ls/pipeline/
+```
+
 If you are working on Linux, do these additional steps:
 
     chmod 666 logstash/sandbox/settings/logstash.yml
