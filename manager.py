@@ -11,6 +11,7 @@ import requests
 import time
 import shutil
 from flask import Flask, request, jsonify
+from shutil import copyfile
 
 from config import config
 
@@ -101,7 +102,7 @@ def kill_etk():
 @app.route('/etk_status/<project_name>', methods=['GET'])
 def etk_status(project_name):
     cmd = 'ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}" | wc -l' \
-           .format(project_name=project_name)
+        .format(project_name=project_name)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read()
     try:
@@ -183,7 +184,7 @@ def run_etk_processes(project_name, processes, project_config):
 
 def kill_etk_process(project_name, ignore_error=False):
     cmd = ('ps -ef | grep -v grep | egrep "tag-mydig-etk-{project_name}-[[:digit:]]{{1,}}"'
-            '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name=project_name)
+           '| awk \'{{print $2}}\'| xargs --no-run-if-empty kill ').format(project_name=project_name)
     ret = subprocess.call(cmd, shell=True)
     if ret != 0 and not ignore_error:
         logger.error('error in kill_etk_process')
@@ -192,40 +193,40 @@ def kill_etk_process(project_name, ignore_error=False):
 
 def update_logstash_pipeline(project_name, output_server, output_topic, output_partition):
     content = \
-'''input {{
-  kafka {{
-    bootstrap_servers => ["{server}"]
-    topics => ["{output_topic}"]
-    consumer_threads => "{output_partition}"
-    codec => json {{}}
-    type => "{project_name}"
-    max_partition_fetch_bytes => "10485760"
-    max_poll_records => "10"
-    fetch_max_wait_ms => "1000"
-    poll_timeout_ms => "1000"
-   }}
-}}
-filter {{
-  if [type] == "{project_name}" {{
-    mutate {{ remove_field => ["_id"] }}
-  }}
-}}
-output {{
-  if [type] == "{project_name}" {{
-    elasticsearch {{
-      document_id  => "%{{doc_id}}"
-      document_type => "ads"
-      hosts => ["{es_server}"]
-      index => "{project_name}"
-    }}
-  }}
-}}'''.format(
-    server='","'.join(output_server),
-    output_topic=output_topic,
-    output_partition=output_partition,
-    project_name=project_name,
-    es_server=config['es_server']
-)
+        '''input {{
+          kafka {{
+            bootstrap_servers => ["{server}"]
+            topics => ["{output_topic}"]
+            consumer_threads => "{output_partition}"
+            codec => json {{}}
+            type => "{project_name}"
+            max_partition_fetch_bytes => "10485760"
+            max_poll_records => "10"
+            fetch_max_wait_ms => "1000"
+            poll_timeout_ms => "1000"
+           }}
+        }}
+        filter {{
+          if [type] == "{project_name}" {{
+            mutate {{ remove_field => ["_id"] }}
+          }}
+        }}
+        output {{
+          if [type] == "{project_name}" {{
+            elasticsearch {{
+              document_id  => "%{{doc_id}}"
+              document_type => "ads"
+              hosts => ["{es_server}"]
+              index => "{project_name}"
+            }}
+          }}
+        }}'''.format(
+            server='","'.join(output_server),
+            output_topic=output_topic,
+            output_partition=output_partition,
+            project_name=project_name,
+            es_server=config['es_server']
+        )
 
     path = os.path.join(config['logstash']['pipeline'], 'logstash-{}.conf'.format(project_name))
     if not os.path.exists(path):
@@ -254,6 +255,13 @@ def create_mappings(index_name, payload_file_path):
         create_mappings(index_name, payload_file_path)
 
 
+def copy_default_config():
+    default_logstash_config = 'logstash.conf'
+    if not os.path.exists('{}/{}'.format(config['logstash']['pipeline'], default_logstash_config)):
+        copyfile('{}/{}'.format(config['logstash']['default_pipeline'], default_logstash_config),
+                 '{}/{}'.format(config['logstash']['pipeline'], default_logstash_config))
+
+
 if __name__ == '__main__':
     try:
         # digui will create indices itself
@@ -262,6 +270,9 @@ if __name__ == '__main__':
 
         # general logs
         create_mappings('logs', 'elasticsearch/sandbox/mappings/logs.json')
+
+        # copy default logstash config
+        copy_default_config()
 
         app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
     except Exception as e:
