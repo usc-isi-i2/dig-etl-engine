@@ -406,7 +406,14 @@ class ConfigGenerator(object):
             self.content_extraction_for_join_fields()
 
         return {
-            "json_content": entries
+            "json_content": entries,
+            "guards": [
+                {
+                    "regex": "no",
+                    "path": "$.{}.disable_default_extractors".format(self.prefix),
+                    "type": "doc"
+                }
+            ],
         }
 
     def data_extraction(self):
@@ -478,7 +485,8 @@ class ConfigGenerator(object):
                 input_path_prefix = self.prefix + "." + config["path"] + "." + self.prefix + "."
                 for rule in config["config"].get("rules") or []:
                     if rule.get("join_indexing"):
-                        input_path = input_path_prefix + rule["path"] + "[*]"
+                        # input_path = input_path_prefix + rule["path"] + "[*]"
+                        input_path = input_path_prefix + rule["path"]
                         segment_name = self.segment_name_for_joins(config, rule)
                         ce = {
                             "input_path": input_path,

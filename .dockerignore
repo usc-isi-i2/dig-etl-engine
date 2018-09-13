@@ -7,4 +7,8 @@
 *.test
 *.log
 .env
-utilities/*
+.engine.status
+utilities
+datasets
+sample-projects
+docs

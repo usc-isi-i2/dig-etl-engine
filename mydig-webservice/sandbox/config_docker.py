@@ -19,9 +19,11 @@ config = {
         }
     },
     'logging': {
-        'file_path': 'log.log',
-        'format': '%(asctime)s %(levelname)s %(message)s',
-        'level': logging.INFO
+        'name': 'mydig-webservice.log', # name of logger
+        'file_path': None,
+        'format': '%(asctime)s [%(levelname)s] %(message)s',
+        'level': logging.INFO,
+        'werkzeug': logging.WARNING
     },
     'es': {
         # do not add / at the end
@@ -67,9 +69,9 @@ config = {
         'spacy_ui_url': 'http://{}:{}/mydig/spacy_ui/'.format(
             os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')),
         'spacy_backend_sever_name_base64': base64.b64encode('{}:{}/mydig'.format(
-            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497'))),
+            os.getenv('DOMAIN', 'localhost'), os.getenv('PORT', '12497')).encode()).decode(),
         'spacy_backend_auth_base64': base64.b64encode('{}:{}'.format(
-            os.getenv('DIG_AUTH_USER', 'admin'), os.getenv('DIG_AUTH_PASSWORD', '123')))
+            os.getenv('DIG_AUTH_USER', 'admin'), os.getenv('DIG_AUTH_PASSWORD', '123')).encode()).decode()
     },
     'landmark': {
         'create': 'http://landmark-rest:5000/project/create_from_dig/{project_name}',
@@ -97,8 +99,19 @@ config = {
             'file_name': 'rss'
         }
     },
+    'external_crawler': {
+        'kafka_topic': 'crawler',
+        'group_id': 'mydig',
+        'upload': {
+            'endpoint': 'http://mydig_ws:9879/projects/{project_name}/data?sync=true&log=false',
+            'file_name': 'crawler'
+        },
+        'default_project': os.getenv('DEFAULT_EXTERNAL_CRAWLER_PROJECT', 'crawler')
+    },
     'data_pushing_worker_backoff_time': 5,
-    'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana'),
+    'status_memory_dump_backoff_time': 5,
+    'catalog_memory_dump_backoff_time': 5,
+    'project_name_blacklist': ('logs', 'dig-logs', 'dig-states', 'dig-profiles', '.kibana', 'crawler'),
     'default_glossary_dicts_path': '/shared_data/dig3-resources/builtin_resources',
     'default_glossaries_path': '/shared_data/dig3-resources/glossaries',
     'default_spacy_rules_path': '/shared_data/dig3-resources/custom_spacy_rules'

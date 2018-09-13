@@ -55,6 +55,10 @@ DIG_AUTH_PASSWORD=123
 - `KAFKA_NUM_PARTITIONS`: partition numbers per topic. Set it to the same value as `NUM_ETK_PROCESSES`. It will not affect the existing partition number in Kafka topics unless you drop the Kafka container (you will lose all data in Kafka topics).
 - `DIG_AUTH_USER, DIG_AUTH_PASSWORD`: myDIG uses nginx to control access. 
 
+```
+Copy logstash/sandbox/pipeline/logstash.conf to DIG_PROJECTS_DIR_PATH/.ls/pipeline/
+```
+
 If you are working on Linux, do these additional steps:
 
     chmod 666 logstash/sandbox/settings/logstash.yml
@@ -86,6 +90,17 @@ Once myDIG is running, go to your browser and visit `http://localhost:12497/mydi
 > Note: myDIG currently works only on Chrome
 
 To use myDIG, look at the [user guide](docs/index.md)
+
+#### Upgrade Issues (12 June 2018)
+
+myDIG v2 is now in alpha, there are couple of big and incompatible changes.
+
+- data, configs and logs of components are not in `DIG_PROJECTS_DIR_PATH/.*`.
+- Kafka queue data will NOT be clean up even after doing `./engine.sh down`, you need to delete `DIG_PROJECTS_DIR_PATH/.kafka` then restart engine (if you change `NUM_ETK_PROCESSES`).
+- There's no default resource any more, if a resource file (glossary) is not compatible, please delete it.
+- There's no `custom_etk_config.json` or `additional_etk_config/*` any more, instead, generated ETK modules are in `working_dir/generated_em` and additional modules are in `working_dir/additional_ems`.
+- ETK log is not fully implemented and tested. Runtime logs will APPEND to `working_dir/etk_worker_*.log`.
+- Spacy rule editor is not working.
 
 #### Upgrade Issues (16 Nov 2017)
 
@@ -256,29 +271,18 @@ files. `DIG_PROJECTS_DIR_PATH/<project_name>` will be mapped to `/shared_data/pr
 > `dig_net` is the LAN in Docker compose.
 
 ### Docker commands for development
-
-build Kibana 4 image:
-
-    docker build -t uscisii2/kibana:4.6-sense kibana/.
     
 build Nginx image:
 
     docker build -t uscisii2/nginx:auth-1.0 nginx/.
-
-build ETK base image:
-
-    # update ETK_VERSION in file VERSION
-    ./release_docker.sh etk build
-    ./release_docker.sh etk push
     
 build ETL image:
     
-    
     # git commit all changes first, then
-    ./release_docker.sh engine tag
+    ./release_docker.sh tag
     git push --tags
     # update DIG_ETL_ENGINE_VERSION in file VERSION
-    ./release_docker.sh engine build
+    ./release_docker.sh build
     ./release_docker.sh push
     
 Invoke development mode:
