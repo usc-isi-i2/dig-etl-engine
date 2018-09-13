@@ -9,6 +9,7 @@ import requests
 import time
 import shutil
 from flask import Flask, request, jsonify
+from shutil import copyfile
 
 from config import config
 
@@ -252,6 +253,13 @@ def create_mappings(index_name, payload_file_path):
         create_mappings(index_name, payload_file_path)
 
 
+def copy_default_config():
+    default_logstash_config = 'logstash.conf'
+    if not os.path.exists('{}/{}'.format(config['logstash']['pipeline'], default_logstash_config)):
+        copyfile('{}/{}'.format(config['logstash']['default_pipeline'], default_logstash_config),
+                 '{}/{}'.format(config['logstash']['pipeline'], default_logstash_config))
+
+
 if __name__ == '__main__':
     try:
         # digui will create indices itself
@@ -260,6 +268,9 @@ if __name__ == '__main__':
 
         # general logs
         create_mappings('logs', 'elasticsearch/sandbox/mappings/logs.json')
+
+        # copy default config
+        copy_default_config()
 
         app.run(debug=config['debug'], host=config['server']['host'], port=config['server']['port'], threaded=True)
     except Exception as e:
