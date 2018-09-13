@@ -228,7 +228,7 @@ services:
       - dig_net
 
   hbase:
-    image: dajobe/hbase:latest
+    image: uscisii2/hbase:latest
 #    ports:
 #      - "9090"
 #      - "9001"
