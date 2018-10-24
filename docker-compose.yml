@@ -126,7 +126,7 @@ services:
       - elasticsearch
 
   sandpaper:
-    image: digsandpaper/digsandpaper:0.2.7
+    image: uscisii2/digsandpaper:0.2.7
 #    ports:
 #      - "9876"
     volumes:
