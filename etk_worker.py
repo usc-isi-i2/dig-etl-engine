@@ -104,7 +104,9 @@ class ETKWorker(object):
                         results = self.etk_ins.process_ems(doc)
                         for result in results:
                             cdr_result = result.cdr_document
-
+                            # TODO remove removing of the provenances fields, once it  is working properly
+                            cdr_result.pop('provenances', None)
+                            
                             # indexing
                             # TODO
                             indexed_cdr = index_knowledge_graph_fields(cdr_result)
@@ -113,14 +115,14 @@ class ETKWorker(object):
                                 continue
                             # cdr = indexed_cdr
 
-                        # cdr['@execution_profile']['@run_core_time'] = \
-                        #     float(time.time() - start_run_core_time)
-                        # doc_sent_time = time.time()
-                        # cdr['@execution_profile']['@doc_sent_time'] = \
-                        #     datetime.utcfromtimestamp(doc_sent_time).isoformat()
-                        # prev_doc_sent_time = doc_sent_time
-                        # cdr['@execution_profile']['@doc_processed_time'] = \
-                        #     float(doc_sent_time - doc_arrived_time)
+                            # cdr['@execution_profile']['@run_core_time'] = \
+                            #     float(time.time() - start_run_core_time)
+                            # doc_sent_time = time.time()
+                            # cdr['@execution_profile']['@doc_sent_time'] = \
+                            #     datetime.utcfromtimestamp(doc_sent_time).isoformat()
+                            # prev_doc_sent_time = doc_sent_time
+                            # cdr['@execution_profile']['@doc_processed_time'] = \
+                            #     float(doc_sent_time - doc_arrived_time)
 
                             # output result
                             r = self.kafka_producer.send(self.kafka_output_topic, indexed_cdr)
