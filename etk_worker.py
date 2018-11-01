@@ -103,10 +103,11 @@ class ETKWorker(object):
                         # process_ems returns a list of Documents
                         results = self.etk_ins.process_ems(doc)
                         for result in results:
+
                             cdr_result = result.cdr_document
                             # TODO remove removing of the provenances fields, once it  is working properly
                             cdr_result.pop('provenances', None)
-                            
+
                             # indexing
                             # TODO
                             indexed_cdr = index_knowledge_graph_fields(cdr_result)
