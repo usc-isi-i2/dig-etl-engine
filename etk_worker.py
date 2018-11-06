@@ -107,6 +107,9 @@ class ETKWorker(object):
                             cdr_result = result.cdr_document
                             # TODO remove removing of the provenances fields, once it  is working properly
                             cdr_result.pop('provenances', None)
+                            if 'type' in cdr_result:
+                                cdr_result['type_'] = cdr_result['type']
+                                cdr_result.pop('type')
 
                             # indexing
                             # TODO
