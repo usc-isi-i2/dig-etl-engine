@@ -99,7 +99,8 @@ class ETKWorker(object):
                         # start_run_core_time = time.time()
                         # run etk module
 
-                        doc = self.etk_ins.create_document(cdr, url=cdr['url'], doc_id=cdr['doc_id'])
+                        doc = self.etk_ins.create_document(cdr, url=cdr['url'] if 'url' in cdr else '',
+                                                           doc_id=cdr['doc_id'])
                         # process_ems returns a list of Documents
                         results = self.etk_ins.process_ems(doc)
                         for result in results:
