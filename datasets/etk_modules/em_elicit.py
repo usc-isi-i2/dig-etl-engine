@@ -1,4 +1,3 @@
-from etk.etk import ETK
 from etk.extractors.html_content_extractor import HTMLContentExtractor, Strategy
 from etk.extractors.html_metadata_extractor import HTMLMetadataExtractor
 from etk.etk_module import ETKModule
@@ -10,6 +9,7 @@ class DemoElicitETKModule(ETKModule):
     """
     Abstract class for extraction module
     """
+
     def __init__(self, etk):
         ETKModule.__init__(self, etk)
         self.metadata_extractor = HTMLMetadataExtractor()
@@ -37,9 +37,9 @@ class DemoElicitETKModule(ETKModule):
 
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.ALL_TEXT), "etk2_text")
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_STRICT),
-                              "etk2_content_strict")
+                  "etk2_content_strict")
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_RELAXED),
-                              "etk2_content_relaxed")
+                  "etk2_content_relaxed")
         doc.store(doc.extract(self.metadata_extractor,
                               raw,
                               extract_title=True,
@@ -67,15 +67,3 @@ class DemoElicitETKModule(ETKModule):
 
     def document_selector(self, doc) -> bool:
         return doc.cdr_document.get("url").startswith("http://www.ce_news_article.org")
-
-
-if __name__ == "__main__":
-
-    sample_html = json.load(codecs.open('sample_html.json', 'r')) # read sample file from disk
-
-    etk = ETK(modules=HtmlBasicETKModule)
-    doc = etk.create_document(sample_html, mime_type="text/html", url="http://ex.com/123")
-
-    docs= etk.process_ems(doc)
-
-    print(json.dumps(docs[0].value, indent=2))
