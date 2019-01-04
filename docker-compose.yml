@@ -24,7 +24,7 @@ services:
       - digui
 
   dig_etl_engine:
-    image: uscisii2/dig-etl-engine:2.0.3
+    image: uscisii2/dig-etl-engine:2.0.4
     environment:
       KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-4}
     volumes:
@@ -50,8 +50,8 @@ services:
 
   kafka:
     image: wurstmeister/kafka
-#    ports:
-#      - "9092"
+    ports:
+      - "9092:9092"
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
@@ -171,7 +171,7 @@ services:
       - elasticsearch
 
   digui:
-    image: uscisii2/digui:3.4.5
+    image: uscisii2/digui:3.4.6
 #    ports:
 #      - "8080"
     volumes:
