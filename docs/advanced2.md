@@ -71,3 +71,94 @@ One record from event data has the following structure:
 > This one json line is converted to a [Document](https://github.com/usc-isi-i2/etk/blob/master/etk/document.py) 
 object in myDIG and this object is passed to the `process_document` function
 
+Lets dissect the [etk module](https://github.com/usc-isi-i2/dig-etl-engine/blob/development/datasets/etk_modules/em_elicit.py)
+for this dataset.
+
+#### Import Statements
+```
+# Importing the extractors we are going to use
+from etk.extractors.html_content_extractor import HTMLContentExtractor, Strategy
+from etk.extractors.html_metadata_extractor import HTMLMetadataExtractor
+from etk.extractors.date_extractor import DateExtractor
+from etk.extractors.glossary_extractor import GlossaryExtractor
+
+# Import etk module related classes
+from etk.etk_module import ETKModule
+```
+
+#### Define custom class and initialization
+```
+class DemoElicitETKModule(ETKModule):
+    def __init__(self, etk):
+        # initialize super class
+        ETKModule.__init__(self, etk)
+        
+        # initialize metadata extractor (extracts metadata from html pages)
+        self.metadata_extractor = HTMLMetadataExtractor()
+        
+        # initialize content extractor (extracts `content` from html page. Tries to identify main text in the html)
+        self.content_extractor = HTMLContentExtractor()
+        
+        # initialize a date extractor (can normalize a variety of date formats)
+        self.date_extractor = DateExtractor(self.etk, 'demo_date_parser')
+        
+        # initialize a glossary extractor for countries with a bunch of extractor level parameters
+        self.country_extractor = GlossaryExtractor(
+            self.etk.load_glossary(
+                "${GLOSSARY_PATH}/countries.txt"),
+            "country_extractor",
+            self.etk.default_tokenizer,
+            case_sensitive=False, ngrams=3)
+            
+        # initialize a glossary extractor for cities
+        self.cities_extractor = GlossaryExtractor(
+            self.etk.load_glossary(
+                "${GLOSSARY_PATH}/cities.txt"),
+            "cities_extractor",
+            self.etk.default_tokenizer,
+            case_sensitive=False, ngrams=3)
+```
+> These glossaries should be present in your project.
+
+> Exercise: Find the glossary page in myDIG UI and see if they match the names used in this etk module
+
+#### process_document function (this is where the Knowledge Graph is built)
+```
+    def process_document(self, doc):
+        """
+        Add your code for processing the document
+        """
+
+        raw = doc.select_segments("$.raw_content")[0]
+
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.ALL_TEXT), "etk2_text")
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_STRICT),
+                  "etk2_content_strict")
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_RELAXED),
+                  "etk2_content_relaxed")
+        doc.store(doc.extract(self.metadata_extractor,
+                              raw,
+                              extract_title=True,
+                              extract_meta=True,
+                              extract_microdata=True,
+                              extract_rdfa=True,
+                              ), "etk2_metadata")
+        doc.kg.add_value("description", json_path="$.etk2_content_strict")
+        doc.kg.add_value("title", json_path="$.etk2_metadata.title")
+
+        description_segments = doc.select_segments(jsonpath='$.etk2_content_strict')
+        for segment in description_segments:
+            extractions = doc.extract(extractor=self.date_extractor, extractable=segment)
+            for extraction in extractions:
+                doc.kg.add_value("event_date", value=extraction.value)
+
+                extracted_countries = doc.extract(
+                    self.country_extractor, segment)
+                doc.kg.add_value('country', value=extracted_countries)
+
+                extracted_cities = doc.extract(self.cities_extractor, segment)
+                doc.kg.add_value('city', value=extracted_cities)
+
+        return list()
+```
+
