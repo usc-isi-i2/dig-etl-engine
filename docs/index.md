@@ -1,6 +1,6 @@
 # myDIG User Guide
 
-This guide takes you through the steps to build a simple application starting with a collection of web pages.
+This guide takes you through the steps to build a simple application starting with a collection of event records.
 Before continuing, install myDIG by following the instructions in the [README.md](https://github.com/usc-isi-i2/dig-etl-engine/blob/master/README.md) file.
 Once the installation completes, visit the page [http://localhost:12497/mydig/ui/](http://localhost:12497/mydig/ui/) to bring up the home page.
 
@@ -14,10 +14,10 @@ The steps include:
 - using rules to extract data based on patterns
 - organizing and customizing the appearance of the search page
 
-This guide will show you how to build a KG and search application for artworks in a museum. 
-The following page shows an example page [https://americanart.si.edu/artwork/sir-thomas-heath-9890](https://americanart.si.edu/artwork/sir-thomas-heath-9890).
-Your objective is to build a KG of artworks in the Smithsonian American Art Museum.
-The KG will include information about the artworks (title, medium, size, etc.) and the artists who created them.
+This guide will show you how to build a KG and search application for an event dataset. 
+
+Your objective is to build a KG of event records.
+The KG will include information about the events (title, date, city, country, description).
 
 [add-project-button]: assets/add-project-button.png
 [create-project]: assets/create-project.png
@@ -41,7 +41,7 @@ From the `All Projects` page, click on the `+` button to add a new project.
 
 ![Add Project Dialog][add-project-button]
 
-                                                                                                    Screenshot 1
+            Screenshot 1
 
 > Project names should be lowercase, contain only letters, numbers and `_`
 
@@ -49,31 +49,31 @@ Click on the `SAVE` button to create the project.
 
 ![Create Project Dialog][create-project]
                                                                                                     
-                                                                                                    Screenshot 2
+            Screenshot 2
 
 Click on the project or the `>` button to go to the project configuration page.
 
 ![Open Project][open-project]
 
-                                                                                                    Screenshot 3
+            Screenshot 3
 ## Import Existing Project Settings
 For this guide, we are going to use existing project settings, which include pre defined fields and glossaries.
 Click on the `Import Project` button from the top right corner menu
 
 ![import-project]
 
-                                                                                                    Screenshot 4
+            Screenshot 4
                                                                                                     
 Select `elicit_20181113185140.tar.gz` from the `datasets` folder, click `SUBMIT` and then click `OVERWRITE` button in the confirmation dialog.
 
 ![import-project-dialog]
 
-                                                                                                    Screenshot 5                          
+            Screenshot 5                          
 There should be 5 new fields and 2 glossaries created.     
 
 ![hamburger-menu]
 
-                                                                                                    Screenshot 6                                                                                                                                                                       
+            Screenshot 6                                                                                                                                                                       
  
 
 ## Loading Data
@@ -82,15 +82,15 @@ The new project screen contains options to configure your project.
 
 ![New Project][new-project]
 
-                                                                                                    Screenshot 7
+            Screenshot 7
 
 Use `Import JSON lines File` to import data in your project and select the `elicit_20.jl` file, which contains a sample of 20 pages from the event dataset.
 This file is part of the myDIG installation, in `datasets/elicit_20.jl`.
 After a few seconds, myDIG will load the data, and show that it has loaded 20 pages:
 
 ![Data Loaded][load-data]
-                                    
-                                                                                                    Screenshot 8
+
+            Screenshot 8
 
 > myDIG scans the files you load identifying TLDs and will show the number of documents you have from each TLD (Our file has documents from a single TLD).
 
@@ -118,7 +118,7 @@ After a couple of minutes, the documents will move through the extraction pipeli
 
 ![Run Pipeline][run-pipeline-1]
 
-                                                                                                    Screenshot 9
+            Screenshot 9
 
 ## Testing The KG
 
@@ -128,13 +128,13 @@ Go ahead and click it.
 In the DIG UI, click the wrench icon (see Screenshot 10) to open the search form:
 ![dig-ui-home]
 
-                                                                                                    Screenshot 10
+            Screenshot 10
 
 Enter `nigeria` in the `Country` field to tell DIG that you want to search for events from Nigeria:
 
 ![Search][search]
 
-                                                                                                    Screenshot 11
+            Screenshot 11
 
 Click `Search` and take a look at the data.
 Your KG so far is simple, but it is already functional.
@@ -156,13 +156,13 @@ Select the `Fields` option (see Screenshot 6) to view the fields in your project
 
 ![Fields][fields]
 
-                                                                                                    Screenshot 12
+            Screenshot 12
 Let's add a new dummy field, for demo purposes. Click on the `+` button at the top right corner.
 
 
 ![add-field]
 
-                                                                                                    Screenshot 13
+            Screenshot 13
 Fill in the fields as shown in the picture above and click `SAVE`. There are more fields in the add field form, we'll discuss these later.
 ### Deleting Fields
 
