@@ -99,11 +99,18 @@ class ETKWorker(object):
                         # start_run_core_time = time.time()
                         # run etk module
 
-                        doc = self.etk_ins.create_document(cdr, url=cdr['url'], doc_id=cdr['doc_id'])
+                        doc = self.etk_ins.create_document(cdr, url=cdr['url'] if 'url' in cdr else '',
+                                                           doc_id=cdr['doc_id'])
                         # process_ems returns a list of Documents
                         results = self.etk_ins.process_ems(doc)
                         for result in results:
+
                             cdr_result = result.cdr_document
+                            # TODO remove removing of the provenances fields, once it  is working properly
+                            cdr_result.pop('provenances', None)
+                            if 'type' in cdr_result:
+                                cdr_result['type_'] = cdr_result['type']
+                                cdr_result.pop('type')
 
                             # indexing
                             # TODO
@@ -113,14 +120,14 @@ class ETKWorker(object):
                                 continue
                             # cdr = indexed_cdr
 
-                        # cdr['@execution_profile']['@run_core_time'] = \
-                        #     float(time.time() - start_run_core_time)
-                        # doc_sent_time = time.time()
-                        # cdr['@execution_profile']['@doc_sent_time'] = \
-                        #     datetime.utcfromtimestamp(doc_sent_time).isoformat()
-                        # prev_doc_sent_time = doc_sent_time
-                        # cdr['@execution_profile']['@doc_processed_time'] = \
-                        #     float(doc_sent_time - doc_arrived_time)
+                            # cdr['@execution_profile']['@run_core_time'] = \
+                            #     float(time.time() - start_run_core_time)
+                            # doc_sent_time = time.time()
+                            # cdr['@execution_profile']['@doc_sent_time'] = \
+                            #     datetime.utcfromtimestamp(doc_sent_time).isoformat()
+                            # prev_doc_sent_time = doc_sent_time
+                            # cdr['@execution_profile']['@doc_processed_time'] = \
+                            #     float(doc_sent_time - doc_arrived_time)
 
                             # output result
                             r = self.kafka_producer.send(self.kafka_output_topic, indexed_cdr)

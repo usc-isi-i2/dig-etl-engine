@@ -11,9 +11,9 @@ RUN mkdir /app/dig-etl-engine
 RUN apt-get update && apt-get install -y default-jre
 
 # download kafka (for command tools)
-RUN wget "http://apache.claz.org/kafka/0.11.0.2/kafka_2.11-0.11.0.2.tgz" && \
-    tar -xvzf "kafka_2.11-0.11.0.2.tgz" && rm "kafka_2.11-0.11.0.2.tgz" && \
-    mv "kafka_2.11-0.11.0.2" kafka
+RUN wget "http://apache.claz.org/kafka/0.11.0.3/kafka_2.11-0.11.0.3.tgz" && \
+    tar -xvzf "kafka_2.11-0.11.0.3.tgz" && rm "kafka_2.11-0.11.0.3.tgz" && \
+    mv "kafka_2.11-0.11.0.3" kafka
 
 # install dependencies
 ADD requirements.txt /app/dig-etl-engine

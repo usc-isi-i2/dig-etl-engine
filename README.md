@@ -67,6 +67,12 @@ If you are working on Linux, do these additional steps:
     
 > To set `vm.max_map_count` permanently, please update it in `/etc/sysctl.conf` and reload sysctl settings by `sysctl
  -p /etc/sysctl.conf`.
+ 
+Move default docker installation (if docker runs out of memory) to a volume
+```
+sudo mv /var/lib/docker /path_with_more_space
+sudo ln -s /path_with_more_space /var/lib/docker
+```
 
 To run myDIG do:
 
