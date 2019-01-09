@@ -18,6 +18,8 @@ We will cover the following topics in this guide:
 to etk modules. This is a significantly big change as compared to the previous version of myDIG. We no longer supply 
 supplementary config files to define the extractions, instead the users are given flexibility to write code.
 
+The [etk documentation](https://usc-isi-i2.github.io/etk/) explains the classes and available extractors.
+
 The structure of an ETK module:
 ```
 from etk.etk_module import ETKModule
@@ -120,22 +122,27 @@ class DemoElicitETKModule(ETKModule):
 ```
 > These glossaries should be present in your project.
 
-> Exercise: Find the glossary page in myDIG UI and see if they match the names used in this etk module
+> ***Exercise: Find the glossary page in myDIG UI and see if the glossaries match the ones used in this etk module***
 
-#### process_document function (this is where the Knowledge Graph is built)
+#### process_document(doc: Document) function (this is where the Knowledge Graph is built)
 ```
     def process_document(self, doc):
         """
         Add your code for processing the document
         """
 
+        # define a segment of the document on which on run extractors
         raw = doc.select_segments("$.raw_content")[0]
-
+        
+        # extract text from the segment using the strategies: `ALL_TEXT`, `MAIN_CONTENT_STRICT` and `MAIN_CONTENT_RELAXED`
+        # and store the output in document itself
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.ALL_TEXT), "etk2_text")
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_STRICT),
                   "etk2_content_strict")
         doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_RELAXED),
                   "etk2_content_relaxed")
+        
+        # extract metadata from the segment
         doc.store(doc.extract(self.metadata_extractor,
                               raw,
                               extract_title=True,
@@ -143,6 +150,9 @@ class DemoElicitETKModule(ETKModule):
                               extract_microdata=True,
                               extract_rdfa=True,
                               ), "etk2_metadata")
+        
+        # start building the knowledge graph, add title and description from 
+        # previously extracted description and title
         doc.kg.add_value("description", json_path="$.etk2_content_strict")
         doc.kg.add_value("title", json_path="$.etk2_metadata.title")
 
@@ -150,15 +160,43 @@ class DemoElicitETKModule(ETKModule):
         for segment in description_segments:
             extractions = doc.extract(extractor=self.date_extractor, extractable=segment)
             for extraction in extractions:
+                # extract date and add to KG
                 doc.kg.add_value("event_date", value=extraction.value)
-
+    
                 extracted_countries = doc.extract(
                     self.country_extractor, segment)
+                
+                # extract country and add to KG
                 doc.kg.add_value('country', value=extracted_countries)
 
                 extracted_cities = doc.extract(self.cities_extractor, segment)
+                
+                # extract city and add to KG
                 doc.kg.add_value('city', value=extracted_cities)
-
+        
+        # return empty list if no additional Documents were created in this function
         return list()
 ```
 
+There is a lot to unpack in this etk module. First we initialize some extractors, please refer the [documentation](https://usc-isi-i2.github.io/etk/).
+
+Next we define a Segment, which is basically subpart of the document. We then proceed to extract text from the segment followed by extracting entities like title, description, city, country etc. Then we build the knowledge graph by calling the
+function `doc.kg.add_value('some_field', extractions)`.
+
+While building the knowledge graph, we can only use fields which already exist in myDIG fields menu.
+
+> ***Exercise: Find the fields page in myDIG and confirm that all the fields in the knowledge graph are present in myDIG***
+
+Users don't have to follow the above etk module's structure. They have the flexibility to write an etk modules in a lot of ways.
+
+For example, they can extract entities without defining a segment first. Or they don't have to store intermittent results in the document. The results can be added to the KG at any point.
+
+Examples of ETK modules are available [here](https://github.com/usc-isi-i2/etk/tree/master/examples)
+
+### document_selector() function, returns a boolean if the current Document should be processed by this etk module
+```
+ def document_selector(self, doc) -> bool:
+        return doc.cdr_document.get("url").startswith("http://www.ce_news_article.org")
+```
+
+We are checking if the value of field `url` starts with `http://www.ce_news_article.org`. Which you can scroll up and confirm this yourself. myDIG call this function to check whether the input record should be processed by the current ETK module.
