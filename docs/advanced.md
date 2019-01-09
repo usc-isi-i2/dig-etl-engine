@@ -1,427 +1,334 @@
-# myDIG Advanced User Guide
+# Processing Data in myDIG
 
-This guide explains how to use features of the DIG processing pipeline that you cannot access from the myDIG user interface.
-The guide assumes that you already read the [User Guide](index.md) and that you have already defined a project and used the processing pipeline to build a search engine for corpus of documents.
+This guide will explain how to process data in the latest version of myDIG. This version rovides a lot of freedom and 
+flexibility to users in terms of data processing.
+The guide assumes that you already read the [User Guide](index.md) and that you have already defined a project and used the 
+processing pipeline to build a search engine for corpus of documents.
 
-The guide covers the following topics:
+We will cover the following topics in this guide:
 
-- ingesting JSON documents
-- targetting extractors to specific document segments
-- defining new extractors (to be written)
+- ETK modules - a new way to process your data
+- Ingesting different file types (csv, xls, xlsx, html etc)
+- Tying everything together in myDIG
 
-I encourage you to build the example shown in this guide. It will take about 30 minutes and you will have a working application as a starting point for importing files into your own project.
+## ETK modules
 
-> Hands-on: start myDIG and define a new project called `events`.
-> 
-> You can follow along and build the project step by step, or you can import the premade `sample-projects/events.tar.gz` and see the complete project.
-> 
-> Note: to import a project, first define an empty project, then use the `Import Project` command to import the `events.tar.gz`. The data for the project is in `datasets/events/`, import both files, set desire docs to 100 and click the red button to run the project.
+[ETK](https://github.com/usc-isi-i2/etk) modules are python scripts, which are used by myDIG to process data and build knowledge graphs. We have moved on from config based extraction to etk modules. This is a significantly bigger change  compared to the previous version. We no longer write supplementary config files to define the extractions, instead the users are given flexibility to write code.
 
-[search-screen]: assets/events/1-search-screen.png 
-[boko-haram]: assets/events/boko-haram.png 
+The [etk documentation](https://usc-isi-i2.github.io/etk/) explains the classes and available extractors.
 
-## Ingesting JSON Documents
+The structure of an ETK module:
+```
+from etk.etk_module import ETKModule
+from etk.document import Document
+import ...
 
-A common use-case, not currently supported in the myDIG user interface, is one where you have a collection of JSON documents, and you want to ingest them into DIG so that you can search them using DIG.
-The procedure to ingest JSON documents involves the following steps:
+class CustomETKModule(ETKModule):
+    def __init__(self, etk):
+        # initialize extractors and other relevant variables
 
-- Preparing JSON documents for ingestion
-- Define DIG fields to store values
-- Define supplementary ETK configuration files
-- Run the extraction pipeline
-
-### Preparing JSON Documents For Ingestion In DIG
-
-DIG can ingest arbutrary JSON documents that have the following attributes:
-
-- `doc_id`: an arbitrary string to identify each document. Each distinct document should have different `doc_id`s. When multiple documents have the same `doc_id`, only the last one processed will appear in the search engine. 
-- `url`: a possbily made-up URL for the document. DIG groups documents based on the domain name in the `url`, so every document must have a `url`. It is not necessary that the `url` can be fetched.
-- `raw_cpntent`: an optional HTML rendition of the document, used for display. The attribute must be present even if it's value is empty.
-
-The documents must be stored in a JSON lines file with `.jl` extension ([http://jsonlines.org/](http://jsonlines.org/)), one document per line.
-If the resulting file is large, you can compress it using `gzip` (DIG only recognizes `gz` files and will report an error with any other compression format).
-
-> Hands on: in myDIG, load the `acled.jl` and `pitf.jl` files found in `dig-etl-engine/datasets/events`
-
-The example files are typical JSON document containing attributes, lists and nested objects:
+    def process_document(self, doc: Document):
+        """
+          The knowledge graph is built in this function.
+          Extract values/entities and add them to the Knowledge Graph, extensive examples are in the 
+          etk repository.
+          Depending on the file type, etk modules vary in their structure, 
+          this is discussed later in this guide
+        """
+        
+    def document_selector(self, doc) -> bool:
+        """
+        Boolean function for selecting document. 
+        The purpose of this function is to determine whether the input record, 
+        belonging to a particular dataset, should be processed by this ETK module. 
+        There maybe numerous datasets in your project and each of them could be 
+        processed by a dedicated ETK module
+        
+        Returns true or false based on some condition, for eg:
+          - if url starts with certain string ?
+          - if a particular field exists in the input Document?
+          - if value of a particular field matches a string ?
+        """
+        return DefaultDocumentSelector().select_document(doc)
 
 ```
-{
-  "event_type": [
-    "Incident",
-    "Targeted Assassination",
-    "Firearms"
-  ],
-  "title": "Armed men shot dead the village chief of...",
-  "url": "http://eventdata.parusanalytics.com/data.dir/atrocities.html",
-  "raw_content": ".",
-  "death_count": 1,
-  "injured_count": 0,
-  "actors": [
-    {
-      "id": "gunmenunknownunknownunclearother",
-      "description": "Unknown/Unclear/Other",
-      "title": "Unknown gunmen"
-    },
-    {
-      "id": "assertedchiefcontestednoncombatantnoncombatantnotstatusstatusvillage",
-      "description": "Noncombatant Status Asserted",
-      "title": "Noncombatant Status Not Contested village chief"
-    }
-  ],
-  "location": "Afghanistan AFG Jowzjan Mangajek Chahar Shanghoy village",
-  "references": [
-    "BBC",
-    "International"
-  ],
-  "event_date": "2016-01-06T00:00:00",
-  "doc_id": "88f4c4fa-bae7-11e7-b53a-94dbc9484288",
-  "@type": "event",
-  "description": "Armed men shot dead the village chief of Chahar Shanghoy of Mangajek District in [northern] Jowzjan Province"
-}
-```
+### ETK Module with an example
+Let's take a look at the elicit events data from the [User Guide](index.md) and the 
+corresponding etk module used to process it.
 
-### Define DIG Fields To Store Values
+> When we imported the project settings, we imported the etk module as well.
 
-The DIG search inteface shows fields that you define in your myDIG project. You must define the fields where you want to store the values you get from your JSON file.
-Sometimes, you may want to define fields with identical names as the attributes in your JSON file, but sometimes you may already have fields in your project where you want to store the data.
-Also, you may want to use different names, and often you may want to extract information from the values in your JSON document before you put these values in fields.
-
-> Hands-on: go to the `Fields` tab in your `events` project and define the following fields:
-
-| field | description | type |
-| :----- | :--- | :-- |
-| event_date | to hold the `event_date` values | string |
-| event_type | to hold the `event_type` values | string |
-| actor_description | to hold the `description` of `actors` | string |
-| location | to hold the `location` | string |
-| actor_title | to hold the `title` of `actors` | string |
-| death_count | to hold the `death_count` | string |
-| injured_count | to hold the `injured_count` | string |
-| _actor_kg_id | to hold the `id` of `actors` | string |
-| references | to hold `references` | string |
-
-> Hands-on: delete the fields `address`, `email`, `phone`, `stock_ticker`, `posting_date`
-
-Note: the current version of the DIG user interface does not support nested object. In the example, you will map all attributes of `actors` to separate fields. When there are multiple `actors` the knowledge graph (KG) will have a list in each field. This is not ideal, but the best possible in this version of DIG.
-
-Note: you are defining a new date field called `event_date` and deleting the `posting_date` that gets crated by default. This is not strictly necessary, but I recommend that you use good names for your fields so that others can understand your project.
-
-### Define Supplementary ETK Config Files
-
-To ingest uour JSON file in DIG, you need to tell DIG how to populate the fields in your project using data fromyour JSON file. 
-You need to define a confguration file with the following structure:
+One record from event data has the following structure:
 
 ```
-{
-  "content_extraction": {
-    "json_content": [
-    ]
-  },
-  "data_extraction": [
-  ]
-}
-```
-
-The configuration file has two sections, corresponding to two stages in the processing pipeline.
-
-The first stage, called *content extraction* segments input files into pieces called *segments*. When the pipeline processes an HTML files, the typical segements are url, title and content; when processing processing tables the segments are rows and cells; when processing JSON files, the segments correspond to pieces of your JSON file that you define usng JSON paths.
-
-The second stage, called *data extraction* applies extractors to segments and stores the results of the extraction in fields.
-
-You use a configuration file to tell the pipeline how to construct segments and what extractors you want to apply to each segment.
-You can give this file any name you want. It must have a `.json` extension, and you must store this file in `mydig-projects/<project-name>/working_dir/additional_etk_config/`
-
-> Hands-on: create the file `events/working_dir/additional_etk_config/etk_config_supplement.json` in the folder you configured in your `.env` file.
-> Put the following document in this file:
-> 
-```
-{
-  "content_extraction": {
-    "json_content": [
-      {
-        "input_path": "title",
-        "segment_name": "event_title"
-      },
-      {
-        "input_path": "description",
-        "segment_name": "description_1"
-      },
-      {
-        "input_path": "url",
-        "segment_name": "url"
-      },
-      {
-        "input_path": "event_type",
-        "segment_name": "event_type"
-      },
-      {
-        "input_path": "death_count",
-        "segment_name": "death_count"
-      },
-      {
-        "input_path": "injured_count",
-        "segment_name": "injured_count"
-      },
-      {
-        "input_path": "references",
-        "segment_name": "references"
-      },
-      {
-        "input_path": "location",
-        "segment_name": "location"
-      },
-      {
-        "input_path": "event_date",
-        "segment_name": "event_date"
-      },
-      {
-        "input_path": "actors[*].id",
-        "segment_name": "_actor_kg_id"
-      },
-      {
-        "input_path": "actors[*].title",
-        "segment_name": "actor_title"
-      },
-      {
-        "input_path": "actors[*].description",
-        "segment_name": "actor_description"
-      }
-    ]
-  },
-  "data_extraction": [
-    {
-      "input_path": "content_extraction.event_title[*]",
-      "fields": {
-        "title": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.description_1[*]",
-      "fields": {
-        "description": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.url[*]",
-      "fields": {
-        "url": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.event_type[*]",
-      "fields": {
-        "event_type": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.death_count[*]",
-      "fields": {
-        "death_count": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.injured_count[*]",
-      "fields": {
-        "injured_count": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.references[*]",
-      "fields": {
-        "references": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.location[*]",
-      "fields": {
-        "location": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.event_date[*]",
-      "fields": {
-        "event_date": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction._actor_kg_id[*]",
-      "fields": {
-        "_actor_kg_id": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.actor_description[*]",
-      "fields": {
-        "actor_description": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.actor_title[*]",
-      "fields": {
-        "actor_title": {
-          "extractors": {
-            "extract_as_is": {}
-          }
-        }
-      }
-    },
-    {
-      "input_path": "content_extraction.location[*]",
-      "fields": {
-        "country": {
-          "extractors": {
-            "extract_using_dictionary": {
-              "config": {
-                "ngrams": 3,
-                "dictionary": "countries",
-                "case_sensitive": false
-              }
-            }
-          }
-        },
-        "city_name": {
-          "extractors": {
-            "extract_using_dictionary": {
-              "config": {
-                "ngrams": 3,
-                "dictionary": "cities",
-                "case_sensitive": false
-              }
-            }
-          }
-        }
-      }
-    }
-  ]
-}
-```
-
-
-
-
-#### Content Extraction Section
-
-The `content_extraction` section consists of an list of objects with two attributes each:
-
-- `input_path`: a JSON path to select values in your JSON file (see ([http://goessner.net/articles/JsonPath/](http://goessner.net/articles/JsonPath/) for details on the syntax of JSON paths)
-- `segment_name`: the name of a segement to store the values fetched using the `input_path`; you can choose arbutary names.
-
-> In the current version of DIG, the JSON path must select literal values (string,  number, Boolean). Selecting objects or lists will produce an error.
-
-The `content_extraction` section for JSON files often mirrors the structure of the JSON file, i.e., there is a segment for each attribute.
-Note the more complex JSON paths used for the `_actor_kg_id`, `actor_title` and `actor_description` segments. These JSON paths select all the values of selected attributes from the nested objects, producing a list of values.
-
-
-#### Data Extraction Section
-
-The `data_extraction` section consists of a list of objects with two attributes:
-
-- `input_path`: a JSON path to select a segment
-- `fields`: a dictionary to specify the fields that will be populated using the information in the selected segment. Note that the segment may contain a list of values, so the fields will be populated all the segment values.
-
-The fields dictionary has the following structure:
-
-```
-{ <field-name-1>: 
   {
-    "extractors": {
-      <extractor-1>: {
-        <extractor-1 arguments>
-      },
-      <extractor-2>: {
-        <extractor-2 arguments>
-      },
-      ...
-    }
-  },
-  <field-name-2>: 
-   { ... },
-  <field-name-3>: 
-   { ... }, 
-  ...
+    "url": "http://www.ce_news_article.org/2016/01/01/201601010124.html",
+    "doc_id": "4371C3A9FDB4BA949C7B895D091957E74E4903EA251AD430F39076024F647AF4",
+    "raw_content" : "<html>event related html data in html structure</html>"
+  }
+```
+> This one json line is converted to a [Document](https://github.com/usc-isi-i2/etk/blob/master/etk/document.py) 
+object in myDIG and this object is passed to the `process_document` function
+
+Lets dissect the [etk module](https://github.com/usc-isi-i2/dig-etl-engine/blob/development/datasets/etk_modules/em_elicit.py)
+for this dataset.
+
+#### Import Statements
+```
+# Importing the extractors we are going to use
+from etk.extractors.html_content_extractor import HTMLContentExtractor, Strategy
+from etk.extractors.html_metadata_extractor import HTMLMetadataExtractor
+from etk.extractors.date_extractor import DateExtractor
+from etk.extractors.glossary_extractor import GlossaryExtractor
+
+# Import etk module related classes
+from etk.etk_module import ETKModule
+```
+
+#### Define custom class and initialization
+```
+class DemoElicitETKModule(ETKModule):
+    def __init__(self, etk):
+        # initialize super class
+        ETKModule.__init__(self, etk)
+        
+        # initialize metadata extractor (extracts metadata from html pages)
+        self.metadata_extractor = HTMLMetadataExtractor()
+        
+        # initialize content extractor (extracts `content` from html page. Tries to identify main text in the html)
+        self.content_extractor = HTMLContentExtractor()
+        
+        # initialize a date extractor (can normalize a variety of date formats)
+        self.date_extractor = DateExtractor(self.etk, 'demo_date_parser')
+        
+        # initialize a glossary extractor for countries with a bunch of extractor level parameters
+        self.country_extractor = GlossaryExtractor(
+            self.etk.load_glossary(
+                "${GLOSSARY_PATH}/countries.txt"),
+            "country_extractor",
+            self.etk.default_tokenizer,
+            case_sensitive=False, ngrams=3)
+            
+        # initialize a glossary extractor for cities
+        self.cities_extractor = GlossaryExtractor(
+            self.etk.load_glossary(
+                "${GLOSSARY_PATH}/cities.txt"),
+            "cities_extractor",
+            self.etk.default_tokenizer,
+            case_sensitive=False, ngrams=3)
+```
+> These glossaries should be present in your project.
+
+***Exercise: Find the glossary page in myDIG UI and see if the glossaries match the ones used in this etk module***
+
+#### process_document function (this is where the Knowledge Graph is built)
+```
+    def process_document(self, doc):
+        """
+        Add your code for processing the document
+        """
+
+        # define a segment of the document on which on run extractors
+        raw = doc.select_segments("$.raw_content")[0]
+        
+        # extract text from the segment using the strategies: `ALL_TEXT`, `MAIN_CONTENT_STRICT` and `MAIN_CONTENT_RELAXED`
+        # and store the output in document itself
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.ALL_TEXT), "etk2_text")
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_STRICT),
+                  "etk2_content_strict")
+        doc.store(doc.extract(self.content_extractor, raw, strategy=Strategy.MAIN_CONTENT_RELAXED),
+                  "etk2_content_relaxed")
+        
+        # extract metadata from the segment
+        doc.store(doc.extract(self.metadata_extractor,
+                              raw,
+                              extract_title=True,
+                              extract_meta=True,
+                              extract_microdata=True,
+                              extract_rdfa=True,
+                              ), "etk2_metadata")
+        
+        # start building the knowledge graph, add title and description from 
+        # previously extracted description and title
+        doc.kg.add_value("description", json_path="$.etk2_content_strict")
+        doc.kg.add_value("title", json_path="$.etk2_metadata.title")
+
+        description_segments = doc.select_segments(jsonpath='$.etk2_content_strict')
+        for segment in description_segments:
+            extractions = doc.extract(extractor=self.date_extractor, extractable=segment)
+            for extraction in extractions:
+                # extract date and add to KG
+                doc.kg.add_value("event_date", value=extraction.value)
+    
+                extracted_countries = doc.extract(
+                    self.country_extractor, segment)
+                
+                # extract country and add to KG
+                doc.kg.add_value('country', value=extracted_countries)
+
+                extracted_cities = doc.extract(self.cities_extractor, segment)
+                
+                # extract city and add to KG
+                doc.kg.add_value('city', value=extracted_cities)
+        
+        # return empty list if no additional Documents were created in this function
+        return list()
+```
+
+There is a lot to unpack in this etk module. First we initialize some extractors, please refer the [documentation](https://usc-isi-i2.github.io/etk/).
+
+Next we define a Segment, which is basically subpart of the document. We then proceed to extract text from the segment followed by extracting entities like title, description, city, country etc. Then we build the knowledge graph by calling the
+function `doc.kg.add_value('some_field', extractions)`.
+
+While building the knowledge graph, we can only use fields which already exist in myDIG fields menu.
+
+***Exercise: Find the fields page in myDIG and confirm that all the fields in the knowledge graph are present in myDIG***
+
+Users don't have to follow the above etk module's structure. They have the flexibility to write an etk modules in a lot of ways.
+
+For example, they can extract entities without defining a segment first. Or they don't have to store intermittent results in the document. The results can be added to the KG at any point.
+
+Examples of ETK modules are available [here](https://github.com/usc-isi-i2/etk/tree/master/examples)
+
+#### document_selector function, returns a boolean if the current Document should be processed by this etk module
+```
+ def document_selector(self, doc) -> bool:
+        return doc.cdr_document.get("url").startswith("http://www.ce_news_article.org")
+```
+
+We are checking if the value of field `url` starts with `http://www.ce_news_article.org`, you can scroll up and confirm yourself. myDIG calls this function to check whether the input record should be processed by the this ETK module.
+
+## Ingesting different file types
+myDIG can now process various file types.
+
+All supported file types are: csv, tsv, xls, xlsx, html, json, and json lines
+
+From the myDIG UI, only json lines file (.jl) can be uploaded, and if the file size is huge (> 200 MB), you can gzip the file. Please note that only .gz files are accepted, any other compression format will result in myDIG throwing an error.
+
+However, you can programmatically upload other file types as explained below.
+
+### Uploading files to myDIG
+```
+    def upload_files_mydig(file_path, url, dataset, file_type):
+        file_name = os.path.basename(file_path)
+        payload = {
+            'file_name': file_name,
+            'file_type': file_type,
+            'dataset': dataset
+        }
+        files = {
+            'file_data': (file_name, open(file_path, mode='rb'), 'application/octet-stream')
+        }
+        
+        resp = requests.post(url, data=payload, files=files)
+
+        return resp.status_code
+```
+The parameters to the function:
+`file_path`: local file path to the file you are trying to upload to myDIG.
+
+`url`: URL for the myDIG file upload endpoint, for local installations it is - 
+http://{USERNAME}:{PASSWORD}@localhost:12497/mydig/projects/{project_name}/data?sync=false&log=true
+
+`dataset`: a string describing your file. This will appear in the `ACTIONS` view of your myDIG project page under the column `TLD`.
+
+`file_type`: file type is determined by the following function. It can be one of the three values : `csv` or `html` or `json_lines`
+
+```
+def determine_file_type(file_type):
+    if file_type in ['csv', 'xls', 'xlsx']:
+        return 'csv'
+    if file_type in ['html', 'shtml', 'htm']:
+        return 'html'
+    if file_type in ['json', 'jl']:
+        return 'json_lines'
+    return file_type
+```
+
+### ETK Modules for different file types
+
+The way the data is processed by myDIG and fed to `process_document` varies slightly, depending on the uploaded file type. The structure of ETK module changes accordingly. In this section we will discuss the variations in the ETK modules.
+
+#### JSON lines file
+This is the simplest scenario and we have already covered it with the introductory example.
+
+#### CSV, TSV or Excel file
+Lets go behind the scenes in myDIG and try to understand what happens when we upload this file type.
+When myDIG receives such a file, we store the uploaded file at this location,
+
+`{DIG_PROJECTS_DIR_PATH}/{project_name}/user_uploaded_files`,
+
+where `DIG_PROJECTS_DIR_PATH` is defined in the .env file and `project_name` is the name of the project.
+
+Then we create a json object with the following structure,
+```
+{
+	"raw_content_path": "path as described above, where myDIG stores the file",
+	"dataset": "the string as described in the section `Uploading files to myDIG`",
+	...
+}
+```
+This json is then initiated to a `Document` object and passed to ETK module. Users should read the file, in the etk module,  using the `raw_content_path` field and process the file appropriately.
+
+Example ETK module,
+```
+...
+from etk.csv_processor import CsvProcessor
+...
+
+class SampleETKModule(self, etk):
+ def __init__(self, etk):
+        ...
+        self.csv_processor = CsvProcessor(etk=etk, heading_row=1) # More details in the etk documentation
+        ...
+
+def process_document(self, doc: Document):
+        doc_json = doc.cdr_document
+        if 'raw_content_path' in doc_json and doc_json['raw_content_path'].strip() != '':
+            try:
+                docs = self.csv_processor.tabular_extractor(filename=doc_json['raw_content_path'],
+                                                            dataset=doc_json['dataset'])
+                ...
+                # build Knowledge Graph
+                ...
+```
+A full ETK module to process a csv file is [here](https://github.com/usc-isi-i2/etk/blob/development/examples/acled/em_acled.py)
+
+#### HTML file
+In this case, when we receive a html file, we read the contents of the html file, create a json object and store it in the field `raw_content`.
+Like so,
+```
+{
+	"raw_content": "html content of the uploaded file",
+	"dataset": "the string as described in the section `Uploading files to myDIG`",
+	...
 }
 ```
 
-From each segment, you can populate multiple fields, and for each field you can specify multiple extractors to extract values from the segment to populate the field.
+This object is passed to the `process_document` function and can be processed in a similar fashion as discussed in the introductory example.
 
-In the example for events, many of the data extraction objects are simple, they populate a single field, and use an extractor called `extract_as_is`, which returns the value of the segment without modification.
+This concludes our section of ETK Modules for different file types.
 
-The data extraction section for the `location` segment is more interesting as it is used to populate two fields, `country` and `city_name`. The reason for this is that the location field contains values such as 
-"Afghanistan AFG Jowzjan Mangajek Chahar Shanghoy village", text that contains the names of countries and cities. The configuration file uses glossaries of country and city names to pull these values from the location strings.
+***Important: the etk module file names should start with `em_` to be picked up by myDIG***
 
-### Run The Extraction Pipeline
+## Tying everything together in myDIG
 
-Once you define the configuration file, you are ready to run the extraction pipeline. Click on the red `Recreate Knowledge Graph` button to rebuild the knowledge graph using you new configuration file.
+In this section we will explain what to do after you have written an ETK module.
 
-> Note: you can define multiple supplemental configuration files to keep your work organized. It is a good idea to create separate configuration files for each kind of JSON file you have.
+Copy the etk module at this location,
 
-If all goes well, in the DIG search user interface you will see a screen that looks something like this. Note that I defined nice icons, colors and placement for the fields to produce a nice looking screen:
+`{DIG_PROJECTS_DIR_PATH}/{project_name}/working_dir/additional_ems/`
 
-![Events Search Screen][search-screen]
+myDIG reads all the etk modules from this location and processes the datasets using these modules. Herein comes the role of the `document_selector` function. An ETK module will process a dataset, if the `document_selector` returned true for that particular dataset.
 
-Once the project gets created, click on the `Open` button to go to the page to configure your project.
+Suppose you already have some datasets and corresponding ETK modules, the pipeline is running and data is being processed.
+Now if you want to add another dataset to the mix and have one more etk module, you should do the following, in order:
 
-## Handling Titles and Descriptions
+1. Upload the dataset to myDIG, keep the `Desired` to 0.
+2. Copy the ETK module to the correct path as described above.
+3. Stop the pipeline, and then start the pipeline.
+4. Update the `Desired` to a non zero number for that dataset.
 
-THe DIG screens require that you define `title` and `description` fields. You config file should define `data_extraction` sections that populate `title` and `description`
+If there are no errors, the data should be processed in couple of minutes.
 
-## Creating Maps
 
-Maps are created from fields whose `type` is `location` as defined in the field editor in my DIG. 
-
-By default, when you create a new project, it will have fields `city`, `city_name`, `state` and `country`. In addition, DIG includes an entity resolution algorithm that resolves city_name/state/country fields to geonames, and stores the resolved cities in field `city`. 
-
-To take advantage of this capability, you should define `data_extraction` sections to populate the values of `city_name`, `state` and `country`.
-
-> **Super important**: **never** define extractions for field `city`. if you have city names, put them in field `city_name`. Otherwise you will mess things up, and the cities will not be displayed on the map.
-
-> Note: in the week of November 12 we will release a version of DIG that can ingest latitude/longitude values from JSON files and create locations that can appear on maps.
-
-Here is an example of a page that shows a map. It is the page for entity "boko haram":
-
-![Boko Haram Entity Page][boko-haram]
