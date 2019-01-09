@@ -124,7 +124,7 @@ class DemoElicitETKModule(ETKModule):
 
 > ***Exercise: Find the glossary page in myDIG UI and see if the glossaries match the ones used in this etk module***
 
-#### process_document(doc: Document) function (this is where the Knowledge Graph is built)
+#### process_document function (this is where the Knowledge Graph is built)
 ```
     def process_document(self, doc):
         """
@@ -193,10 +193,59 @@ For example, they can extract entities without defining a segment first. Or they
 
 Examples of ETK modules are available [here](https://github.com/usc-isi-i2/etk/tree/master/examples)
 
-### document_selector() function, returns a boolean if the current Document should be processed by this etk module
+#### document_selector function, returns a boolean if the current Document should be processed by this etk module
 ```
  def document_selector(self, doc) -> bool:
         return doc.cdr_document.get("url").startswith("http://www.ce_news_article.org")
 ```
 
-We are checking if the value of field `url` starts with `http://www.ce_news_article.org`. Which you can scroll up and confirm this yourself. myDIG call this function to check whether the input record should be processed by the current ETK module.
+We are checking if the value of field `url` starts with `http://www.ce_news_article.org`, you can scroll up and confirm yourself. myDIG calls this function to check whether the input record should be processed by the this ETK module.
+
+## Ingesting different file types
+myDIG can now process a various file types.
+
+All supported file types are: csv, tsv, xls, xlsx, html, json, and json lines
+
+From the myDIG UI, only json lines file (.jl) can be uploaded, and if the file size is huge (> 200 MB), you can gzip the file. Please note that only .gz files are accepted, any other compression format will result in myDIG throwing an error.
+
+However, you can programmatically upload other file types as explained below.
+
+### Uploading files to myDIG
+```
+    def upload_files_mydig(file_path, url, dataset, file_type):
+        file_name = os.path.basename(file_path)
+        payload = {
+            'file_name': file_name,
+            'file_type': file_type,
+            'dataset': dataset
+        }
+        files = {
+            'file_data': (file_name, open(file_path, mode='rb'), 'application/octet-stream')
+        }
+        
+        resp = requests.post(url, data=payload, files=files)
+
+        return resp.status_code
+```
+The parameters to the function:
+`file_path`: local file path to the file you are trying to upload to myDIG.
+
+`url`: URL for the myDIG file upload endpoint, for local installations it is - 
+http://{USERNAME}:{PASSWORD}@localhost:12497/mydig/projects/{project_name}/data?sync=false&log=true
+
+`dataset`: a string describing your file. This will appear in the `ACTIONS` view of your myDIG project page under the column `TLD`.
+
+`file_type`: file type is determined by this simple function. It can be one of the three values : `csv` or `html` or `json_lines`
+
+```
+def determine_file_type(file_type):
+    if file_type in ['csv', 'xls', 'xlsx']:
+        return 'csv'
+    if file_type in ['html', 'shtml', 'htm']:
+        return 'html'
+    if file_type in ['json', 'jl']:
+        return 'json_lines'
+    return file_type
+```
+
+### ETK Modules for different file types
