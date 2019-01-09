@@ -235,7 +235,7 @@ http://{USERNAME}:{PASSWORD}@localhost:12497/mydig/projects/{project_name}/data?
 
 `dataset`: a string describing your file. This will appear in the `ACTIONS` view of your myDIG project page under the column `TLD`.
 
-`file_type`: file type is determined by this simple function. It can be one of the three values : `csv` or `html` or `json_lines`
+`file_type`: file type is determined by the following function. It can be one of the three values : `csv` or `html` or `json_lines`
 
 ```
 def determine_file_type(file_type):
@@ -249,3 +249,67 @@ def determine_file_type(file_type):
 ```
 
 ### ETK Modules for different file types
+
+The way the data is processed by myDIG and fed to `process_document` varies slightly, depending on the uploaded file type. The structure of ETK module changes accordingly. In this section we will discuss the variations in the ETK modules.
+
+#### JSON lines file
+This is the simplest scenario and we have already covered it with the introductory example.
+
+#### CSV, TSV or Excel file
+Lets go behind the scenes in myDIG and try to understand what happens when we upload this file type.
+When myDIG receives such a file, we store the uploaded file at this location,
+
+`{DIG_PROJECTS_DIR_PATH}/{project_name}/user_uploaded_files`,
+
+where `DIG_PROJECTS_DIR_PATH` is defined in the .env file and `project_name` is the name of the project.
+
+Then we create a json object with the following structure,
+```
+{
+	"raw_content_path": "path as described above, where myDIG stores the file",
+	"dataset": "the string as described in the section `Uploading files to myDIG`",
+	...
+}
+```
+This json is then passed to ETK module. Users should read the file using the `raw_content_path` field and process the file appropriately.
+
+Example ETK module,
+```
+...
+from etk.csv_processor import CsvProcessor
+...
+
+class SampleETKModule(self, etk):
+ def __init__(self, etk):
+        ...
+        self.csv_processor = CsvProcessor(etk=etk, heading_row=1) # More details in the etk documentation
+        ...
+
+def process_document(self, doc: Document):
+        doc_json = doc.cdr_document
+        if 'raw_content_path' in doc_json and doc_json['raw_content_path'].strip() != '':
+            try:
+                docs = self.csv_processor.tabular_extractor(filename=doc_json['raw_content_path'],
+                                                            dataset=doc_json['dataset'])
+                ...
+                # build Knowledge Graph
+                ...
+```
+A full ETK module to process a csv file is [here](https://github.com/usc-isi-i2/etk/blob/development/examples/acled/em_acled.py)
+
+#### HTML file
+In this case, when we receive a html file, we read the contents of the html file, create a json object and store it in the field `raw_content`.
+Like so,
+```
+{
+	"raw_content": "html content of the uploaded file",
+	"dataset": "the string as described in the section `Uploading files to myDIG`",
+	...
+}
+```
+
+This object is passed to the `process_document` function and can be processed in a similar fashion as discussed in the introductory example.
+
+This concludes our section of ETK Modules for different file types.
+
+> ***Important: the etk module file names should start with `em_` to be picked up by myDIG***
