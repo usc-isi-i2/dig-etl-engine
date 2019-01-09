@@ -1,7 +1,7 @@
 # Processing Data in myDIG
 
-This guide will explain how to process data in the latest version of myDIG. This version of myDIG provides a lot of freedom and 
-flexibility to users.
+This guide will explain how to process data in the latest version of myDIG. This version rovides a lot of freedom and 
+flexibility to users in terms of data processing.
 The guide assumes that you already read the [User Guide](index.md) and that you have already defined a project and used the 
 processing pipeline to build a search engine for corpus of documents.
 
@@ -13,9 +13,7 @@ We will cover the following topics in this guide:
 
 ## ETK modules
 
-[ETK](https://github.com/usc-isi-i2/etk) modules are python scripts, which are used by myDIG to process data. We have moved on from config based extraction pipeline
-to etk modules. This is a significantly big change as compared to the previous version of myDIG. We no longer supply 
-supplementary config files to define the extractions, instead the users are given flexibility to write code.
+[ETK](https://github.com/usc-isi-i2/etk) modules are python scripts, which are used by myDIG to process data and build knowledge graphs. We have moved on from config based extraction to etk modules. This is a significantly bigger change  compared to the previous version. We no longer write supplementary config files to define the extractions, instead the users are given flexibility to write code.
 
 The [etk documentation](https://usc-isi-i2.github.io/etk/) explains the classes and available extractors.
 
@@ -201,7 +199,7 @@ Examples of ETK modules are available [here](https://github.com/usc-isi-i2/etk/t
 We are checking if the value of field `url` starts with `http://www.ce_news_article.org`, you can scroll up and confirm yourself. myDIG calls this function to check whether the input record should be processed by the this ETK module.
 
 ## Ingesting different file types
-myDIG can now process a various file types.
+myDIG can now process various file types.
 
 All supported file types are: csv, tsv, xls, xlsx, html, json, and json lines
 
@@ -270,7 +268,7 @@ Then we create a json object with the following structure,
 	...
 }
 ```
-This json is then passed to ETK module. Users should read the file using the `raw_content_path` field and process the file appropriately.
+This json is then initiated to a `Document` object and passed to ETK module. Users should read the file, in the etk module,  using the `raw_content_path` field and process the file appropriately.
 
 Example ETK module,
 ```
@@ -321,18 +319,16 @@ Copy the etk module at this location,
 
 `{DIG_PROJECTS_DIR_PATH}/{project_name}/working_dir/additional_ems/`
 
-myDIG reads all the etk modules from this location and processes the datasets using these modules. Herein comes the role of the `document_selector` function. An ETK modules will process a dataset, if the `document_selector` returned true for that particular dataset.
+myDIG reads all the etk modules from this location and processes the datasets using these modules. Herein comes the role of the `document_selector` function. An ETK module will process a dataset, if the `document_selector` returned true for that particular dataset.
 
 Suppose you already have some datasets and corresponding ETK modules, the pipeline is running and data is being processed.
-Now if you want to add another dataset to the mix and have one more etk module.
-
-You should do the following, in order:
+Now if you want to add another dataset to the mix and have one more etk module, you should do the following, in order:
 
 1. Upload the dataset to myDIG, keep the `Desired` to 0.
 2. Copy the ETK module to the correct path as described above.
 3. Stop the pipeline, and then start the pipeline.
 4. Update the `Desired` to a non zero number for that dataset.
 
-If there are no errors, the data should be processed in couple of seconds.
+If there are no errors, the data should be processed in couple of minutes.
 
 
