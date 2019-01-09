@@ -9,7 +9,6 @@ We will cover the following topics in this guide:
 
 - ETK modules - a new way to process your data
 - Ingesting different file types (csv, xls, xlsx, html etc)
-- Defining DIG fields and their correlation to Knowledge Graph
 - Tying everything together in myDIG
 
 ## ETK modules
@@ -122,7 +121,7 @@ class DemoElicitETKModule(ETKModule):
 ```
 > These glossaries should be present in your project.
 
-> ***Exercise: Find the glossary page in myDIG UI and see if the glossaries match the ones used in this etk module***
+***Exercise: Find the glossary page in myDIG UI and see if the glossaries match the ones used in this etk module***
 
 #### process_document function (this is where the Knowledge Graph is built)
 ```
@@ -185,7 +184,7 @@ function `doc.kg.add_value('some_field', extractions)`.
 
 While building the knowledge graph, we can only use fields which already exist in myDIG fields menu.
 
-> ***Exercise: Find the fields page in myDIG and confirm that all the fields in the knowledge graph are present in myDIG***
+***Exercise: Find the fields page in myDIG and confirm that all the fields in the knowledge graph are present in myDIG***
 
 Users don't have to follow the above etk module's structure. They have the flexibility to write an etk modules in a lot of ways.
 
@@ -312,4 +311,28 @@ This object is passed to the `process_document` function and can be processed in
 
 This concludes our section of ETK Modules for different file types.
 
-> ***Important: the etk module file names should start with `em_` to be picked up by myDIG***
+***Important: the etk module file names should start with `em_` to be picked up by myDIG***
+
+## Tying everything together in myDIG
+
+In this section we will explain what to do after you have written an ETK module.
+
+Copy the etk module at this location,
+
+`{DIG_PROJECTS_DIR_PATH}/{project_name}/working_dir/additional_ems/`
+
+myDIG reads all the etk modules from this location and processes the datasets using these modules. Herein comes the role of the `document_selector` function. An ETK modules will process a dataset, if the `document_selector` returned true for that particular dataset.
+
+Suppose you already have some datasets and corresponding ETK modules, the pipeline is running and data is being processed.
+Now if you want to add another dataset to the mix and have one more etk module.
+
+You should do the following, in order:
+
+1. Upload the dataset to myDIG, keep the `Desired` to 0.
+2. Copy the ETK module to the correct path as described above.
+3. Stop the pipeline, and then start the pipeline.
+4. Update the `Desired` to a non zero number for that dataset.
+
+If there are no errors, the data should be processed in couple of seconds.
+
+
