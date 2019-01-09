@@ -6,15 +6,12 @@ from etk.extractors.glossary_extractor import GlossaryExtractor
 
 
 class DemoElicitETKModule(ETKModule):
-    """
-    Abstract class for extraction module
-    """
 
     def __init__(self, etk):
         ETKModule.__init__(self, etk)
         self.metadata_extractor = HTMLMetadataExtractor()
         self.content_extractor = HTMLContentExtractor()
-        self.date_extractor = DateExtractor(self.etk, 'acled_date_parser')
+        self.date_extractor = DateExtractor(self.etk, 'demo_date_parser')
         self.country_extractor = GlossaryExtractor(
             self.etk.load_glossary(
                 "${GLOSSARY_PATH}/countries.txt"),
